@@ -1,0 +1,56 @@
+import { GoogleGenAI } from "@google/genai";
+import { queryChunks } from "../ai/pinecone.js";
+
+export const genAI = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI });
+
+
+export const generateQuizQuestions = async ({ title, context, morecontext }) => {
+
+  const prompt = `
+
+You are an expert quiz generator.
+The title of quiz is ${title}
+Using ONLY the following context, create a quiz about: " with title as ${title} and more details of the quiz ${context} ".
+
+Extra Context:
+${morecontext || "No additional context provided."}
+
+Output:
+- Return ONLY a valid JSON array (no markdown, no extra text)
+- Each object should have: 
+  - "question": string
+  - "options": array of 4 strings
+  - "answer":index number of the answer
+
+  If user tells nothing about the number of questions then make atleast 10 otherwise listen tot what user says 
+Example:
+[
+  {
+    "question": "What is 2+2?",
+    "options": ["1", "2", "3", "4"],
+    "answer": 3 
+  }
+]
+
+just give response in json not in markdown format 
+
+`;
+
+  const result = await genAI.models.generateContent({
+    model: "gemini-2.0-flash",
+    contents: prompt,
+  });
+
+  let text = result.response?.candidates?.[0]?.content?.parts?.[0]?.text || result.text || "";
+
+  const jsonMatch = text.match(/```(?:json)?\n([\s\S]*?)```/);
+  const jsonString = jsonMatch ? jsonMatch[1] : text;
+
+  try {
+    const parsed = JSON.parse(jsonString);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    console.error("Failed to parse Gemini JSON:", e, "\nRaw text:", text);
+    return [];
+  }
+};

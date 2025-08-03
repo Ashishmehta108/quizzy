@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%; /* zinc-50 */
+    --foreground: 240 5% 10%; /* zinc-900 */
+
+    --card: 0 0% 100%; /* zinc-50 */
+    --card-foreground: 240 5% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 5% 10%;
+    --primary: 240 5% 26.1%; /* zinc-600 */
+
+    --primary-foreground: 210 40% 98%; /* white */
+
+    --secondary: 240 5% 96%; /* zinc-100 */
+    --secondary-foreground: 240 5% 10%; /* zinc-900 */
+
+    --muted: 240 4.8% 95.9%; /* zinc-100 */
+    --muted-foreground: 240 3.8% 46.1%; /* zinc-500 */
+
+    --accent: 240 5% 26.1%; /* zinc-600 */
+    --sidebar: #fafafa;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 240 5% 90%; /* zinc-200 */
+    --input: 240 5% 90%; /* zinc-200 */
+    --ring: 217.2 91.2% 59.8%; /* blue-600 */
+
+    --radius: 0.75rem;
+
+    /* Optional: soft brand colors */
+    --color-1: oklch(66.2% 0.225 25.9);
+    --color-2: oklch(60.4% 0.26 302);
+    --color-3: oklch(69.6% 0.165 251);
+    --color-4: oklch(80.2% 0.134 225);
+    --color-5: oklch(90.7% 0.231 133);
+  }
+
+  .dark {
+    --background: 240 5% 10%; /* zinc-900 */
+    --foreground: 240 5% 96%; /* zinc-100 */
+    --sidebar: #18181b;
+    --card: 240 5% 10%;
+    --card-foreground: 240 5% 96%;
+
+    --popover: 240 5% 10%;
+    --popover-foreground: 240 5% 96%;
+    --primary: 240 5% 26.1%; /* zinc-600 */
+
+    --primary-foreground: 240 5% 96%; /* zinc-100 */
+
+    --secondary: 240 3.7% 15.9%; /* zinc-800 */
+    --secondary-foreground: 240 5% 96%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 4.8% 65.1%; /* zinc-400 */
+
+    --accent: 217.2 91.2% 59.8%;
+    --accent-foreground: 240 5% 96%;
+
+    --destructive: 0 72% 40%;
+    --destructive-foreground: 240 5% 96%;
+
+    --border: 240 3.7% 15.9%; /* zinc-800 */
+    --input: 240 3.7% 15.9%;
+    --ring: 217.2 91.2% 59.8%;
+
+    --color-1: oklch(66.2% 0.225 25.9);
+    --color-2: oklch(60.4% 0.26 302);
+    --color-3: oklch(69.6% 0.165 251);
+    --color-4: oklch(80.2% 0.134 225);
+    --color-5: oklch(90.7% 0.231 133);
+  }
+
+  .theme {
+    --animate-marquee: marquee var(--duration) infinite linear;
+    --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+    --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-zinc-100 dark:bg-zinc-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-blue-400 dark:bg-blue-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-blue-500 dark:bg-blue-500;
+}
+
+@theme inline {
+  @keyframes rainbow {
+    0% {
+      background-position: 0%;
+    }
+    100% {
+      background-position: 200%;
+    }
+  }
+}
+
+.grid-container {
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  height: 100vh;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 1rem;
+}
