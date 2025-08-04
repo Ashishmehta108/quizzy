@@ -8,6 +8,7 @@ export interface QuizResponse {
   quiz: Quiz;
   document: Document;
   questions: Question[];
+  result: Result;
 }
 
 export type updatedQuestions = {
@@ -22,13 +23,13 @@ export interface Quiz {
   id: string;
   title: string;
   userId: string;
-  docId?: string;
+  createdAt: string;
 }
 
 export interface Document {
   id: string;
   userId: string;
-  createdAt: string; // ISO date string
+  createdAt: string;
 }
 
 export interface Question {
@@ -39,12 +40,18 @@ export interface Question {
   answer: number;
 }
 
+export interface ResultResponse {
+  data: Result;
+}
+
 export interface Result {
   id: string;
   quizId: string;
   userId: string;
+  title: string;
   score: number;
-  optionsReview: Record<string, number>;
+  optionsReview: string;
+  submittedAt: string;
   quiz?: Quiz;
 }
 

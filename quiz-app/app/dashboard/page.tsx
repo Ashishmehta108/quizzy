@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArchiveBook, TableDocument, Add } from "iconsax-reactjs";
+import { ArchiveBook, TableDocument, Add, Notepad2 } from "iconsax-reactjs";
 import { useAuthStore } from "@/store/auth";
-import { QuizCard } from "@/components/ui/quiz-card";
-import { ResultCard } from "@/components/ui/result-card";
+import { QuizTable } from "@/components/ui/quiz-card";
+import ResultTable from "@/components/ui/result-card";
 import {
   QuizCardSkeleton,
   ResultCardSkeleton,
@@ -58,7 +58,9 @@ export default function DashboardPage() {
   return (
     <div className="bg-white dark:bg-zinc-900">
       <main className="max-w-7xl container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-2xl font-medium mb-4">Dashboard</div>
+        <div className="text-2xl font-medium mb-4 flex items-center ">
+          Dashboard
+        </div>
 
         <Tabs defaultValue="quizzes" className="space-y-6">
           <TabsList className="grid w-full max-w-md grid-cols-2 mx-auto">
@@ -106,9 +108,7 @@ export default function DashboardPage() {
               </Card>
             ) : (
               <div className="flex flex-wrap justify-center gap-5 items-stretch max-w-6xl mx-auto">
-                {quizzes.map((quiz) => (
-                  <QuizCard key={quiz.quiz.id} quiz={quiz} />
-                ))}
+                <QuizTable quizzes={quizzes} />
               </div>
             )}
           </TabsContent>
@@ -130,7 +130,7 @@ export default function DashboardPage() {
             ) : results.length === 0 ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
-                  <TableDocument size="48" className="text-zinc-400 mb-4" />
+                  <Notepad2 size="48" className="text-zinc-400 mb-4" />
                   <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-2">
                     No results yet
                   </h3>
@@ -140,13 +140,12 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {
-                  //@ts-ignore
-                  results.data.map((result) => (
-                    <ResultCard key={result.id} result={result} />
-                  ))
-                }
+              <div className="w-full">
+                <ResultTable
+                  results={{
+                    data: results,
+                  }}
+                />
               </div>
             )}
           </TabsContent>

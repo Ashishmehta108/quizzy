@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthState>()(
             password,
           });
           const { token, user } = response.data;
-          localStorage.setItem("quiz-app-token", token);
+
           set({ user, token, isLoading: false });
         } catch (error) {
           set({ isLoading: false });
@@ -77,8 +77,6 @@ export const useAuthStore = create<AuthState>()(
           return res.data.user;
         } catch (error) {
           console.error("Failed to restore session:", error);
-          useAuthStore.setState({ user: null, token: null });
-          localStorage.removeItem("quiz-app-token");
         }
       },
     }),

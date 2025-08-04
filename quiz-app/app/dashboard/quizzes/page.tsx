@@ -7,8 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, BookOpen, Trophy, LogOut } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
-import { QuizCard } from "@/components/ui/quiz-card";
-import { ResultCard } from "@/components/ui/result-card";
+import { QuizTable } from "@/components/ui/quiz-card";
 import api from "@/lib/api";
 import type { Quiz, QuizResponse, Result } from "@/lib/types";
 import Link from "next/link";
@@ -31,7 +30,6 @@ export default function DashboardPage() {
       }
       fetchData();
     }
-    console.log(user);
   }, [user, router]);
 
   const fetchData = async () => {
@@ -62,15 +60,10 @@ export default function DashboardPage() {
     fetchData();
   }, []);
 
-  const handleLogout = () => {
-    logout();
-    router.push("/login");
-  };
-
   if (!user) return null;
 
   return (
-    <div className="bg-white max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 dark:bg-zinc-900">
+    <div className="bg-white max-w-7xl mx-auto container px-4 sm:px-6 lg:px-8 py-8 dark:bg-zinc-900">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold">Your Quizzes</h2>
@@ -114,10 +107,8 @@ export default function DashboardPage() {
         </Card>
       ) : (
         <div className="flex justify-center">
-          <div className="grid gap-6 md:grid-cols-1 my-5 lg:grid-cols-1 max-w-2xl w-full">
-            {quizzes.map((quiz) => (
-              <QuizCard key={quiz.quiz.id} quiz={quiz} />
-            ))}
+          <div className=" w-full">
+            <QuizTable quizzes={quizzes} />
           </div>
         </div>
       )}

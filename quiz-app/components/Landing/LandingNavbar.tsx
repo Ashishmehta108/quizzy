@@ -38,7 +38,7 @@ export function NavbarDemo() {
       <Navbar>
         {/* Desktop Navigation */}
         <NavBody>
-          <NavbarLogo  logo={logo.src} />
+          <NavbarLogo logo={logo.src} />
           <NavItems items={navItems} />
           <div className="flex items-center gap-4">
             <NavbarButton
@@ -48,9 +48,9 @@ export function NavbarDemo() {
               {" "}
               <ModeToggle />
             </NavbarButton>
-            <NavbarButton variant="primary">
-              <Link href={"/login"}>Login</Link>
-            </NavbarButton>
+            <Link href={"/login"}>
+              <NavbarButton variant="primary"> Login</NavbarButton>
+            </Link>
           </div>
         </NavBody>
         <MobileNav>
@@ -77,15 +77,17 @@ export function NavbarDemo() {
                 <span className="block">{item.name}</span>
               </a>
             ))}
-            <div className="flex w-full flex-col gap-4">
+            <div className="flex w-full   flex-col gap-4">
               <ModeToggle />
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-              >
-                Login
-              </NavbarButton>
+              <Link href={"/login"}>
+                <NavbarButton
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  variant="primary"
+                  className="max-w-[100px]"
+                >
+                  Login
+                </NavbarButton>
+              </Link>
             </div>
           </MobileNavMenu>
         </MobileNav>

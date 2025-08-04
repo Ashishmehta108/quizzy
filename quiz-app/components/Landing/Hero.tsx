@@ -11,6 +11,7 @@ import {
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { SafariDashboard } from "./SafariDashboard";
+import Link from "next/link";
 
 export default function Hero() {
   const router = useRouter();
@@ -34,10 +35,6 @@ export default function Hero() {
                 <ArrowUpRight className="w-4 h-4 text-sky-500 hover:-translate-y-0.5 transition-transform hover:translate-x-0.5 " />
               </span>
             </div>
-            {/* <Badge className="mb-8 bg-white text-neutral-800 shadow-md shadow-cyan-500/20 border border-cyan-100/30  px-5 text-xs ">
-						<Sparkles className="w-4 h-4 mr-2" />
-						Powered by AI
-					</Badge> */}
           </AnimatedElement>
 
           <AnimatedElement delay={400}>
@@ -59,12 +56,13 @@ export default function Hero() {
           </AnimatedElement>
 
           <AnimatedElement delay={800}>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-10">
-             
-              <Button className="text-sm bg-blue-500 hover:bg-blue-600   font-medium group rounded-full py-6">
-                Start Creating Now{" "}
-              </Button>
-            </div>
+            <Link href={"/dashboard"}>
+              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-10">
+                <Button className="text-sm bg-blue-500 hover:bg-blue-600   font-medium group rounded-full py-6">
+                  Start Creating Now{" "}
+                </Button>
+              </div>
+            </Link>
           </AnimatedElement>
 
           <AnimatedElement

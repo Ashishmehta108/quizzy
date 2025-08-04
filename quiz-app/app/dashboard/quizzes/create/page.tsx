@@ -29,7 +29,7 @@ interface CreateQuizForm {
 
 export default function CreateQuizPage() {
   const [error, setError] = useState<string>("");
-  const [success, setSuccess] = useState<QuizResponse | null>(null);
+  const [success, setSuccess] = useState<Quiz | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuthStore();
   const router = useRouter();
@@ -41,11 +41,6 @@ export default function CreateQuizPage() {
   } = useForm<CreateQuizForm>();
   const files = watch("files");
   const inputRef = register("files").ref;
-
-  // if (!user) {
-  //   // router.push("/login")
-  //   return null
-  // }
 
   const onSubmit = async (data: CreateQuizForm) => {
     try {
@@ -63,15 +58,15 @@ export default function CreateQuizPage() {
       }
 
       const response = await api.post<{
-        quiz: QuizResponse;
+        quiz: Quiz;
         questions: Question[];
       }>("/quizzes", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-
-      setSuccess(response.data.quiz);
+      const quiz = response.data.quiz;
+      setSuccess(quiz);
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to create quiz");
     } finally {
@@ -80,27 +75,27 @@ export default function CreateQuizPage() {
   };
 
   if (success) {
+    console.log(success);
     return (
-      <div className=" bg-white dark:bg-zinc-950 py-8">
-        <div className="max-w-4xl  container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className=" bg-white dark:bg-zinc-900 py-8">
+        <div className="max-w-2xl  container mx-auto px-4 sm:px-6 lg:px-8">
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <FileText className="h-8 w-8 text-green-600" />
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mb-4">
+                <FileText className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold text-gray-900   dark:text-white mb-2">
                 Quiz Created Successfully!
               </h2>
-              <p className="text-gray-600 text-center mb-6">
-                Your quiz "{success.quiz.title}" has been created with{" "}
-                {success.questions.length} questions.
+              <p className="text-gray-600 text-center dark:text-zinc-400 mb-6">
+                Your quiz "{success.title}" has been created
               </p>
               <div className="flex gap-4">
-                <Link href={`/quizzes/${success.quiz.id}`}>
-                  <Button>Take Quiz Now</Button>
+                <Link href={`/quizzes/${success.id}`}>
+                  <Button variant={"secondary"}>Take Quiz Now</Button>
                 </Link>
                 <Link href="/dashboard">
-                  <Button variant="outline">Back to Dashboard</Button>
+                  <Button variant="outline" className="hover:bg-zinc-100 dark:hover:bg-zinc-800">Back to Dashboard</Button>
                 </Link>
               </div>
             </CardContent>
@@ -212,7 +207,12 @@ export default function CreateQuizPage() {
               </div>
 
               <div className="flex justify-end">
-                <Button type="submit" className="dark:bg-white dark:hover:bg-zinc-200 dark:text-black text-white bg-zinc-900 hover:bg-zinc-800" disabled={isLoading} size="lg">
+                <Button
+                  type="submit"
+                  className="dark:bg-white dark:hover:bg-zinc-200 dark:text-black text-white bg-zinc-900 hover:bg-zinc-800"
+                  disabled={isLoading}
+                  size="lg"
+                >
                   {isLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />

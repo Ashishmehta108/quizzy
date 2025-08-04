@@ -8,12 +8,13 @@ import {
   MessageSquare,
   Upload,
   Wand2,
+  Pencil,
 } from "lucide-react";
 
 type Feature = {
   title: string;
   description: string;
-  icons: [LucideIcon, LucideIcon];
+  icons: [LucideIcon];
   color: string; // tailwind color class
 };
 
@@ -23,28 +24,28 @@ export function Features() {
       title: "AI-Powered Generation",
       description:
         "Create comprehensive quizzes on any topic with our advanced AI. Just tell us what you want to learn and watch the magic happen.",
-      icons: [Sparkles, Wand2],
+      icons: [Sparkles],
       color: "text-pink-500",
     },
     {
       title: "Document Intelligence",
       description:
         "Upload PDFs, text files, or documents and automatically generate contextual quizzes from your content with perfect accuracy.",
-      icons: [FileText, Upload],
+      icons: [FileText],
       color: "text-blue-500",
     },
     {
       title: "Progress Tracking",
       description:
         "Monitor your learning journey with real-time progress tracking and insights to keep you motivated and on track.",
-      icons: [BarChart3, Sparkles],
+      icons: [BarChart3],
       color: "text-green-500",
     },
     {
       title: "Interactive Learning",
       description:
         "Take quizzes with an engaging interface, get instant feedback, and ask follow-up questions to deepen understanding.",
-      icons: [MessageSquare, Sparkles],
+      icons: [Pencil],
       color: "text-yellow-500",
     },
   ];
@@ -61,15 +62,16 @@ export function Features() {
         <div className="grid md:grid-cols-2 gap-10 w-full">
           {features.map((feature, index) => {
             const Icon1 = feature.icons[0];
-            const Icon2 = feature.icons[1];
+            // const Icon2 = feature.icons[1];
 
             return (
               <AnimatedElement key={index} delay={400 + index * 150}>
                 <Card
                   className="h-full p-8 
-                    bg-white/30 dark:bg-zinc-900/30 
+                    bg-white/30 dark:bg-zinc-900/70 
                     backdrop-blur-lg 
-                    border border-white/40 dark:border-zinc-800 
+                    cursor-pointer
+                    border border-zinc-300/60 dark:border-zinc-800 
                     shadow-[0_4px_20px_rgba(0,0,0,0.05)] 
                     rounded-2xl transition-all duration-300 
                     hover:shadow-lg"
@@ -80,18 +82,20 @@ export function Features() {
                       <div
                         className={`relative w-14 h-14 rounded-full 
                         bg-white/60 backdrop-blur-md 
-                        border border-white/50 
+                        border border-zinc-100/50 
+                        dark:border-zinc-800
+                        dark:bg-zinc-800/60
                         flex items-center justify-center 
-                        shadow-[0_2px_8px_rgba(0,0,0,0.05)]`}
+                        `}
                       >
                         {/* First Icon (solid) */}
                         <Icon1
-                          className={`absolute h-6 w-6 ${feature.color} opacity-90`}
+                          className={` absolute h-6 w-6 ${feature.color} opacity-90`}
                         />
                         {/* Second Icon (lighter & shifted) */}
-                        <Icon2
+                        {/* <Icon2
                           className={`absolute h-6 w-6 ${feature.color} opacity-40 translate-x-1 translate-y-1`}
-                        />
+                        /> */}
                       </div>
                       {/* Content */}
                       <div className="flex-1">

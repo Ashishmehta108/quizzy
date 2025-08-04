@@ -53,7 +53,9 @@ export const createQuiz = async (req, res) => {
                 quizId: quiz.id,
                 question: q.question,
                 options: JSON.stringify(q.options),
-                answer: q.answer
+                answer: q.answer,
+                createdAt: new Date(),
+                explanation: q.explanation
             });
         }
 
@@ -75,10 +77,9 @@ export const getQuizzes = async (req, res) => {
         for (let q of all) {
             console.log(all)
             const questionsList = await db.select().from(questions).where(eq(questions.quizId, q.id));
-            console.log(questionsList)
             result.push({
                 quiz: q,
-                questions: questionsList
+                questions: questionsList,
             });
         }
         console.log(result)

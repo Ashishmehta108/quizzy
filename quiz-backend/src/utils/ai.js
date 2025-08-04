@@ -21,6 +21,7 @@ Output:
   - "question": string
   - "options": array of 4 strings
   - "answer":index number of the answer
+  - "explanation": string this is explanation of the question's answer make it such that even beginner can understand it and its brief.
 
   If user tells nothing about the number of questions then make atleast 10 otherwise listen tot what user says 
 Example:
@@ -28,7 +29,8 @@ Example:
   {
     "question": "What is 2+2?",
     "options": ["1", "2", "3", "4"],
-    "answer": 3 
+    "answer": 3 ,
+    explanation: "2+2=4"
   }
 ]
 
@@ -39,6 +41,7 @@ just give response in json not in markdown format
   const result = await genAI.models.generateContent({
     model: "gemini-2.0-flash",
     contents: prompt,
+
   });
 
   let text = result.response?.candidates?.[0]?.content?.parts?.[0]?.text || result.text || "";

@@ -50,7 +50,20 @@ export const login = async (req, res) => {
     .where(eq(users.id, user.id));
 
   res
-    .cookie("access_token", accessToken, { httpOnly: true })
-    .cookie("refresh_token", refreshToken, { httpOnly: true })
-    .json({ user, accessToken, refreshToken });
+    .cookie("access_token", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000,
+    })
+    .cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    .json({ user });
+
 };

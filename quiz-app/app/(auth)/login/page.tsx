@@ -18,6 +18,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuthStore } from "@/store/auth";
 import Link from "next/link";
 import Image from "next/image";
+import { Loader } from "lucide-react";
 
 interface LoginForm {
   email: string;
@@ -124,7 +125,14 @@ export default function LoginPage() {
                 className="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-400"
                 disabled={isLoading}
               >
-                {isLoading ? "Signing in..." : "Sign in"}
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader className="h-4 w-4 animate-spin" />
+                    Signing in...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">Sign in</span>
+                )}
               </Button>
             </form>
 

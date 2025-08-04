@@ -1,18 +1,19 @@
-import { pgTable, varchar, text, integer } from "drizzle-orm/pg-core";
+import { pgTable, varchar, text, integer, timestamp } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  name: varchar("name", { length: 100 }).notNull(),
-  email: varchar("email", { length: 100 }).notNull().unique(),
-  password: text("password").notNull(),
-  accessToken: text("access_token"),      
-  refreshToken: text("refresh_token"),   
+    id: varchar("id", { length: 36 }).primaryKey(),
+    name: varchar("name", { length: 100 }).notNull(),
+    email: varchar("email", { length: 100 }).notNull().unique(),
+    password: text("password").notNull(),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
 });
 
 export const quizzes = pgTable("quizzes", {
     id: varchar("id", { length: 36 }).primaryKey(),
     title: varchar("title", { length: 200 }).notNull(),
     userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const questions = pgTable("questions", {
@@ -20,7 +21,10 @@ export const questions = pgTable("questions", {
     quizId: varchar("quiz_id", { length: 36 }).references(() => quizzes.id, { onDelete: "cascade" }),
     question: text("question").notNull(),
     options: text("options").notNull(),
-    answer: integer("answer").notNull()
+    answer: integer("answer").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    submittedAt: timestamp("submitted_at").notNull().defaultNow(),
+    explanation: text("explanation").notNull(),
 });
 
 export const results = pgTable("results", {
@@ -28,6 +32,7 @@ export const results = pgTable("results", {
     userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }),
     quizId: varchar("quiz_id", { length: 36 }).references(() => quizzes.id, { onDelete: "cascade" }),
     score: integer("score").notNull(),
-    optionsReview: text("quiz_review").notNull()
+    optionsReview: text("quiz_review").notNull(),
+    submittedAt: timestamp("submitted_at").notNull().defaultNow(),
 });
 

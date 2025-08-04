@@ -3,21 +3,17 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, BookOpen, Trophy, LogOut } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
-import { QuizCard } from "@/components/ui/quiz-card";
-import { ResultCard } from "@/components/ui/result-card";
+import ResultTable from "@/components/ui/result-card";
 import api from "@/lib/api";
-import type { Quiz, QuizResponse, Result } from "@/lib/types";
-import Link from "next/link";
+import type { Result } from "@/lib/types";
+
 
 export default function DashboardPage() {
-  const [quizzes, setQuizzes] = useState<QuizResponse[]>([]);
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(false);
-  const { user, logout, restoreSession, isLoading } = useAuthStore();
+  const { user, restoreSession, isLoading } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -31,25 +27,18 @@ export default function DashboardPage() {
       }
       fetchData();
     }
-    console.log(user);
   }, [user, router]);
 
   const fetchData = async () => {
     try {
-      const [quizzesRes, resultsRes] = await Promise.all([
-        api.get<QuizResponse[]>("/quizzes", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("quiz-app-token")}`,
-          },
-        }),
+      const [resultsRes] = await Promise.all([
         api.get<Result[]>("/results", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("quiz-app-token")}`,
           },
         }),
       ]);
-
-      setQuizzes(quizzesRes.data);
+      console.log(resultsRes);
       setResults(resultsRes.data);
     } catch (error) {
       console.error("Failed to fetch data:", error);
@@ -60,10 +49,6 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchData();
   }, []);
-  const handleLogout = () => {
-    logout();
-    router.push("/login");
-  };
 
   if (!user) return null;
 
@@ -72,7 +57,9 @@ export default function DashboardPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between flex-col">
           <h2 className="text-xl font-semibold">Quiz Results</h2>
-          <p className="text-gray-600">View your quiz performance and scores</p>
+          <p className="text-gray-600 dark:text-zinc-400 text-base">
+            View your quiz performance and scores
+          </p>
         </div>
         {loading ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -101,14 +88,8 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {
-              //@ts-ignore
-
-              results.data.map((result) => (
-                <ResultCard key={result.id} result={result} />
-              ))
-            }
+          <div className="w-full">
+            <ResultTable results={{ data: results }} />
           </div>
         )}
       </main>

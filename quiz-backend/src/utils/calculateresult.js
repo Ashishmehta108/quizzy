@@ -4,19 +4,15 @@ import { results, questions } from "../config/db/schema.js";
 
 export const calculateResult = async (resultId, userId, quizId) => {
     try {
-        // 1. Get the result entry
-        console.log(resultId, userId, quizId)
         const [resultRow] = await db
             .select()
             .from(results)
             .where(
                 and(
                     eq(results.id, resultId),
-                    eq(results.quizId, quizId),
                     eq(results.userId, userId)
                 )
             );
-        console.log(resultRow)
         if (!resultRow) throw new Error("Result not found or unauthorized");
 
         let selectedAnswers;
@@ -53,7 +49,9 @@ export const calculateResult = async (resultId, userId, quizId) => {
             selectedAnswers: questionsData.map((q, index) => ({
                 question: q.question,
                 selected: selectedAnswers[index] || [],
-                correct: q.answer
+                correct: q.answer,
+                options: JSON.parse(q.options),
+
             }))
         })
         return {
@@ -63,7 +61,11 @@ export const calculateResult = async (resultId, userId, quizId) => {
             selectedAnswers: questionsData.map((q, index) => ({
                 question: q.question,
                 selected: selectedAnswers[index] || [],
-                correct: q.answer
+                correct: q.answer,
+                options: JSON.parse(q.options),
+                explanation: q.explanation,
+                createdAt: q.createdAt,
+                submittedAt: q.submittedAt
             }))
         };
     } catch (error) {

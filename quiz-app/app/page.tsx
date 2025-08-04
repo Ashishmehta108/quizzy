@@ -61,7 +61,6 @@ export const AnimatedElement = ({
 export function WipeText() {
   return (
     <div className="relative -rotate-2 my-2 inline-block overflow-hidden rounded">
-      {/* Background Wipe Layer */}
       <motion.div
         className="absolute inset-0 bg-blue-500"
         initial={{ x: "-100%" }}
@@ -81,11 +80,11 @@ export function WipeText() {
 
 const QuizAppLanding = () => {
   return (
-    <div className="min-h-screen relative  dark:bg-zinc-950 transition-colors duration-300">
+    <div className="min-h-screen pb-8 relative  dark:bg-zinc-950 transition-colors duration-300">
       <NavbarDemo />
       <Hero />
       <Features />
-      <Info/>
+      <Info />
       <TestimonialsSection />
       <CTA />
       <Footer />

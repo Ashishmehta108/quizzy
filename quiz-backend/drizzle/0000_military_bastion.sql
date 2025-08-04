@@ -3,13 +3,17 @@ CREATE TABLE "questions" (
 	"quiz_id" varchar(36),
 	"question" text NOT NULL,
 	"options" text NOT NULL,
-	"answer" integer NOT NULL
+	"answer" integer NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"submitted_at" timestamp DEFAULT now() NOT NULL,
+	"explanation" text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "quizzes" (
 	"id" varchar(36) PRIMARY KEY NOT NULL,
 	"title" varchar(200) NOT NULL,
-	"user_id" varchar(36)
+	"user_id" varchar(36),
+	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "results" (
@@ -17,7 +21,8 @@ CREATE TABLE "results" (
 	"user_id" varchar(36),
 	"quiz_id" varchar(36),
 	"score" integer NOT NULL,
-	"quiz_review" text NOT NULL
+	"quiz_review" text NOT NULL,
+	"submitted_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
