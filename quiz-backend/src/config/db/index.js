@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { pgTable, serial, text, varchar } from "drizzle-orm/pg-core";
+import postgres from "postgres"
 import { drizzle } from "drizzle-orm/node-postgres";
 
 
