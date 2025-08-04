@@ -1,9 +1,9 @@
 import { randomUUID } from "crypto";
-import { questions, quizzes, results, test, users } from "./config/db/schema.js";
-import { client, db } from "./config/db/index.js"
+import { questions, quizzes, results, users } from "./config/db/schema.js";
+import {  db } from "./config/db/index.js"
 
 async function seed() {
-    await client.connect();
+    // await client.connect();
 
     const userId = randomUUID();
     await db.insert(users).values({
@@ -40,12 +40,12 @@ async function seed() {
         score: 10
     });
 
-    await db.insert(test).values({
-        text: "Just a test row"
-    });
+    // await db.insert(test).values({
+    //     text: "Just a test row"
+    // });
 
     console.log("Seed data inserted!");
-    await client.end();
+    // await client.end();
 }
 
 seed();
