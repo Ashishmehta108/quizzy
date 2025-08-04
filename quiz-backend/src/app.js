@@ -16,7 +16,6 @@ app.use("/api/quizzes", quizRoutes);
 app.use("/api/results", resultRouter)
 
 app.get("/", async (req, res) => {
-
     res.send("hello")
 })
 
