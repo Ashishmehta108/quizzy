@@ -24,7 +24,11 @@ export const register = async (req, res) => {
   const [user] = await db
     .insert(users)
     .values({ id, name, email, password: hashed, accessToken, refreshToken })
-    .returning();
+    .returning({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+    });
 
   res
     .cookie("access_token", accessToken, { httpOnly: true })
