@@ -1,6 +1,7 @@
+import "dotenv/config"
+
 import { Pinecone } from "@pinecone-database/pinecone";
 import { genAI } from "../utils/ai.js"
-
 const pinecone = new Pinecone({
     apiKey: process.env.PINECONE_API_KEY,
 });

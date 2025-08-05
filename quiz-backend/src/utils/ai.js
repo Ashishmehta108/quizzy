@@ -1,5 +1,4 @@
 import { GoogleGenAI } from "@google/genai";
-import { queryChunks } from "../ai/pinecone.js";
 
 export const genAI = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI });
 

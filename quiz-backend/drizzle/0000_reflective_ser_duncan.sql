@@ -25,10 +25,14 @@ CREATE TABLE "results" (
 	"submitted_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "test" (
+	"name" varchar(100) PRIMARY KEY NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "users" (
 	"id" varchar(36) PRIMARY KEY NOT NULL,
 	"name" varchar(100) NOT NULL,
-	"email" varchar(100) NOT NULL,
+	"email" varchar(255) NOT NULL,
 	"password" text NOT NULL,
 	"access_token" text,
 	"refresh_token" text,

@@ -1,5 +1,5 @@
 {
-  "id": "5426d4ac-303c-47b3-9b52-ad6f71bb526d",
+  "id": "94f6034c-f263-4cfc-9a3d-6d43e7583b77",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -210,6 +210,25 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.test": {
+      "name": "test",
+      "schema": "",
+      "columns": {
+        "name": {
+          "name": "name",
+          "type": "varchar(100)",
+          "primaryKey": true,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.users": {
       "name": "users",
       "schema": "",
@@ -228,7 +247,7 @@
         },
         "email": {
           "name": "email",
-          "type": "varchar(100)",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
