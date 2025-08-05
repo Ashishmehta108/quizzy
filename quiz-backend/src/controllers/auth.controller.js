@@ -36,7 +36,6 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
-  console.log(email, password)
   const [user] = await db.select({
     id: users.id,
     name: users.name,
@@ -70,6 +69,12 @@ export const login = async (req, res) => {
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
-    .json({ user, token });
+    .json({
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email
+      }, token: accessToken
+    });
 
 };
