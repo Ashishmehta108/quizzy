@@ -76,7 +76,7 @@ export const useAuthStore = create<AuthState>()(
         set({ user });
       },
       restoreSession: async () => {
-        const token = await getToken();
+        const token = (await getToken()) || get().token;
         if (!token) return;
         try {
           const res = await api.get<User>("/auth/me", {
