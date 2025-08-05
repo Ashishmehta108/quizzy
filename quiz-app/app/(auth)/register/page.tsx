@@ -53,7 +53,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-900 py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl   flex justify-center items-center font-bold text-center">
+          <CardTitle className="md:text-2xl  text-xl  flex justify-center items-center font-bold text-center">
             Create account with{" "}
             <div className="relative">
               <div className="absolute top-[20px] left-[22px] h-[25px] w-[25px] bg-white z-0"></div>
@@ -66,12 +66,15 @@ export default function RegisterPage() {
               />
             </div>
           </CardTitle>
-          <CardDescription className="text-center">
+          <CardDescription className="text-center md:text-sm text-xs">
             Enter your information to create your account
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-4 text-xs md:text-sm"
+          >
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
@@ -83,7 +86,7 @@ export default function RegisterPage() {
               <Input
                 id="name"
                 type="text"
-                className="focus-visible:border-zinc-400 focus-visible:ring-transparent"
+                className="focus-visible:border-zinc-400 placeholder:text-sm text-sm md:text-base md:placeholder:text-base focus-visible:ring-transparent"
                 placeholder="Enter your full name"
                 {...register("name", {
                   required: "Name is required",
@@ -105,7 +108,7 @@ export default function RegisterPage() {
               <Input
                 id="email"
                 type="email"
-                className="focus-visible:border-zinc-400 focus-visible:ring-transparent"
+                className="focus-visible:border-zinc-400  placeholder:text-sm text-sm md:text-base md:placeholder:text-basefocus-visible:ring-transparent"
                 placeholder="Enter your email"
                 {...register("email", {
                   required: "Email is required",
@@ -127,7 +130,7 @@ export default function RegisterPage() {
               <Input
                 id="password"
                 type="password"
-                className="focus-visible:border-zinc-400 focus-visible:ring-transparent"
+                className="focus-visible:border-zinc-400 placeholder:text-sm text-sm md:text-base md:placeholder:text-base focus-visible:ring-transparent"
                 placeholder="Enter your password"
                 {...register("password", {
                   required: "Password is required",
@@ -149,7 +152,7 @@ export default function RegisterPage() {
               <Input
                 id="confirmPassword"
                 type="password"
-                className="focus-visible:border-zinc-400 focus-visible:ring-transparent"
+                className="focus-visible:border-zinc-400 placeholder:text-sm text-sm md:text-base md:placeholder:text-base focus-visible:ring-transparent"
                 placeholder="Confirm your password"
                 {...register("confirmPassword", {
                   required: "Please confirm your password",
@@ -166,7 +169,7 @@ export default function RegisterPage() {
 
             <Button
               type="submit"
-              className="w-full flex items-center bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+              className="w-full flex items-center bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 text-sm dark:hover:bg-blue-600"
               disabled={isLoading}
             >
               {isLoading ? (

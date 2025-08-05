@@ -11,7 +11,7 @@ import { test } from "./config/db/schema.js";
 import { db } from "./config/db/index.js";
 import { eq } from "drizzle-orm";
 const app = express();
-app.use(cors({ origin: "*", credentials: true, allowedHeaders: ["Content-Type", "Authorization"], }))
+app.use(cors({ origin:process.env.FRONTEND_URL, credentials: true, allowedHeaders: ["Content-Type", "Authorization"], }))
 app.use(cookieParser())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

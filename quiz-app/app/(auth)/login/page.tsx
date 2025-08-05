@@ -51,7 +51,7 @@ export default function LoginPage() {
       <div className=" min-h-screen flex items-center justify-center bg-white dark:bg-zinc-900 py-12 px-4 sm:px-6 lg:px-8">
         <Card className="w-full max-w-md border-none outline-none shadow-none">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-3xl flex  justify-center items-center font-bold text-center">
+            <CardTitle className="md:text-3xl text-2xl flex  justify-center items-center font-bold text-center">
               Sign in to
               <div className="relative">
                 <div className="absolute top-[20px] left-[22px] h-[25px] w-[25px] bg-white z-0"></div>
@@ -64,7 +64,7 @@ export default function LoginPage() {
                 />
               </div>
             </CardTitle>
-            <CardDescription className="text-center text-base max-w-xs mx-auto">
+            <CardDescription className="text-center text-xs md:text-base max-w-xs mx-auto">
               Enter your email and password to access your account
             </CardDescription>
           </CardHeader>
@@ -82,7 +82,7 @@ export default function LoginPage() {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  className=" focus-visible:border-zinc-400 focus-visible:ring-transparent"
+                  className=" focus-visible:border-zinc-400  placeholder:text-sm text-sm md:text-base md:placeholder:text-base focus-visible:ring-transparent"
                   {...register("email", {
                     required: "Email is required",
                     pattern: {
@@ -104,7 +104,7 @@ export default function LoginPage() {
                   id="password"
                   type="password"
                   placeholder="Enter your password"
-                  className=" focus-visible:border-zinc-400 focus-visible:ring-transparent  "
+                  className=" focus-visible:border-zinc-400  placeholder:text-sm text-sm md:text-base md:placeholder:text-base focus-visible:ring-transparent  "
                   {...register("password", {
                     required: "Password is required",
                     minLength: {
