@@ -36,7 +36,11 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
-  const [user] = await db.select().from(users).where(eq(users.email, email));
+  const [user] = await db.select({
+    id: users.id,
+    name: users.name,
+    email: users.email,
+  }).from(users).where(eq(users.email, email));
   if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
   const match = await bcrypt.compare(password, user.password);
@@ -53,17 +57,17 @@ export const login = async (req, res) => {
     .cookie("access_token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "none",
       path: "/",
       maxAge: 24 * 60 * 60 * 1000,
     })
     .cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "none",
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
-    .json({ user });
+    .json({ user, token });
 
 };

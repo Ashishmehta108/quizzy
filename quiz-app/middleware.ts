@@ -15,8 +15,10 @@ export default async function middleware(req: NextRequest) {
   );
 
   if (isPrivate && !token) {
+    console.log("Redirecting to login page");
     return NextResponse.redirect(new URL("/login", req.url));
   } else if (isPublic && token) {
+    console.log("Redirecting to dashboard");
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 

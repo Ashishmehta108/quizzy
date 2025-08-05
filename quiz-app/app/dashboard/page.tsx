@@ -22,7 +22,7 @@ export default function DashboardPage() {
   const [quizzes, setQuizzes] = useState<QuizResponse[]>([]);
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user, restoreSession, isLoading } = useAuthStore();
+  const { user, restoreSession, isLoading,token } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -40,10 +40,13 @@ export default function DashboardPage() {
 
   const fetchData = async () => {
     try {
+      console.log(token);
       const [quizzesRes, resultsRes] = await Promise.all([
         api.get<QuizResponse[]>("/quizzes"),
         api.get<Result[]>("/results"),
       ]);
+
+      console.log(quizzesRes, resultsRes);
       setQuizzes(quizzesRes.data);
       setResults(resultsRes.data);
     } catch (error) {

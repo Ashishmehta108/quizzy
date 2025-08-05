@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import api, { deleteToken, getToken } from "@/lib/api";
 import type { User, AuthResponse } from "@/lib/types";
-import { cookies } from "next/headers";
 
 interface AuthState {
   user: User | null;

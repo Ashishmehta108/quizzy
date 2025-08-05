@@ -5,12 +5,11 @@ import cors from "cors";
 import authRoutes from "./routes/auth.routes.js";
 import quizRoutes from "./routes/quiz.routes.js";
 import cookieParser from "cookie-parser";
-import { readFile } from "node:fs";
 import { resultRouter } from "./routes/result.routes.js"
-import { test } from "./config/db/schema.js";
-import { db } from "./config/db/index.js";
-import { eq } from "drizzle-orm";
+
 const app = express();
+
+// app.use(cors({ origin: "http://localhost:3000", credentials: true, allowedHeaders: ["Content-Type", "Authorization"], }))
 app.use(cors({ origin:process.env.FRONTEND_URL, credentials: true, allowedHeaders: ["Content-Type", "Authorization"], }))
 app.use(cookieParser())
 app.use(express.json());

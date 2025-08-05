@@ -15,19 +15,17 @@ export const protect = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({ message: "Access token missing" });
     }
-
     const decoded = jwt.verify(token, ACCESS_SECRET);
-
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.id, decoded.userId)); // assuming your JWT payload has { userId }
+      .where(eq(users.id, decoded.userId));
 
+    console.log(user)
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
 
-    // Optionally verify if token matches DB stored accessToken
     if (user.accessToken && user.accessToken !== token) {
       return res.status(401).json({ message: "Token mismatch" });
     }

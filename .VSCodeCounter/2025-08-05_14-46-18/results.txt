@@ -1,0 +1,220 @@
+Date : 2025-08-05 14:46:18
+Directory : c:\Users\ashis\quizzy
+Total : 137 files,  15977 codes, 134 comments, 2309 blanks, all 18420 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| TypeScript JSX     |         88 |      8,653 |         89 |        877 |      9,619 |
+| YAML               |          2 |      4,806 |          0 |      1,126 |      5,932 |
+| JavaScript         |         25 |        701 |         29 |        156 |        886 |
+| TypeScript         |          9 |        638 |          8 |        104 |        750 |
+| Markdown           |          1 |        465 |          0 |          0 |        465 |
+| JSON               |          5 |        442 |          0 |          1 |        443 |
+| PostCSS            |          2 |        200 |          3 |         43 |        246 |
+| MS SQL             |          1 |         40 |          5 |          0 |         45 |
+| JSON with Comments |          1 |         27 |          0 |          1 |         28 |
+| XML                |          3 |          5 |          0 |          1 |          6 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                      | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                         |        137 |     15,977 |        134 |      2,309 |     18,420 |
+| . (Files)                                                                 |          1 |        465 |          0 |          0 |        465 |
+| quiz-app                                                                  |        108 |     12,817 |        102 |      1,688 |     14,607 |
+| quiz-app (Files)                                                          |          8 |      3,458 |          2 |        673 |      4,133 |
+| quiz-app\app                                                              |         16 |      2,346 |         14 |        205 |      2,565 |
+| quiz-app\app (Files)                                                      |          3 |        230 |          3 |         45 |        278 |
+| quiz-app\app\(auth)                                                       |          2 |        328 |          0 |         23 |        351 |
+| quiz-app\app\(auth)\login                                                 |          1 |        143 |          0 |         11 |        154 |
+| quiz-app\app\(auth)\register                                              |          1 |        185 |          0 |         12 |        197 |
+| quiz-app\app\api                                                          |          1 |         11 |          0 |          3 |         14 |
+| quiz-app\app\api\cookie                                                   |          1 |         11 |          0 |          3 |         14 |
+| quiz-app\app\dashboard                                                    |          8 |      1,519 |          3 |        111 |      1,633 |
+| quiz-app\app\dashboard (Files)                                            |          2 |        168 |          0 |         15 |        183 |
+| quiz-app\app\dashboard\profile                                            |          1 |         36 |          0 |          3 |         39 |
+| quiz-app\app\dashboard\quizzes                                            |          3 |        753 |          1 |         58 |        812 |
+| quiz-app\app\dashboard\quizzes (Files)                                    |          1 |        108 |          0 |         10 |        118 |
+| quiz-app\app\dashboard\quizzes\[id]                                       |          1 |        426 |          1 |         34 |        461 |
+| quiz-app\app\dashboard\quizzes\create                                     |          1 |        219 |          0 |         14 |        233 |
+| quiz-app\app\dashboard\results                                            |          2 |        562 |          2 |         35 |        599 |
+| quiz-app\app\dashboard\results (Files)                                    |          1 |         91 |          0 |          8 |         99 |
+| quiz-app\app\dashboard\results\[id]                                       |          1 |        471 |          2 |         27 |        500 |
+| quiz-app\app\results                                                      |          1 |        244 |          8 |         19 |        271 |
+| quiz-app\app\test                                                         |          1 |         14 |          0 |          4 |         18 |
+| quiz-app\components                                                       |         74 |      6,570 |         80 |        733 |      7,383 |
+| quiz-app\components (Files)                                               |          6 |        244 |         20 |         23 |        287 |
+| quiz-app\components\Landing                                               |          8 |        573 |         11 |         41 |        625 |
+| quiz-app\components\dashboard                                             |          2 |        176 |          4 |         13 |        193 |
+| quiz-app\components\magicui                                               |          3 |        255 |         25 |         11 |        291 |
+| quiz-app\components\profile                                               |          1 |          0 |          0 |          1 |          1 |
+| quiz-app\components\ui                                                    |         54 |      5,322 |         20 |        644 |      5,986 |
+| quiz-app\hooks                                                            |          2 |        175 |          3 |         37 |        215 |
+| quiz-app\lib                                                              |          3 |         91 |          0 |         19 |        110 |
+| quiz-app\public                                                           |          3 |          5 |          0 |          1 |          6 |
+| quiz-app\store                                                            |          1 |         79 |          2 |          8 |         89 |
+| quiz-app\styles                                                           |          1 |         93 |          1 |         12 |        106 |
+| quiz-backend                                                              |         28 |      2,695 |         32 |        621 |      3,348 |
+| quiz-backend (Files)                                                      |          3 |      1,668 |          0 |        471 |      2,139 |
+| quiz-backend\drizzle                                                      |          3 |        354 |          5 |          0 |        359 |
+| quiz-backend\drizzle (Files)                                              |          1 |         40 |          5 |          0 |         45 |
+| quiz-backend\drizzle\meta                                                 |          2 |        314 |          0 |          0 |        314 |
+| quiz-backend\src                                                          |         22 |        673 |         27 |        150 |        850 |
+| quiz-backend\src (Files)                                                  |          3 |         68 |          5 |         17 |         90 |
+| quiz-backend\src\ai                                                       |          2 |         88 |         14 |         17 |        119 |
+| quiz-backend\src\ai (Files)                                               |          1 |         79 |         14 |         13 |        106 |
+| quiz-backend\src\ai\parsedoc                                              |          1 |          9 |          0 |          4 |         13 |
+| quiz-backend\src\config                                                   |          2 |         46 |          0 |         11 |         57 |
+| quiz-backend\src\config\db                                                |          2 |         46 |          0 |         11 |         57 |
+| quiz-backend\src\controllers                                              |          3 |        195 |          5 |         35 |        235 |
+| quiz-backend\src\middlewares                                              |          2 |         58 |          2 |         17 |         77 |
+| quiz-backend\src\routes                                                   |          3 |         46 |          1 |         15 |         62 |
+| quiz-backend\src\utils                                                    |          7 |        172 |          0 |         38 |        210 |
++---------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                  | language           | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| c:\Users\ashis\quizzy\README.md                                           | Markdown           |        465 |          0 |          0 |        465 |
+| c:\Users\ashis\quizzy\quiz-app\app\(auth)\login\page.tsx                  | TypeScript JSX     |        143 |          0 |         11 |        154 |
+| c:\Users\ashis\quizzy\quiz-app\app\(auth)\register\page.tsx               | TypeScript JSX     |        185 |          0 |         12 |        197 |
+| c:\Users\ashis\quizzy\quiz-app\app\api\cookie\route.ts                    | TypeScript         |         11 |          0 |          3 |         14 |
+| c:\Users\ashis\quizzy\quiz-app\app\dashboard\layout.tsx                   | TypeScript JSX     |         23 |          0 |          3 |         26 |
+| c:\Users\ashis\quizzy\quiz-app\app\dashboard\page.tsx                     | TypeScript JSX     |        145 |          0 |         12 |        157 |
+| c:\Users\ashis\quizzy\quiz-app\app\dashboard\profile\page.tsx             | TypeScript JSX     |         36 |          0 |          3 |         39 |
+| c:\Users\ashis\quizzy\quiz-app\app\dashboard\quizzes\[id]\page.tsx        | TypeScript JSX     |        426 |          1 |         34 |        461 |
+| c:\Users\ashis\quizzy\quiz-app\app\dashboard\quizzes\create\page.tsx      | TypeScript JSX     |        219 |          0 |         14 |        233 |
+| c:\Users\ashis\quizzy\quiz-app\app\dashboard\quizzes\page.tsx             | TypeScript JSX     |        108 |          0 |         10 |        118 |
+| c:\Users\ashis\quizzy\quiz-app\app\dashboard\results\[id]\page.tsx        | TypeScript JSX     |        471 |          2 |         27 |        500 |
+| c:\Users\ashis\quizzy\quiz-app\app\dashboard\results\page.tsx             | TypeScript JSX     |         91 |          0 |          8 |         99 |
+| c:\Users\ashis\quizzy\quiz-app\app\globals.css                            | PostCSS            |        107 |          2 |         31 |        140 |
+| c:\Users\ashis\quizzy\quiz-app\app\layout.tsx                             | TypeScript JSX     |         37 |          1 |          4 |         42 |
+| c:\Users\ashis\quizzy\quiz-app\app\page.tsx                               | TypeScript JSX     |         86 |          0 |         10 |         96 |
+| c:\Users\ashis\quizzy\quiz-app\app\results\page.tsx                       | TypeScript JSX     |        244 |          8 |         19 |        271 |
+| c:\Users\ashis\quizzy\quiz-app\app\test\page.tsx                          | TypeScript JSX     |         14 |          0 |          4 |         18 |
+| c:\Users\ashis\quizzy\quiz-app\components.json                            | JSON               |         21 |          0 |          0 |         21 |
+| c:\Users\ashis\quizzy\quiz-app\components\Footer.tsx                      | TypeScript JSX     |        141 |          2 |          8 |        151 |
+| c:\Users\ashis\quizzy\quiz-app\components\Landing\CTA.tsx                 | TypeScript JSX     |         31 |          0 |          2 |         33 |
+| c:\Users\ashis\quizzy\quiz-app\components\Landing\Features.tsx            | TypeScript JSX     |        106 |          8 |          6 |        120 |
+| c:\Users\ashis\quizzy\quiz-app\components\Landing\Hero.tsx                | TypeScript JSX     |         73 |          0 |          7 |         80 |
+| c:\Users\ashis\quizzy\quiz-app\components\Landing\HowitWorks.tsx          | TypeScript JSX     |        130 |          1 |          6 |        137 |
+| c:\Users\ashis\quizzy\quiz-app\components\Landing\Info.tsx                | TypeScript JSX     |         19 |          0 |          2 |         21 |
+| c:\Users\ashis\quizzy\quiz-app\components\Landing\LandingNavbar.tsx       | TypeScript JSX     |         92 |          1 |          5 |         98 |
+| c:\Users\ashis\quizzy\quiz-app\components\Landing\SafariDashboard.tsx     | TypeScript JSX     |         15 |          0 |          5 |         20 |
+| c:\Users\ashis\quizzy\quiz-app\components\Landing\Testimonials.tsx        | TypeScript JSX     |        107 |          1 |          8 |        116 |
+| c:\Users\ashis\quizzy\quiz-app\components\Modetoggle.tsx                  | TypeScript JSX     |         36 |          0 |          2 |         38 |
+| c:\Users\ashis\quizzy\quiz-app\components\Navbar.tsx                      | TypeScript JSX     |         47 |          0 |          4 |         51 |
+| c:\Users\ashis\quizzy\quiz-app\components\PollingWrapper.tsx              | TypeScript JSX     |          0 |          0 |          1 |          1 |
+| c:\Users\ashis\quizzy\quiz-app\components\RainbowButton.tsx               | TypeScript JSX     |         11 |          0 |          1 |         12 |
+| c:\Users\ashis\quizzy\quiz-app\components\dashboard\Loading.tsx           | TypeScript JSX     |         27 |          0 |          3 |         30 |
+| c:\Users\ashis\quizzy\quiz-app\components\dashboard\Sidebar.tsx           | TypeScript JSX     |        149 |          4 |         10 |        163 |
+| c:\Users\ashis\quizzy\quiz-app\components\magicui\marquee.tsx             | TypeScript JSX     |         49 |         22 |          3 |         74 |
+| c:\Users\ashis\quizzy\quiz-app\components\magicui\rainbow-button.tsx      | TypeScript JSX     |         25 |          3 |          4 |         32 |
+| c:\Users\ashis\quizzy\quiz-app\components\magicui\safari.tsx              | TypeScript JSX     |        181 |          0 |          4 |        185 |
+| c:\Users\ashis\quizzy\quiz-app\components\profile\profile.tsx             | TypeScript JSX     |          0 |          0 |          1 |          1 |
+| c:\Users\ashis\quizzy\quiz-app\components\theme-provider.tsx              | TypeScript JSX     |          9 |         18 |          7 |         34 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\accordion.tsx                | TypeScript JSX     |         50 |          0 |          9 |         59 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\alert-dialog.tsx             | TypeScript JSX     |        127 |          0 |         15 |        142 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\alert.tsx                    | TypeScript JSX     |         53 |          0 |          7 |         60 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\aspect-ratio.tsx             | TypeScript JSX     |          4 |          0 |          4 |          8 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\avatar.tsx                   | TypeScript JSX     |         44 |          0 |          7 |         51 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\badge.tsx                    | TypeScript JSX     |         31 |          0 |          6 |         37 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\breadcrumb.tsx               | TypeScript JSX     |        105 |          0 |         11 |        116 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\button.tsx                   | TypeScript JSX     |         51 |          0 |          6 |         57 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\calendar.tsx                 | TypeScript JSX     |        203 |          0 |         11 |        214 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\card.tsx                     | TypeScript JSX     |         71 |          0 |          9 |         80 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\carousel.tsx                 | TypeScript JSX     |        232 |          0 |         31 |        263 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\chart.tsx                    | TypeScript JSX     |        327 |          2 |         37 |        366 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\checkbox.tsx                 | TypeScript JSX     |         26 |          0 |          5 |         31 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\collapsible.tsx              | TypeScript JSX     |          6 |          0 |          6 |         12 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\command.tsx                  | TypeScript JSX     |        136 |          0 |         18 |        154 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\context-menu.tsx             | TypeScript JSX     |        182 |          0 |         19 |        201 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\dialog.tsx                   | TypeScript JSX     |        109 |          0 |         14 |        123 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\drawer.tsx                   | TypeScript JSX     |        105 |          0 |         14 |        119 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\dropdown-menu.tsx            | TypeScript JSX     |        182 |          0 |         19 |        201 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\form.tsx                     | TypeScript JSX     |        153 |          0 |         26 |        179 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\hover-card.tsx               | TypeScript JSX     |         23 |          0 |          7 |         30 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\input-otp.tsx                | TypeScript JSX     |         63 |          0 |          9 |         72 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\input.tsx                    | TypeScript JSX     |         19 |          0 |          4 |         23 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\label.tsx                    | TypeScript JSX     |         21 |          0 |          6 |         27 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\menubar.tsx                  | TypeScript JSX     |        217 |          0 |         20 |        237 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\navigation-menu.tsx          | TypeScript JSX     |        117 |          0 |         12 |        129 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\pagination.tsx               | TypeScript JSX     |        107 |          0 |         11 |        118 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\popover.tsx                  | TypeScript JSX     |         25 |          0 |          7 |         32 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\progress.tsx                 | TypeScript JSX     |         24 |          0 |          5 |         29 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\question-form.tsx            | TypeScript JSX     |         80 |          2 |         11 |         93 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\quiz-card.tsx                | TypeScript JSX     |        230 |          0 |         12 |        242 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\radio-group.tsx              | TypeScript JSX     |         39 |          0 |          6 |         45 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\resizable-navbar.tsx         | TypeScript JSX     |        267 |          1 |         23 |        291 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\resizable.tsx                | TypeScript JSX     |         39 |          0 |          7 |         46 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\result-card.tsx              | TypeScript JSX     |        113 |          1 |         11 |        125 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\scroll-area.tsx              | TypeScript JSX     |         43 |          0 |          6 |         49 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\select.tsx                   | TypeScript JSX     |        146 |          0 |         15 |        161 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\separator.tsx                | TypeScript JSX     |         27 |          0 |          5 |         32 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\sheet.tsx                    | TypeScript JSX     |        126 |          0 |         16 |        142 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\sidebar.tsx                  | TypeScript JSX     |        700 |         11 |         55 |        766 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\skeleton.tsx                 | TypeScript JSX     |         13 |          0 |          3 |         16 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\slider.tsx                   | TypeScript JSX     |         24 |          0 |          5 |         29 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\sonner.tsx                   | TypeScript JSX     |         26 |          0 |          6 |         32 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\switch.tsx                   | TypeScript JSX     |         25 |          0 |          5 |         30 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\table.tsx                    | TypeScript JSX     |        107 |          0 |         11 |        118 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\tabs.tsx                     | TypeScript JSX     |         48 |          0 |          8 |         56 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\textarea.tsx                 | TypeScript JSX     |         19 |          0 |          4 |         23 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\toast.tsx                    | TypeScript JSX     |        116 |          0 |         14 |        130 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\toaster.tsx                  | TypeScript JSX     |         32 |          0 |          4 |         36 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\toggle-group.tsx             | TypeScript JSX     |         52 |          0 |         10 |         62 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\toggle.tsx                   | TypeScript JSX     |         39 |          0 |          7 |         46 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\tooltip.tsx                  | TypeScript JSX     |         23 |          0 |          8 |         31 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\use-mobile.tsx               | TypeScript JSX     |         15 |          0 |          5 |         20 |
+| c:\Users\ashis\quizzy\quiz-app\components\ui\use-toast.ts                 | TypeScript         |        160 |          3 |         32 |        195 |
+| c:\Users\ashis\quizzy\quiz-app\hooks\use-mobile.tsx                       | TypeScript JSX     |         15 |          0 |          5 |         20 |
+| c:\Users\ashis\quizzy\quiz-app\hooks\use-toast.ts                         | TypeScript         |        160 |          3 |         32 |        195 |
+| c:\Users\ashis\quizzy\quiz-app\lib\api.ts                                 | TypeScript         |         23 |          0 |          6 |         29 |
+| c:\Users\ashis\quizzy\quiz-app\lib\types.ts                               | TypeScript         |         63 |          0 |         11 |         74 |
+| c:\Users\ashis\quizzy\quiz-app\lib\utils.ts                               | TypeScript         |          5 |          0 |          2 |          7 |
+| c:\Users\ashis\quizzy\quiz-app\middleware.ts                              | TypeScript         |         18 |          0 |          7 |         25 |
+| c:\Users\ashis\quizzy\quiz-app\next.config.mjs                            | JavaScript         |         12 |          1 |          2 |         15 |
+| c:\Users\ashis\quizzy\quiz-app\package.json                               | JSON               |         77 |          0 |          0 |         77 |
+| c:\Users\ashis\quizzy\quiz-app\pnpm-lock.yaml                             | YAML               |      3,178 |          0 |        658 |      3,836 |
+| c:\Users\ashis\quizzy\quiz-app\postcss.config.mjs                         | JavaScript         |          6 |          1 |          2 |          9 |
+| c:\Users\ashis\quizzy\quiz-app\public\menu.svg                            | XML                |          3 |          0 |          1 |          4 |
+| c:\Users\ashis\quizzy\quiz-app\public\placeholder-logo.svg                | XML                |          1 |          0 |          0 |          1 |
+| c:\Users\ashis\quizzy\quiz-app\public\placeholder.svg                     | XML                |          1 |          0 |          0 |          1 |
+| c:\Users\ashis\quizzy\quiz-app\store\auth.ts                              | TypeScript         |         79 |          2 |          8 |         89 |
+| c:\Users\ashis\quizzy\quiz-app\styles\globals.css                         | PostCSS            |         93 |          1 |         12 |        106 |
+| c:\Users\ashis\quizzy\quiz-app\tailwind.config.ts                         | TypeScript         |        119 |          0 |          3 |        122 |
+| c:\Users\ashis\quizzy\quiz-app\tsconfig.json                              | JSON with Comments |         27 |          0 |          1 |         28 |
+| c:\Users\ashis\quizzy\quiz-backend\drizzle.config.js                      | JavaScript         |         10 |          0 |          2 |         12 |
+| c:\Users\ashis\quizzy\quiz-backend\drizzle\0000_reflective_ser_duncan.sql | MS SQL             |         40 |          5 |          0 |         45 |
+| c:\Users\ashis\quizzy\quiz-backend\drizzle\meta\0000_snapshot.json        | JSON               |        301 |          0 |          0 |        301 |
+| c:\Users\ashis\quizzy\quiz-backend\drizzle\meta\_journal.json             | JSON               |         13 |          0 |          0 |         13 |
+| c:\Users\ashis\quizzy\quiz-backend\package.json                           | JSON               |         30 |          0 |          1 |         31 |
+| c:\Users\ashis\quizzy\quiz-backend\pnpm-lock.yaml                         | YAML               |      1,628 |          0 |        468 |      2,096 |
+| c:\Users\ashis\quizzy\quiz-backend\src\ai\parsedoc\doc.js                 | JavaScript         |          9 |          0 |          4 |         13 |
+| c:\Users\ashis\quizzy\quiz-backend\src\ai\pinecone.js                     | JavaScript         |         79 |         14 |         13 |        106 |
+| c:\Users\ashis\quizzy\quiz-backend\src\app.js                             | JavaScript         |         24 |          0 |          5 |         29 |
+| c:\Users\ashis\quizzy\quiz-backend\src\config\db\index.js                 | JavaScript         |         10 |          0 |          4 |         14 |
+| c:\Users\ashis\quizzy\quiz-backend\src\config\db\schema.js                | JavaScript         |         36 |          0 |          7 |         43 |
+| c:\Users\ashis\quizzy\quiz-backend\src\controllers\auth.controller.js     | JavaScript         |         49 |          5 |         16 |         70 |
+| c:\Users\ashis\quizzy\quiz-backend\src\controllers\quiz.controller.js     | JavaScript         |         83 |          0 |          9 |         92 |
+| c:\Users\ashis\quizzy\quiz-backend\src\controllers\result.controller.js   | JavaScript         |         63 |          0 |         10 |         73 |
+| c:\Users\ashis\quizzy\quiz-backend\src\middlewares\auth.middleware.js     | JavaScript         |         31 |          1 |         10 |         42 |
+| c:\Users\ashis\quizzy\quiz-backend\src\middlewares\upload.middleware.js   | JavaScript         |         27 |          1 |          7 |         35 |
+| c:\Users\ashis\quizzy\quiz-backend\src\routes\auth.routes.js              | JavaScript         |         12 |          0 |          2 |         14 |
+| c:\Users\ashis\quizzy\quiz-backend\src\routes\quiz.routes.js              | JavaScript         |         26 |          1 |          5 |         32 |
+| c:\Users\ashis\quizzy\quiz-backend\src\routes\result.routes.js            | JavaScript         |          8 |          0 |          8 |         16 |
+| c:\Users\ashis\quizzy\quiz-backend\src\seed.js                            | JavaScript         |         38 |          5 |          9 |         52 |
+| c:\Users\ashis\quizzy\quiz-backend\src\server.js                          | JavaScript         |          6 |          0 |          3 |          9 |
+| c:\Users\ashis\quizzy\quiz-backend\src\utils\ai.js                        | JavaScript         |         49 |          0 |         10 |         59 |
+| c:\Users\ashis\quizzy\quiz-backend\src\utils\calculateresult.js           | JavaScript         |         67 |          0 |          9 |         76 |
+| c:\Users\ashis\quizzy\quiz-backend\src\utils\chunk.js                     | JavaScript         |         17 |          0 |          5 |         22 |
+| c:\Users\ashis\quizzy\quiz-backend\src\utils\delete.file.js               | JavaScript         |         12 |          0 |          3 |         15 |
+| c:\Users\ashis\quizzy\quiz-backend\src\utils\jwt.js                       | JavaScript         |         12 |          0 |          8 |         20 |
+| c:\Users\ashis\quizzy\quiz-backend\src\utils\parsepdf.js                  | JavaScript         |          7 |          0 |          3 |         10 |
+| c:\Users\ashis\quizzy\quiz-backend\src\utils\readfile.js                  | JavaScript         |          8 |          0 |          0 |          8 |
+| Total                                                                     |                    |     15,977 |        134 |      2,309 |     18,420 |
++---------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
