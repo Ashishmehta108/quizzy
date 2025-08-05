@@ -1,27 +1,31 @@
-import { configDotenv } from "dotenv"
-configDotenv()
 import express from "express";
 import cors from "cors";
-import authRoutes from "./routes/auth.routes.js";
-import quizRoutes from "./routes/quiz.routes.js";
 import cookieParser from "cookie-parser";
-import { resultRouter } from "./routes/result.routes.js"
+import { configDotenv } from "dotenv";
+configDotenv();
 
 const app = express();
 
-// app.use(cors({ origin: "http://localhost:3000", credentials: true, allowedHeaders: ["Content-Type", "Authorization"], }))
-app.use(cors({ origin:process.env.FRONTEND_URL, credentials: true, allowedHeaders: ["Content-Type", "Authorization"], }))
-app.use(cookieParser())
+// ---- CORS SETUP (must be first!) ----
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+}));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+import authRoutes from "./routes/auth.routes.js";
+import quizRoutes from "./routes/quiz.routes.js";
+import { resultRouter } from "./routes/result.routes.js";
+
 app.use("/api/auth", authRoutes);
+// app.use("/api/auth", authRoutes);
 app.use("/api/quizzes", quizRoutes);
-app.use("/api/results", resultRouter)
+app.use("/api/results", resultRouter);
 
-app.get("/", async (req, res) => {
-    res.send("hello")
-})
-
+app.get("/", (_req, res) => res.send("hello"));
 
 export default app;

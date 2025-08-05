@@ -42,7 +42,9 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     try {
       setError("");
-      await registerUser(data.name, data.email, data.password);
+      console.log("registering");
+      const resp = await registerUser(data.name, data.email, data.password);
+      console.log(resp);
       router.push("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.message || "Registration failed");

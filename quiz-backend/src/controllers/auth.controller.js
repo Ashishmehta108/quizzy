@@ -6,15 +6,16 @@ import { generateAccessToken, generateRefreshToken } from "../utils/jwt.js";
 import { randomUUID } from "node:crypto";
 
 export const register = async (req, res) => {
+  console.log("register")
   const { name, email, password } = req.body;
 
-  // const [existing] = (await db
-  //   .select({ name: users.name })
-  //   .from(users)
-  //   .where(eq(users.email, email))).length > 0;
+  const [existing] = (await db
+    .select({ name: users.name })
+    .from(users)
+    .where(eq(users.email, email))).length > 0;
 
-  // if (existing) return res.status(400).json({ message: "User already exists" });
-
+  if (existing) return res.status(400).json({ message: "User already exists" });
+  console.log(name, email, password)
   const hashed = await bcrypt.hash(password, 10);
   const id = randomUUID();
   const accessToken = generateAccessToken(id);
@@ -35,7 +36,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
-
+  console.log(email, password)
   const [user] = await db.select({
     id: users.id,
     name: users.name,

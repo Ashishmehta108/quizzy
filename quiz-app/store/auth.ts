@@ -40,11 +40,13 @@ export const useAuthStore = create<AuthState>()(
       register: async (name: string, email: string, password: string) => {
         set({ isLoading: true });
         try {
+          console.log("posting");
           const response = await api.post<AuthResponse>("/auth/register", {
             name,
             email,
             password,
           });
+          console.log(response);
           const { token, user } = response.data;
           set({ user, token, isLoading: false });
         } catch (error) {
