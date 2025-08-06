@@ -26,11 +26,11 @@ export default function DashboardPage() {
   const { user, restoreSession, isLoading, token } = useAuthStore();
   const router = useRouter();
   const { tkn } = useSession();
-  if (tkn == null) {
-    router.push("/login");
-  }
   useEffect(() => {
     if (!isLoading) {
+      if (tkn == null) {
+        router.push("/login");
+      }
       fetchData();
     }
   }, [user, isLoading]);
