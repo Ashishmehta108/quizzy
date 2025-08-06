@@ -124,7 +124,7 @@ export function QuestionCard({
               variant="outline"
               onClick={onPrevious}
               disabled={!canGoPrevious}
-              className="flex items-center dark:hover:bg-zinc-800 hover:bg-zinc-100 gap-2 px-6 py-3 disabled:opacity-50"
+              className="flex items-center dark:hover:bg-zinc-800 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 gap-2 px-6 py-3 disabled:opacity-50 "
             >
               <ChevronLeft className="h-4 w-4" />
               Previous

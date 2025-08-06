@@ -74,18 +74,17 @@ export const login = async (req, res) => {
 
     console.log("Tokens generated and saved for user:", user.id);
 
-    return res
+    res
       .cookie("access_token", accessToken, {
         httpOnly: true,
         secure: true,
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        sameSite: "none"
       })
       .cookie("refresh_token", refreshToken, {
         httpOnly: true,
         secure: true,
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      })
-      .json({
+        sameSite: "none"
+      }).json({
         user: {
           id: user.id,
           name: user.name,
@@ -94,7 +93,6 @@ export const login = async (req, res) => {
         token: accessToken,
       });
 
-    console.log("Login successful for user:", user.id);
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Internal server error" });

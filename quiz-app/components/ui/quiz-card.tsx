@@ -153,11 +153,11 @@ export function QuizTable({ quizzes }: QuizTableProps) {
                         href={
                           attempted
                             ? `/dashboard/results/${quiz.result?.id}`
-                            : `/dashboard/quizzes/${quiz.quiz.id}/result`
+                            : `/dashboard/quizzes/${quiz.quiz.id}`
                         }
                       >
                         <Button
-                          className="bg-blue-900 hover:bg-blue-800 dark:bg-blue-900 dark:hover:bg-blue-800"
+                          className="bg-blue-900 hover:bg-blue-800 text-white "
                           size="sm"
                         >
                           {attempted ? "View Result" : "Take Quiz"}
