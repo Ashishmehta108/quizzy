@@ -8,7 +8,7 @@ const app = express();
 
 // ---- CORS SETUP (must be first!) ----
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin:"https://sttbtd41-3000.inc1.devtunnels.ms",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],

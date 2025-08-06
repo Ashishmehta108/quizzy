@@ -40,6 +40,7 @@ export default function LoginPage() {
     try {
       setError("");
       await login(data.email, data.password);
+      console.log("logged in ");
       router.push("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed");

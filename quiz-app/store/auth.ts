@@ -35,7 +35,6 @@ export const useAuthStore = create<AuthState>()(
             }
           );
           const { token, user } = response.data;
-          console.log(response);
           set({ user, token, isLoading: false });
         } catch (error) {
           set({ isLoading: false });
@@ -58,7 +57,6 @@ export const useAuthStore = create<AuthState>()(
               withCredentials: true,
             }
           );
-          console.log(response);
           const { token, user } = response.data;
           set({ user, token, isLoading: false });
         } catch (error) {
@@ -83,8 +81,8 @@ export const useAuthStore = create<AuthState>()(
             headers: {
               Authorization: `Bearer ${token}`,
             },
+            withCredentials: true,
           });
-          console.log(res);
           //@ts-ignore
           useAuthStore.setState({ user: res.data?.user, token });
           //@ts-ignore
