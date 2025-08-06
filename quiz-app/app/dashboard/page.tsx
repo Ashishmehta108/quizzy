@@ -22,7 +22,7 @@ export default function DashboardPage() {
   const [quizzes, setQuizzes] = useState<QuizResponse[]>([]);
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user, restoreSession, isLoading,token } = useAuthStore();
+  const { user, restoreSession, isLoading, token } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -146,7 +146,7 @@ export default function DashboardPage() {
               <div className="w-full">
                 <ResultTable
                   results={{
-                    data: results,
+                    data: { data: results },
                   }}
                 />
               </div>
