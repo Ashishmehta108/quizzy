@@ -26,8 +26,8 @@ export default function DashboardPage() {
   const { user, restoreSession, isLoading, token } = useAuthStore();
   const router = useRouter();
   const { tkn } = useSession();
-  console.log("token is ",tkn);
-  if (!tkn) {
+  console.log("token is ", tkn);
+  if (tkn == null) {
     router.push("/login");
   }
   useEffect(() => {
