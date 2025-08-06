@@ -26,7 +26,6 @@ export default function DashboardPage() {
   const { user, restoreSession, isLoading, token } = useAuthStore();
   const router = useRouter();
   const { tkn } = useSession();
-  console.log("token is ", tkn);
   if (tkn == null) {
     router.push("/login");
   }
@@ -38,7 +37,6 @@ export default function DashboardPage() {
 
   const fetchData = async () => {
     try {
-      console.log(token);
       const [quizzesRes, resultsRes] = await Promise.all([
         api.get<QuizResponse[]>("/quizzes"),
         api.get<{

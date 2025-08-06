@@ -31,7 +31,6 @@ export const SessionProvider = ({
   useEffect(() => {
     const getCookiehelper = async () => {
       const cookieToken = await getCookie("access_token");
-      console.log("cookietoken", cookieToken);
       if (cookieToken) {
         setToken(cookieToken);
       }
