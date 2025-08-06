@@ -1,8 +1,8 @@
+import { configDotenv } from "dotenv";
+configDotenv();
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { configDotenv } from "dotenv";
-configDotenv();
 
 const app = express();
 

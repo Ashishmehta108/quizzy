@@ -43,12 +43,14 @@ export default function DashboardPage() {
       console.log(token);
       const [quizzesRes, resultsRes] = await Promise.all([
         api.get<QuizResponse[]>("/quizzes"),
-        api.get<Result[]>("/results"),
+        api.get<{
+          data: Result[];
+        }>("/results"),
       ]);
 
-      console.log(quizzesRes, resultsRes);
+      console.log(resultsRes.data);
       setQuizzes(quizzesRes.data);
-      setResults(resultsRes.data);
+      setResults(resultsRes.data.data);
     } catch (error) {
       console.error("Failed to fetch data:", error);
     } finally {
@@ -144,11 +146,7 @@ export default function DashboardPage() {
               </Card>
             ) : (
               <div className="w-full">
-                <ResultTable
-                  results={{
-                    data: { data: results },
-                  }}
-                />
+                <ResultTable results={results} />
               </div>
             )}
           </TabsContent>

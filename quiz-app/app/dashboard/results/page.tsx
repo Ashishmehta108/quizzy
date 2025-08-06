@@ -9,7 +9,6 @@ import ResultTable from "@/components/ui/result-card";
 import api from "@/lib/api";
 import type { Result } from "@/lib/types";
 
-
 export default function DashboardPage() {
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(false);
@@ -32,14 +31,14 @@ export default function DashboardPage() {
   const fetchData = async () => {
     try {
       const [resultsRes] = await Promise.all([
-        api.get<Result[]>("/results", {
+        api.get<{ data: Result[] }>("/results", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("quiz-app-token")}`,
           },
         }),
       ]);
       console.log(resultsRes);
-      setResults(resultsRes.data);
+      setResults(resultsRes.data.data);
     } catch (error) {
       console.error("Failed to fetch data:", error);
     } finally {
@@ -89,7 +88,7 @@ export default function DashboardPage() {
           </Card>
         ) : (
           <div className="w-full">
-            <ResultTable results={{ data: results }} />
+            <ResultTable results={results} />
           </div>
         )}
       </main>

@@ -284,7 +284,6 @@ export default function TakeQuizPage({
       const optionsFilled: Record<string, number> = {};
 
       quiz.questions.forEach((question) => {
-
         const userAnswer = answers[question.id];
         optionsFilled[question.id] = userAnswer ?? 1;
 
@@ -398,7 +397,7 @@ export default function TakeQuizPage({
                   : "Keep practicing!"}
               </p>
               <div className="flex gap-4">
-                <Link href={`/results/${result.id}`}>
+                <Link href={`/dashboard/results/${result.id}`}>
                   <Button>View Detailed Results</Button>
                 </Link>
                 <Link href="/dashboard">
