@@ -4,8 +4,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Image from "next/image";
-import logo from "../public/quizzy_metadata_logo.png"
+import logo from "../public/quizzy_metadata_logo.png";
 import Navbar from "@/components/Navbar";
+import { SessionProvider } from "@/components/Sessionprovider";
 const inter = Inter({ subsets: ["greek"] });
 
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   description: "A modern quiz application built with Next.js",
   generator: "v0.dev",
   icons: {
-    icon: logo.src
+    icon: logo.src,
   },
 };
 
@@ -22,19 +23,20 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {/* <Navbar /> */}
-          {children}
-        </ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {/* <Navbar /> */}
+            {children}
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

@@ -17,6 +17,7 @@ import api from "@/lib/api";
 import type { QuizResponse, Result } from "@/lib/types";
 import Link from "next/link";
 import "../globals.css";
+import { useSession } from "@/components/Sessionprovider";
 
 export default function DashboardPage() {
   const [quizzes, setQuizzes] = useState<QuizResponse[]>([]);
@@ -24,16 +25,13 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const { user, restoreSession, isLoading, token } = useAuthStore();
   const router = useRouter();
-
+  const { tkn } = useSession();
+  console.log("token is ",tkn);
+  if (!tkn) {
+    router.push("/login");
+  }
   useEffect(() => {
     if (!isLoading) {
-      if (!user?.id) {
-        const u = restoreSession();
-        if (!u) {
-          router.push("/login");
-        }
-        return;
-      }
       fetchData();
     }
   }, [user, isLoading]);
