@@ -16,7 +16,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { Result } from "@/lib/types";
 
 interface ResultTableProps {
-  results: { data: Result[] }; 
+  results: { data: { data: Result[] } };
 }
 
 export default function ResultTable({ results }: ResultTableProps) {
@@ -29,7 +29,7 @@ export default function ResultTable({ results }: ResultTableProps) {
   }, []);
   const filteredResults = useMemo(() => {
     //@ts-ignore
-    const sorted = results.data.sort((a, b) => {
+    const sorted = results.data.data.sort((a, b) => {
       const dateA = new Date(a?.submittedAt || Date.now()).getTime();
       const dateB = new Date(b?.submittedAt || Date.now()).getTime();
       return sortDesc ? dateB - dateA : dateA - dateB;
