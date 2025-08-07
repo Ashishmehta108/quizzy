@@ -95,7 +95,12 @@ export default function CreateQuizPage() {
                   <Button variant={"secondary"}>Take Quiz Now</Button>
                 </Link>
                 <Link href="/dashboard">
-                  <Button variant="outline" className="hover:bg-zinc-100 dark:hover:bg-zinc-800">Back to Dashboard</Button>
+                  <Button
+                    variant="outline"
+                    className="hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  >
+                    Back to Dashboard
+                  </Button>
                 </Link>
               </div>
             </CardContent>
