@@ -42,7 +42,6 @@ export default function DashboardPage() {
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch data:", error);
-    } finally {
     }
   };
 
