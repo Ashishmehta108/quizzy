@@ -35,10 +35,10 @@ export default function DashboardPage() {
       ]);
       console.log(resultsRes);
       setResults(resultsRes.data.data);
+      setLoading(false);
     } catch (error) {
       console.error("Failed to fetch data:", error);
     } finally {
-      setLoading(false);
     }
   };
   useEffect(() => {
@@ -56,7 +56,7 @@ export default function DashboardPage() {
             View your quiz performance and scores
           </p>
         </div>
-        {true ? (
+        {loading ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[...Array(6)].map((_, i) => (
               <Card key={i} className="animate-pulse">

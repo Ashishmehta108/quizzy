@@ -241,10 +241,10 @@ export default function TakeQuizPage({
       }
 
       setQuiz(foundQuiz);
+      setLoading(false);
     } catch (error) {
       setError("Failed to load quiz");
     } finally {
-      setLoading(false);
     }
   };
   const handleAnswerSelect = (answerId: number) => {

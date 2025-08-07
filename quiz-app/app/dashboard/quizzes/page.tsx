@@ -34,17 +34,15 @@ export default function DashboardPage() {
 
   const fetchData = async () => {
     try {
-      const [quizzesRes, resultsRes] = await Promise.all([
+      const [quizzesRes] = await Promise.all([
         api.get<QuizResponse[]>("/quizzes"),
-        api.get<Result[]>("/results"),
       ]);
 
       setQuizzes(quizzesRes.data);
-      setResults(resultsRes.data);
+      setLoading(false);
     } catch (error) {
       console.error("Failed to fetch data:", error);
     } finally {
-      setLoading(false);
     }
   };
 
