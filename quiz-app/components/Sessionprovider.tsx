@@ -38,10 +38,10 @@ export const SessionProvider = ({
         } else {
           setToken(newToken);
         }
+        setIsRestored(true);
       } catch (err) {
         console.error("Session restoration error:", err);
         router.replace("/login");
-      } finally {
         setIsRestored(true);
       }
     };
