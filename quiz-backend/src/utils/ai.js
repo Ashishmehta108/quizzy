@@ -10,7 +10,7 @@ export const generateQuizQuestions = async ({ title, context, morecontext }) => 
 You are an expert quiz generator.
 The title of quiz is ${title}
 If the quiz is a technical quiz then only create the quiz with the most recent information about the topic.
-Using ONLY the following context, create a quiz about: " with title as ${title} and more details of the quiz ${context} ".
+Using ONLY the following context, create a quiz: " with title as ${title} and more details of the quiz ${context} ".
 
 Extra Context:
 ${morecontext || "No additional context provided."}

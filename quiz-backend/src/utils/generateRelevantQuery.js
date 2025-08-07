@@ -14,14 +14,15 @@ const openai = new OpenAI({
  */
 export async function generateRelevantQuery(documentText) {
     try {
+        console.log(documentText)
         const prompt = `
 A user uploaded the following document but did not provide a clear query.
-Read the content and generate a short, relevant topic or question that could be used to create a quiz.
+Read the content and generate a short, relevant topic or question that could be used to create a quiz also the document might contain code so understand the code and then make the summary.
 
 Document:
 ${documentText}
 
-Return only the topic or question in one sentence as i want to pass all the context of the text to the llm in a single string not in any other data type.
+Return only the summary in one sentence as i want to pass all the context of the text to the llm in a single string not in any other data type. dont give the result in markdown format
 `;
 
         const response = await openai.chat.completions.create({
@@ -38,6 +39,7 @@ Return only the topic or question in one sentence as i want to pass all the cont
             ],
         });
 
+        console.log("Relevant query generated:", response.choices[0]?.message?.content?.trim());
         return response.choices[0]?.message?.content?.trim();
     } catch (error) {
         console.error("Failed to generate relevant query:", error);

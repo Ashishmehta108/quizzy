@@ -19,11 +19,10 @@ export const createQuiz = async (req, res) => {
         let retrivalcontext = null
         if (filePath) {
             if (fileType !== "text/plain") {
-                await processPdf(filePath, req.user.id, docId);
+               betterQuery= await processPdf(filePath, req.user.id, docId);
             } else {
                 const text = await fs.readFile(filePath, async (err, buffer) => {
                     console.log(buffer)
-                    console.log(text)
                     const chunktext = chunkText(buffer.toString(), 1000, 100);
                     await upsertChunks(req.user.id, docId, chunktext);
                     betterQuery = await generateRelevantQuery(buffer.toString());
