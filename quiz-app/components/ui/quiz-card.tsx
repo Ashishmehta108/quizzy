@@ -184,8 +184,8 @@ export function QuizTable({ quizzes }: QuizTableProps) {
       <div className="lg:hidden max-w-sm mx-auto space-y-4">
         {filteredQuizzes.length > 0 ? (
           filteredQuizzes.map((quiz) => {
-            const createdDate = quiz.document?.createdAt
-              ? new Date(quiz.document.createdAt).toLocaleDateString()
+            const createdDate = quiz.quiz?.createdAt
+              ? new Date(quiz.quiz.createdAt).toLocaleDateString()
               : "Date not specified";
 
             const attempted = !!quiz.result;
@@ -221,7 +221,7 @@ export function QuizTable({ quizzes }: QuizTableProps) {
                   <Link href={`/dashboard/quizzes/${quiz.quiz.id}`}>
                     <Button
                       size="sm"
-                      className="w-full bg-blue-900 hover:bg-blue-800 dark:bg-blue-900 dark:hover:bg-blue-800"
+                      className="p-3 bg-blue-900 hover:bg-blue-800 dark:bg-blue-900 dark:hover:bg-blue-800"
                     >
                       {attempted ? "View Result" : "Take Quiz"}
                     </Button>

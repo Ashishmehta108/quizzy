@@ -391,7 +391,7 @@ export default function ResultViewPage() {
                         return (
                           <div key={optionIndex} className={optionClass}>
                             <div className="flex items-center gap-2 sm:gap-3">
-                              <div className="sm:w-6 sm:h-6 h-5 w-5 rounded-full bg-zinc-300 dark:bg-zinc-700 flex items-center justify-center text-xs font-normal md:text-sm  text-zinc-700 dark:text-zinc-300">
+                              <div className="sm:w-6 sm:h-6 h-5 w-5 rounded-full bg-zinc-300 dark:bg-zinc-700 flex  md:flex-row flex-col md:items-center md:justify-center items-start justify-center text-xs font-normal md:text-sm  text-zinc-700 dark:text-zinc-300">
                                 {String.fromCharCode(65 + optionIndex)}
                               </div>
                               <span className="  text-zinc-900 dark:text-zinc-100">
