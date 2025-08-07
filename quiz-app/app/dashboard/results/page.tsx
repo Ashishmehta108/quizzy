@@ -31,11 +31,7 @@ export default function DashboardPage() {
   const fetchData = async () => {
     try {
       const [resultsRes] = await Promise.all([
-        api.get<{ data: Result[] }>("/results", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("quiz-app-token")}`,
-          },
-        }),
+        api.get<{ data: Result[] }>("/results"),
       ]);
       console.log(resultsRes);
       setResults(resultsRes.data.data);
@@ -60,7 +56,7 @@ export default function DashboardPage() {
             View your quiz performance and scores
           </p>
         </div>
-        {loading ? (
+        {isLoading ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[...Array(6)].map((_, i) => (
               <Card key={i} className="animate-pulse">
