@@ -27,7 +27,16 @@ app.use("/api/quizzes", quizRoutes);
 app.use("/api/results", resultRouter);
 
 app.get("/", (_req, res) => {
+    res.cookie("test", "test", {
+        httpOnly: true, secure: true, sameSite: "none",
+        maxAge: 60 * 60 * 24 * 1000
+    });
+    res.send("hello")
+});
 
+
+app.get("/cookie", (_req, res) => {
+    res.cookie("test1", "test", { httpOnly: true, secure: true, sameSite: "none", expires: new Date(Date.now() + 60 * 60 * 24 * 1000) });
     res.send("hello")
 });
 

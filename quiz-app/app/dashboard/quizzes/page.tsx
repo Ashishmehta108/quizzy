@@ -35,16 +35,8 @@ export default function DashboardPage() {
   const fetchData = async () => {
     try {
       const [quizzesRes, resultsRes] = await Promise.all([
-        api.get<QuizResponse[]>("/quizzes", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("quiz-app-token")}`,
-          },
-        }),
-        api.get<Result[]>("/results", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("quiz-app-token")}`,
-          },
-        }),
+        api.get<QuizResponse[]>("/quizzes"),
+        api.get<Result[]>("/results"),
       ]);
 
       setQuizzes(quizzesRes.data);
