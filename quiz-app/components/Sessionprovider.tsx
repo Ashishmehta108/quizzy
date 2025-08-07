@@ -47,7 +47,7 @@ export const SessionProvider = ({
     };
     initSession();
   }, [router]);
-  if (!isRestored || window.location.pathname !== "/") return <Loader />;
+  if (!isRestored) return <Loader />;
 
   return (
     <SessionContext.Provider value={{ token: localToken, setToken }}>
