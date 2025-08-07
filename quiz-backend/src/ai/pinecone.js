@@ -92,7 +92,12 @@ export async function queryChunks(query, userId, topK = 5, docId) {
         filter,
         includeMetadata: true,
     });
-    console.log(results)
+    console.log(results.matches.map(match => ({
+        id: match.id,
+        score: match.score,
+        text: match.metadata.text || "",
+        metadata: match.metadata,
+    })))
     return results.matches.map(match => ({
         id: match.id,
         score: match.score,

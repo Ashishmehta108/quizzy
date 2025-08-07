@@ -7,7 +7,7 @@ import { processPdf } from "../ai/parsedoc/doc.js";
 import { queryChunks, upsertChunks } from "../ai/pinecone.js";
 import { chunkText } from "../utils/chunk.js";
 import fs from "fs";
-import { generateRelevantQuery } from "../utils/generateRelevantQuery.js";
+// import { generateRelevantQuery } from "../utils/generateRelevantQuery.js";
 
 export const createQuiz = async (req, res) => {
     try {
@@ -19,13 +19,13 @@ export const createQuiz = async (req, res) => {
         let retrivalcontext = null
         if (filePath) {
             if (fileType !== "text/plain") {
-               betterQuery= await processPdf(filePath, req.user.id, docId);
+             await processPdf(filePath, req.user.id, docId);
             } else {
                 const text = await fs.readFile(filePath, async (err, buffer) => {
                     console.log(buffer)
                     const chunktext = chunkText(buffer.toString(), 1000, 100);
                     await upsertChunks(req.user.id, docId, chunktext);
-                    betterQuery = await generateRelevantQuery(buffer.toString());
+                    // betterQuery = await generateRelevantQuery(buffer.toString());
                 });
             }
             retrivalcontext = (await queryChunks(query, req.user.id, 4, docId)).map((chunk) => ({

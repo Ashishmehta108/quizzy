@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth";
+import Loader from "./loader/loader";
 
 interface SessionContextType {
   token: string | null;
@@ -47,7 +48,7 @@ export const SessionProvider = ({
 
     initSession();
   }, [router]);
-  if (!isRestored) return <div className="p-6">Loading session...</div>;
+  if (!isRestored) return <Loader />;
 
   return (
     <SessionContext.Provider value={{ token: localToken, setToken }}>

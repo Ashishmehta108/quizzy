@@ -198,8 +198,8 @@ export default function CreateQuizPage() {
                 </div>
                 {files && files.length > 0 && (
                   <div className="mt-2">
-                    <p className="text-sm text-gray-600">Selected files:</p>
-                    <ul className="mt-1 text-sm text-gray-900">
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">Selected files:</p>
+                    <ul className="mt-1 text-sm text-zinc-900 dark:text-zinc-300">
                       {Array.from(files).map((file, index) => (
                         <li key={index} className="flex items-center gap-2">
                           <FileText className="h-4 w-4" />
