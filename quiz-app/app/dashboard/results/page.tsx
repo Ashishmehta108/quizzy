@@ -22,7 +22,6 @@ export default function DashboardPage() {
         if (!u) {
           router.push("/login");
         }
-        return;
       }
       fetchData();
     }
@@ -38,13 +37,8 @@ export default function DashboardPage() {
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch data:", error);
-    } finally {
-    }
+    } 
   };
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   if (!user) return null;
 
   return (
