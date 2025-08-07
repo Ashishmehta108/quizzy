@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import {
@@ -27,15 +27,21 @@ interface LoginForm {
 
 export default function LoginPage() {
   const [error, setError] = useState<string>("");
-  const { login, isLoading } = useAuthStore();
+  const { login, isLoading, user } = useAuthStore();
   const router = useRouter();
-
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginForm>();
 
+  useEffect(() => {
+    if (!isLoading) {
+      if (user) {
+        router.push("/dashboard");
+      }
+    }
+  }, [user, isLoading]);
   const onSubmit = async (data: LoginForm) => {
     try {
       setError("");
