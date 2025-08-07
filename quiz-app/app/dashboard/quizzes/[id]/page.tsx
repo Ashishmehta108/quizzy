@@ -83,7 +83,7 @@ export function QuestionCard({
                 >
                   <div className="flex items-center gap-4">
                     <div
-                      className={`w-10 h-10 rounded-full border-2 flex items-center justify-center font-semibold text-xs transition-all duration-200 ${
+                      className={`w-7 h-7 rounded-full border-2 flex items-center justify-center font-semibold text-xs transition-all duration-200 ${
                         isSelected
                           ? " bg-blue-500  text-white"
                           : " bg-white dark:bg-zinc-900 dark:text-zinc-400 text-gray-600 "
@@ -94,14 +94,14 @@ export function QuestionCard({
 
                     <div className="flex-1">
                       <span
-                        className={`text-base font-medium transition-colors duration-200`}
+                        className={` text-sm sm:text-base  transition-colors duration-200`}
                       >
                         {option}
                       </span>
                     </div>
 
                     {isSelected && (
-                      <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
+                      <div className="sm:w-5 sm:h-5 h-4 w-4 rounded-full bg-blue-500 flex items-center justify-center">
                         <div className="w-2 h-2 bg-white rounded-full" />
                       </div>
                     )}

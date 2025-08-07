@@ -77,8 +77,8 @@ export function Features() {
                     hover:shadow-lg"
                 >
                   <CardContent className="p-0">
-                    <div className="flex items-start space-x-6">
-                      {/* Glassmorphic Icon Container */}
+                    <div className="flex flex-col items-center md:flex-row md:items-start space-x-6">
+
                       <div
                         className={`relative w-14 h-14 rounded-full 
                         bg-white/60 backdrop-blur-md 
@@ -92,12 +92,7 @@ export function Features() {
                         <Icon1
                           className={` absolute h-6 w-6 ${feature.color} opacity-90`}
                         />
-                        {/* Second Icon (lighter & shifted) */}
-                        {/* <Icon2
-                          className={`absolute h-6 w-6 ${feature.color} opacity-40 translate-x-1 translate-y-1`}
-                        /> */}
                       </div>
-                      {/* Content */}
                       <div className="flex-1">
                         <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-4">
                           {feature.title}

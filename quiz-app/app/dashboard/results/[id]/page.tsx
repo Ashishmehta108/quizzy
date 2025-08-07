@@ -306,7 +306,7 @@ export default function ResultViewPage() {
             <div className="flex items-center gap-3">
               <BookOpen className="h-6 w-6 text-zinc-600 dark:text-zinc-400" />
               <div>
-                <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+                <h2 className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-zinc-100">
                   Question Review
                 </h2>
                 <p className="text-zinc-600 dark:text-zinc-400">
@@ -390,11 +390,11 @@ export default function ResultViewPage() {
 
                         return (
                           <div key={optionIndex} className={optionClass}>
-                            <div className="flex items-center gap-3">
-                              <div className="w-6 h-6 rounded-full bg-zinc-300 dark:bg-zinc-700 flex items-center justify-center text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <div className="sm:w-6 sm:h-6 h-5 w-5 rounded-full bg-zinc-300 dark:bg-zinc-700 flex items-center justify-center text-xs font-normal md:text-sm  text-zinc-700 dark:text-zinc-300">
                                 {String.fromCharCode(65 + optionIndex)}
                               </div>
-                              <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                              <span className="  text-zinc-900 dark:text-zinc-100">
                                 {option}
                               </span>
                             </div>
@@ -402,7 +402,7 @@ export default function ResultViewPage() {
                               {isSelected && (
                                 <Badge
                                   variant="outline"
-                                  className="text-xs border-zinc-300 dark:border-zinc-700"
+                                  className="text-xs  border-zinc-300 dark:border-zinc-700"
                                 >
                                   <User className="h-3 w-3 mr-1" />
                                   Your Choice
@@ -415,9 +415,9 @@ export default function ResultViewPage() {
                                 </Badge>
                               )}
                               {isCorrectOption ? (
-                                <CheckCircle2 className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+                                <CheckCircle2 className="h-3 w-3 text-zinc-600 dark:text-zinc-400" />
                               ) : isSelected ? (
-                                <X className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
+                                <X className="h-3 w-3 text-zinc-600 dark:text-zinc-400" />
                               ) : null}
                             </div>
                           </div>
@@ -429,7 +429,7 @@ export default function ResultViewPage() {
                     <Accordion type="single" collapsible>
                       <AccordionItem value="explanation" className="border-0">
                         <AccordionTrigger className="hover:no-underline p-3 bg-zinc-100 dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 text-sm md:text-base">
                             <Info className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
                             <span className="text-zinc-900 dark:text-zinc-100">
                               {isCorrect
