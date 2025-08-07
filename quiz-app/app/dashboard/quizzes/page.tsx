@@ -15,7 +15,7 @@ import Link from "next/link";
 export default function DashboardPage() {
   const [quizzes, setQuizzes] = useState<QuizResponse[]>([]);
   const [results, setResults] = useState<Result[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { user, logout, restoreSession, isLoading } = useAuthStore();
   const router = useRouter();
 
@@ -65,7 +65,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {isLoading ? (
+      {loading ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
             <Card key={i} className="animate-pulse">

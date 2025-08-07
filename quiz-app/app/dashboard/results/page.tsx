@@ -11,7 +11,7 @@ import type { Result } from "@/lib/types";
 
 export default function DashboardPage() {
   const [results, setResults] = useState<Result[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { user, restoreSession, isLoading } = useAuthStore();
   const router = useRouter();
 
@@ -56,7 +56,7 @@ export default function DashboardPage() {
             View your quiz performance and scores
           </p>
         </div>
-        {isLoading ? (
+        {true ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[...Array(6)].map((_, i) => (
               <Card key={i} className="animate-pulse">

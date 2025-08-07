@@ -78,14 +78,12 @@ export const login = async (req, res) => {
       .cookie("access_token", accessToken, {
         httpOnly: true,
         secure: true,
-        sameSite: "none",
-        expires: new Date(Date.now() + 60 * 60 * 24 * 1000)
+        sameSite: "none"
       })
       .cookie("refresh_token", refreshToken, {
         httpOnly: true,
         secure: true,
-        sameSite: "none",
-        expires: new Date(Date.now() + 60 * 60 * 24 * 1000)
+        sameSite: "none"
       }).json({
         user: {
           id: user.id,
