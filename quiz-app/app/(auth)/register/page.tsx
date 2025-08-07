@@ -43,8 +43,7 @@ export default function RegisterPage() {
     try {
       setError("");
       console.log("registering");
-      const resp = await registerUser(data.name, data.email, data.password);
-      console.log(resp);
+      await registerUser(data.name, data.email, data.password);
       router.push("/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.message || "Registration failed");

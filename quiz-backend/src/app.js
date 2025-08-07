@@ -26,6 +26,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/quizzes", quizRoutes);
 app.use("/api/results", resultRouter);
 
-app.get("/", (_req, res) => res.send("hello"));
+app.get("/", (_req, res) => {
+
+    res.send("hello")
+});
 
 export default app;

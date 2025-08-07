@@ -7,6 +7,7 @@ import { processPdf } from "../ai/parsedoc/doc.js";
 import { queryChunks, upsertChunks } from "../ai/pinecone.js";
 import { chunkText } from "../utils/chunk.js";
 import fs from "fs";
+import { generateRelevantQuery } from "../utils/generateRelevantQuery.js";
 
 export const createQuiz = async (req, res) => {
     try {
@@ -14,7 +15,7 @@ export const createQuiz = async (req, res) => {
         const fileType = req?.files[0]?.mimetype;
         const { title, query } = req.body;
         const docId = randomUUID();
-
+        let betterQuery = null
         let retrivalcontext = null
         if (filePath) {
             if (fileType !== "text/plain") {
@@ -30,13 +31,16 @@ export const createQuiz = async (req, res) => {
             retrivalcontext = (await queryChunks(query, req.user.id, 4, docId)).map((chunk) => ({
                 data: chunk.text
             }));
-        }
 
+
+            betterQuery = await generateRelevantQuery(docText);
+
+        }
         const finalQuestions = await generateQuizQuestions(
             {
                 title: title,
                 context: query,
-                morecontext: retrivalcontext && retrivalcontext + " This is the data parsed from the document uploaded by the user so make the quiz accordingly."
+                morecontext: retrivalcontext && retrivalcontext + " This is the data parsed from the document uploaded by the user so make the quiz accordingly." + `this is the full info of the pdf ${betterQuery} `
             }
         );
 

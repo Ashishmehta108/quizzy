@@ -18,6 +18,7 @@ export const useSession = () => useContext(SessionContext);
 async function getCookie(name: string) {
   const match = await fetch("/api/cookie");
   const data = await match.json();
+  console.log(data);
   return data;
 }
 

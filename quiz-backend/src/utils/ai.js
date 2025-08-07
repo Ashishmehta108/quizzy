@@ -9,6 +9,7 @@ export const generateQuizQuestions = async ({ title, context, morecontext }) => 
 
 You are an expert quiz generator.
 The title of quiz is ${title}
+If the quiz is a technical quiz then only create the quiz with the most recent information about the topic.
 Using ONLY the following context, create a quiz about: " with title as ${title} and more details of the quiz ${context} ".
 
 Extra Context:
@@ -38,7 +39,7 @@ just give response in json not in markdown format
 `;
 
   const result = await genAI.models.generateContent({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash",
     contents: prompt,
 
   });

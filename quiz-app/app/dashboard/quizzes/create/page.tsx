@@ -91,7 +91,7 @@ export default function CreateQuizPage() {
                 Your quiz "{success.title}" has been created
               </p>
               <div className="flex gap-4">
-                <Link href={`/quizzes/${success.id}`}>
+                <Link href={`/dashboard/quizzes/${success.id}`}>
                   <Button variant={"secondary"}>Take Quiz Now</Button>
                 </Link>
                 <Link href="/dashboard">

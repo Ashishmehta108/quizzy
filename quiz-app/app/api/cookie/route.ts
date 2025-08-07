@@ -5,8 +5,8 @@ export async function GET(req: NextRequest) {
   const cookieStore = await cookies();
   console.log(cookieStore)
   const token = await cookieStore.get("access_token");
-  console.log(token);
-  return NextResponse.json({ token: token?.value ?? null });
+  console.log(token?.value);
+  return NextResponse.json({ token: token?.value });
 }
 
 export async function DELETE(req: NextRequest) {

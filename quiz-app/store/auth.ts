@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import api, { deleteToken } from "@/lib/api";
+import api, { deleteToken, getToken } from "@/lib/api";
 import type { User, AuthResponse } from "@/lib/types";
 
 interface AuthState {
@@ -74,7 +74,7 @@ export const useAuthStore = create<AuthState>()(
         set({ user });
       },
       restoreSession: async () => {
-        const token = get().token;
+        const token = (await get().token) || (await getToken());
         if (!token) return;
         try {
           const res = await api.get<User>("/auth/me", {

@@ -26,10 +26,25 @@ export default function DashboardPage() {
   const { user, restoreSession, isLoading, token } = useAuthStore();
   const router = useRouter();
   const { tkn } = useSession();
+
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   useEffect(() => {
     if (!isLoading) {
-      if (tkn == null) {
-        router.push("/login");
+      if (!user?.id) {
+        try {
+          restoreSession();
+          if (!useAuthStore.getState().user) {
+            router.push("/login");
+            return;
+          }
+        } catch (error) {
+          router.push("/login");
+          return;
+        }
       }
       fetchData();
     }
@@ -55,6 +70,8 @@ export default function DashboardPage() {
   };
 
   if (!user) return null;
+
+  if (!isMounted) return null;
 
   return (
     <div className="bg-white dark:bg-zinc-900">
