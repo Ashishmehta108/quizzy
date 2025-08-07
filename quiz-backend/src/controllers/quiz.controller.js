@@ -26,9 +26,8 @@ export const createQuiz = async (req, res) => {
                     console.log(text)
                     const chunktext = chunkText(buffer.toString(), 1000, 100);
                     await upsertChunks(req.user.id, docId, chunktext);
+                    betterQuery = await generateRelevantQuery(buffer.toString());
                 });
-
-                betterQuery = await generateRelevantQuery(buffer.toString());
             }
             retrivalcontext = (await queryChunks(query, req.user.id, 4, docId)).map((chunk) => ({
                 data: chunk.text
