@@ -9,7 +9,6 @@ export async function processPdf(filePath, userId, docId) {
     const chunks = chunkText(text, 1000, 100);
     await upsertChunks(userId, docId, chunks);
     console.log(`Processed ${chunks.length} chunks from ${filePath}`);
-    return betterQuery;
 }
 
 

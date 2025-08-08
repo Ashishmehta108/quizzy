@@ -35,7 +35,12 @@ export default function DashboardPage() {
   const fetchData = async () => {
     try {
       const [quizzesRes] = await Promise.all([
-        api.get<QuizResponse[]>("/quizzes"),
+        api.get<QuizResponse[]>("/quizzes",{
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }),
       ]);
 
       setQuizzes(quizzesRes.data);

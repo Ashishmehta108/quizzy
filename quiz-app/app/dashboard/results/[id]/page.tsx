@@ -104,7 +104,12 @@ export default function ResultViewPage() {
   const fetchResult = async () => {
     try {
       setLoading(true);
-      const response = await api.get<ApiResponse>(`/results/${id}`);
+      const response = await api.get<ApiResponse>(`/results/${id}`, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
       console.log("Quiz result response:", response.data);
       setResult(response.data.result);
     } catch (error: any) {

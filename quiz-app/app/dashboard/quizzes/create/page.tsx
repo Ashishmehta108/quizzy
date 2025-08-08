@@ -63,6 +63,7 @@ export default function CreateQuizPage() {
       }>("/quizzes", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`
         },
       });
       const quiz = response.data.quiz;
@@ -198,7 +199,9 @@ export default function CreateQuizPage() {
                 </div>
                 {files && files.length > 0 && (
                   <div className="mt-2">
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">Selected files:</p>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                      Selected files:
+                    </p>
                     <ul className="mt-1 text-sm text-zinc-900 dark:text-zinc-300">
                       {Array.from(files).map((file, index) => (
                         <li key={index} className="flex items-center gap-2">

@@ -30,14 +30,19 @@ export default function DashboardPage() {
   const fetchData = async () => {
     try {
       const [resultsRes] = await Promise.all([
-        api.get<{ data: Result[] }>("/results"),
+        api.get<{ data: Result[] }>("/results", {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }),
       ]);
       console.log(resultsRes);
       setResults(resultsRes.data.data);
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch data:", error);
-    } 
+    }
   };
   if (!user) return null;
 

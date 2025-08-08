@@ -6,12 +6,12 @@ import { useAuthStore } from "@/store/auth";
 import Loader from "./loader/loader";
 
 interface SessionContextType {
-  token: string | null;
-  setToken: (token: string | null) => void;
+  tkn: string | null;
+  setToken: (tkn: string | null) => void;
 }
 
 const SessionContext = createContext<SessionContextType>({
-  token: null,
+  tkn: null,
   setToken: () => {},
 });
 
@@ -50,7 +50,7 @@ export const SessionProvider = ({
   if (!isRestored) return <Loader />;
 
   return (
-    <SessionContext.Provider value={{ token: localToken, setToken }}>
+    <SessionContext.Provider value={{ tkn: localToken, setToken }}>
       {children}
     </SessionContext.Provider>
   );

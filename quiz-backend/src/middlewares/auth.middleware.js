@@ -9,9 +9,7 @@ export const protect = async (req, res, next) => {
   try {
     const headerToken = req.headers.authorization?.split(" ")[1];
     const cookieToken = req.cookies?.access_token;
-
     const token = headerToken || cookieToken;
-
     if (!token) {
       return res.status(401).json({ message: "Access token missing" });
     }

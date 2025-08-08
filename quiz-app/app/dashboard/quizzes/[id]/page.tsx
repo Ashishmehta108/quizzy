@@ -299,6 +299,11 @@ export default function TakeQuizPage({
         quizId: quiz.quiz.id,
         totalScore,
         optionsFilled: data,
+      },{
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        }
       });
 
       setResult(response.data.data);

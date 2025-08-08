@@ -35,6 +35,7 @@ export const useAuthStore = create<AuthState>()(
             }
           );
           const { token, user } = response.data;
+          localStorage.setItem("access_token", token);
           set({ user, token, isLoading: false });
         } catch (error) {
           set({ isLoading: false });
@@ -67,6 +68,7 @@ export const useAuthStore = create<AuthState>()(
 
       logout: async () => {
         await deleteToken();
+        localStorage.setItem("access_token", "");
         set({ user: null, token: null });
       },
 
@@ -74,7 +76,7 @@ export const useAuthStore = create<AuthState>()(
         set({ user });
       },
       restoreSession: async () => {
-        const token = (await get().token) || (await getToken());
+        const token = localStorage.getItem("access_token");
         if (!token) return;
         try {
           const res = await api.get<User>("/auth/me", {
