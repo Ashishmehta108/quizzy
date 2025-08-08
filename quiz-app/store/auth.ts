@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import api, { deleteToken, getToken } from "@/lib/api";
-import type { User, AuthResponse } from "@/lib/types";
+import type { User } from "@/lib/types";
 
 interface AuthState {
   user: User | null;
@@ -11,7 +11,12 @@ interface AuthState {
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   setUser: (user: User) => void;
-  restoreSession: () => Promise<void>;
+  restoreSession: () => Promise<User | undefined>;
+}
+
+interface AuthResponse {
+  token: string;
+  user: User;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -59,6 +64,7 @@ export const useAuthStore = create<AuthState>()(
             }
           );
           const { token, user } = response.data;
+          localStorage.setItem("access_token", token);
           set({ user, token, isLoading: false });
         } catch (error) {
           set({ isLoading: false });
@@ -79,16 +85,18 @@ export const useAuthStore = create<AuthState>()(
         const token = localStorage.getItem("access_token");
         if (!token) return;
         try {
-          const res = await api.get<User>("/auth/me", {
+          const res = await api.get<AuthResponse>("/auth/me", {
             headers: {
               Authorization: `Bearer ${token}`,
             },
             withCredentials: true,
           });
           //@ts-ignore
+
+          localStorage.setItem("access_token", res.data.token);
           useAuthStore.setState({ user: res.data?.user, token });
           //@ts-ignore
-          return res.data.user;
+          return res?.data?.user;
         } catch (error) {
           console.error("Failed to restore session:", error);
         }
