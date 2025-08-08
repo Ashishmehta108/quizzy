@@ -15,15 +15,17 @@ export const createQuiz = async (req, res) => {
         const fileType = req?.files[0]?.mimetype;
         const { title, query } = req.body;
         const docId = randomUUID();
+        let fulldoc = ""
         let retrivalcontext = null
         if (filePath) {
             if (fileType !== "text/plain") {
-                await processPdf(filePath, req.user.id, docId);
+                fulldoc = await processPdf(filePath, req.user.id, docId);
             } else {
                 const text = await fs.readFile(filePath, async (err, buffer) => {
                     console.log(buffer)
                     const chunktext = chunkText(buffer.toString(), 1000, 100);
                     await upsertChunks(req.user.id, docId, chunktext);
+                    fulldoc = chunktext.map((chunk) => chunk.text).join(" ");
                 });
             }
             retrivalcontext = (await queryChunks(query, req.user.id, 4, docId)).map((chunk) => ({
@@ -34,7 +36,7 @@ export const createQuiz = async (req, res) => {
             {
                 title: title,
                 context: query,
-                morecontext: retrivalcontext && retrivalcontext + " This is the data parsed from the document uploaded by the user so make the quiz accordingly."
+                morecontext: retrivalcontext && retrivalcontext + " This is the data parsed from the document uploaded by the user so make the quiz accordingly." + "this is the full document " + fulldoc
             }
         );
 

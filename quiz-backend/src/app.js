@@ -3,7 +3,7 @@ configDotenv();
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-
+import morgan from "morgan"
 const app = express();
 
 // ---- CORS SETUP (must be first!) ----
@@ -16,7 +16,7 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use()
 import authRoutes from "./routes/auth.routes.js";
 import quizRoutes from "./routes/quiz.routes.js";
 import { resultRouter } from "./routes/result.routes.js";
