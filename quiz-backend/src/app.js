@@ -16,7 +16,7 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use()
+app.use(morgan("combined"))
 import authRoutes from "./routes/auth.routes.js";
 import quizRoutes from "./routes/quiz.routes.js";
 import { resultRouter } from "./routes/result.routes.js";
