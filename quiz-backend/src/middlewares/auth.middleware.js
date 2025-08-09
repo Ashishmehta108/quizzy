@@ -15,7 +15,13 @@ export const protect = async (req, res, next) => {
     }
     const decoded = jwt.verify(token, ACCESS_SECRET);
     const [user] = await db
-      .select()
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        accessToken: users.accessToken,
+        refreshToken: users.refreshToken,
+      })
       .from(users)
       .where(eq(users.id, decoded.userId));
 

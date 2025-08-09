@@ -5,9 +5,10 @@ const router = Router();
 
 router.post("/register", register);
 router.post("/login", login);
-router.get("/me",protect,async(req,res)=>{
+router.get("/me", protect, async (req, res) => {
 	res.json({
-		user:req.user
+		user: req.user,
+		token: req.user.accessToken
 	})
 })
 export default router;
