@@ -33,7 +33,7 @@ export const SessionProvider = ({
       try {
         await restoreSession();
         const newToken = useAuthStore.getState().token;
-        if (!newToken) {
+        if (!newToken && window.location.pathname !== "/") {
           router.replace("/login");
         } else {
           setToken(newToken);
@@ -41,7 +41,7 @@ export const SessionProvider = ({
         setIsRestored(true);
       } catch (err) {
         console.error("Session restoration error:", err);
-        router.replace("/login");
+        router.replace("/");
         setIsRestored(true);
       }
     };
