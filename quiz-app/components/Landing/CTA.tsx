@@ -18,7 +18,6 @@ export default function CTA() {
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <CoolButton
-              onClick={() => {}}
               className=" text-sm px-6 bg-zinc-950"
             />
             <p className="text-blue-100 font-medium">

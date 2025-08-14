@@ -1,12 +1,18 @@
 .radial {
   position: absolute;
-  inset: 0;
-
+  top: -20%; /* slightly above to mimic top glow */
+  left: 50%;
+  width: 120%; /* smaller area = better performance */
+  height: 120%;
+  transform: translateX(-50%) rotate(45deg);
   background: radial-gradient(
-    ellipse 50% 40% at 20% 20%,
+    ellipse 60% 50% at 30% 30%,
     rgba(255, 255, 255, 0.15),
-    /* frosted white */ rgba(255, 255, 255, 0) /* fade out */
+    /* lighter highlight */ rgba(244, 238, 238, 0) /* fade out */
   );
-  backdrop-filter: blur(20px); /* Frosted effect */
-  -webkit-backdrop-filter: blur(20px); /* Safari support */
+  filter: blur(
+    15px
+  ); /* use filter instead of backdrop-filter for better performance */
+  pointer-events: none;
+  z-index: 10;
 }

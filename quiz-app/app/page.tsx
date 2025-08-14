@@ -5,13 +5,13 @@ import { motion } from "framer-motion";
 import { useInView, Variants } from "framer-motion";
 import { useRef } from "react";
 import { TestimonialsSection } from "@/components/Landing/Testimonials";
-import { Features } from "@/components/Landing/Features";
 import Footer from "@/components/Footer";
 import CTA from "@/components/Landing/CTA";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Landing/Hero";
 import { NavbarDemo } from "@/components/Landing/LandingNavbar";
 import Info from "@/components/Landing/Info";
+import { IphonePopup } from "@/components/Landing/Notification";
 
 interface AnimatedElementProps {
   children: React.ReactNode;
@@ -83,7 +83,8 @@ const QuizAppLanding = () => {
     <div className="min-h-screen pb-8 relative  dark:bg-zinc-950 transition-colors duration-300">
       <NavbarDemo />
       <Hero />
-      <Features />
+      {/* <Features /> */}
+      <IphonePopup />
       <Info />
       <TestimonialsSection />
       <CTA />

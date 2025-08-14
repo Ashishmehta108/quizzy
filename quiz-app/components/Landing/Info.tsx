@@ -5,7 +5,7 @@
     return (
         <div className="flex flex-col container max-w-6xl mx-auto md:flex-row justify-between items-center my-20">
         <div className="">
-            <h2 className="text-4xl md:text-6xl font-semibold text-zinc-900 dark:text-white mb-7 tracking-tight">
+            <h2 className="text-3xl md:text-5xl font-semibold text-zinc-900 dark:text-white mb-7 tracking-tight">
             Why choose us?
             </h2>
             <p className="text-sm md:text-base text-zinc-600 dark:text-zinc-400 mb-12 max-w-3xl mx-auto leading-relaxed max-w-md">

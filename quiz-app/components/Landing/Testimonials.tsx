@@ -5,70 +5,40 @@ import { Star } from "lucide-react";
 import { AnimatedElement } from "@/app/page";
 const reviews = [
   {
-    name: "Jack",
-    username: "@jack",
-    body: "I've never seen anything like this before. It's amazing. I love it.",
-    img: "https://avatar.vercel.sh/jack",
+    name: "Anonymous",
+    username: "@anonymous",
+    body: "Fun, easy-to-use quiz app with a wide variety of topics, instant feedback, and great progress tracking.",
+    img: "https://avatar.vercel.sh/anonymous",
   },
   {
-    name: "Jill",
-    username: "@jill",
-    body: "I don't know what to say. I'm speechless. This is amazing.",
-    img: "https://avatar.vercel.sh/jill",
+    name: "Akshay",
+    username: "@akshay",
+    body: "Rest interface is good and features too.",
+    img: "https://avatar.vercel.sh/akshay",
   },
   {
-    name: "John",
-    username: "@john",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/john",
+    name: "Nitesh",
+    username: "@nitesh",
+    body: "I played 2 types of quizzes, I enjoyed a lot.",
+    img: "https://avatar.vercel.sh/nitesh",
   },
   {
-    name: "Jane",
-    username: "@jane",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/jane",
+    name: "Priya",
+    username: "@priya",
+    body: "This app makes learning so fun and interactive!",
+    img: "https://avatar.vercel.sh/priya",
   },
   {
-    name: "Jenny",
-    username: "@jenny",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/jenny",
+    name: "Rohan",
+    username: "@rohan",
+    body: "Great way to test my knowledge on different topics quickly.",
+    img: "https://avatar.vercel.sh/rohan",
   },
   {
-    name: "James",
-    username: "@james",
-    body: "I'm at a loss for words. This is amazing. I love it.",
-    img: "https://avatar.vercel.sh/james",
-  },
-];
-
-const testimonials = [
-  {
-    name: "Sarah Chen",
-    role: "Medical Student",
-    company: "Stanford University",
-    content:
-      "This completely revolutionized my study routine. I can turn any textbook chapter into engaging quizzes in seconds.",
-    avatar: "SC",
-    rating: 5,
-  },
-  {
-    name: "David Park",
-    role: "Software Engineer",
-    company: "Google",
-    content:
-      "Perfect for onboarding and training. I upload technical docs and get instant knowledge assessments.",
-    avatar: "DP",
-    rating: 5,
-  },
-  {
-    name: "Maria Rodriguez",
-    role: "High School Teacher",
-    company: "Lincoln High",
-    content:
-      "My students are more engaged than ever. Creating personalized quizzes takes minutes instead of hours.",
-    avatar: "MR",
-    rating: 5,
+    name: "Sneha",
+    username: "@sneha",
+    body: "Love the instant feedback feature, keeps me motivated!",
+    img: "https://avatar.vercel.sh/sneha",
   },
 ];
 
@@ -124,12 +94,12 @@ export function TestimonialsSection() {
       <div className="max-w-7xl mx-auto">
         <AnimatedElement>
           <div className="text-center mb-24">
-            <h2 className="text-2xl sm:text-6xl font-bold text-zinc-900 dark:text-white mb-8 tracking-tight">
+            <h2 className="text-2xl sm:text-5xl font-bold text-zinc-900 dark:text-white mb-8 tracking-tight">
               Loved by{" "}
               <span className="text-blue-600 dark:text-blue-400">learners</span>{" "}
               everywhere
             </h2>
-            <p className="text-xl text-zinc-600 dark:text-zinc-300 max-w-3xl mx-auto">
+            <p className="text-lg text-zinc-600 dark:text-zinc-300 max-w-3xl mx-auto">
               Join thousands who have transformed their learning experience
             </p>
           </div>

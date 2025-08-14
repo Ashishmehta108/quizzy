@@ -3,13 +3,13 @@ import { db } from "../config/db/index.js";
 import { users } from "../config/db/schema.js";
 import { eq } from "drizzle-orm";
 import "dotenv/config"
-const ACCESS_SECRET = process.env.ACCESS_SECRET || "accesssecret";
+const ACCESS_SECRET = process.env.ACCESS_SECRET;
 
 export const protect = async (req, res, next) => {
   try {
     const headerToken = req.headers.authorization?.split(" ")[1];
     const cookieToken = req.cookies?.access_token;
-    console.log("cookieToken", cookieToken)
+    console.log("cookieToken", cookieToken,headerToken  )
     const token = headerToken || cookieToken;
     if (!token) {
       return res.status(401).json({ message: "Access token missing" });
