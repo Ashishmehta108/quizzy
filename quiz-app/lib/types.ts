@@ -24,6 +24,7 @@ export interface Quiz {
   title: string;
   userId: string;
   createdAt: string;
+  submitted: boolean;
 }
 
 export interface Document {
@@ -38,6 +39,7 @@ export interface Question {
   question: string;
   options: string;
   answer: number;
+  submittedAt: string;
 }
 
 export interface ResultResponse {

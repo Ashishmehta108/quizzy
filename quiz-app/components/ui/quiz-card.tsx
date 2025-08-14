@@ -18,6 +18,7 @@ import {
   ArrowUpWideNarrow,
   CheckCircle,
   XCircle,
+  CheckCircle2,
 } from "lucide-react";
 import { QuizResponse } from "@/lib/types";
 import Link from "next/link";
@@ -118,12 +119,12 @@ export function QuizTable({ quizzes }: QuizTableProps) {
           </TableHeader>
           <TableBody>
             {filteredQuizzes.length > 0 ? (
-              filteredQuizzes.map((quiz) => {
+              filteredQuizzes.map((quiz, index) => {
                 const createdDate = quiz.quiz?.createdAt
                   ? new Date(quiz.quiz.createdAt).toLocaleDateString()
                   : "Date not specified";
 
-                const attempted = !!quiz.result;
+                const attempted = quiz.quiz.submitted;
 
                 return (
                   <TableRow key={quiz.quiz.id}>
@@ -138,12 +139,12 @@ export function QuizTable({ quizzes }: QuizTableProps) {
                     <TableCell className="py-3 flex items-center gap-2">
                       {attempted ? (
                         <div className="flex items-center gap-2">
-                          <CheckCircle className="text-green-600 w-4 h-4" />
-                          <span>Result</span>
+                          <CheckCircle2 className="text-white fill-green-500 w-4 h-4" />
+                          <span>Attempted</span>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2">
-                          <XCircle className="text-red-500 w-4 h-4" />
+                          <XCircle className="text-white fill-red-500 w-4 h-4" />
                           <span>Not Attempted</span>
                         </div>
                       )}

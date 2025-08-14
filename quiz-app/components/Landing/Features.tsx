@@ -53,7 +53,7 @@ export function Features() {
   return (
     <section className="py-32 px-4 sm:px-6 lg:px-8 bg-zinc-50 dark:bg-zinc-950">
       <div className="max-w-5xl container mx-auto flex flex-col items-center">
-        <AnimatedElement delay={200}>
+        <AnimatedElement>
           <div className="text-center mb-24 text-5xl sm:text-6xl font-semibold text-zinc-900 dark:text-white">
             Features
           </div>
@@ -65,7 +65,7 @@ export function Features() {
             // const Icon2 = feature.icons[1];
 
             return (
-              <AnimatedElement key={index} delay={400 + index * 150}>
+              <AnimatedElement key={index} >
                 <Card
                   className="h-full p-8 
                     bg-white/30 dark:bg-zinc-900/70 

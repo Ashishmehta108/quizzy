@@ -14,7 +14,7 @@ export default function DashboardLayout({
     <SidebarProvider>
       <AppSidebar />
       <main className=" w-full relative  flex flex-col bg-white dark:bg-zinc-900 min-h-screen ">
-        <div className="flex  items-center pb-2 justify-between">
+        <div className="flex  items-center pb-3 justify-between border-b border-zinc-200 dark:border-zinc-800 ">
           <SidebarTrigger className=" translate-x-5 translate-y-2" />
           <ModeToggle className="mr-5  translate-y-2" />
         </div>

@@ -1,0 +1,1 @@
+ALTER TABLE "quizzes" ADD COLUMN "submitted_at" boolean DEFAULT false NOT NULL;

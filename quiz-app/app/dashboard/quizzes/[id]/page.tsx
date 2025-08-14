@@ -295,17 +295,21 @@ export default function TakeQuizPage({
       const wrapped = values.map((num) => [num]);
 
       const data = JSON.stringify(wrapped);
-      const response = await api.post<ResultResponse>("/results", {
-        quizId: quiz.quiz.id,
-        totalScore,
-        optionsFilled: data,
-      },{
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      const response = await api.post<ResultResponse>(
+        "/results",
+        {
+          quizId: quiz.quiz.id,
+          totalScore,
+          optionsFilled: data,
+        },
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
         }
-      });
-
+      );
+      console.log("Result response:", response.data);
       setResult(response.data.data);
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to submit quiz");
@@ -428,7 +432,9 @@ export default function TakeQuizPage({
     <div className="relative min-h-screen dark:bg-zinc-900 bg-white mt-2">
       <div className=" max-w-2xl container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:gap-8 gap-2">
         <div className="xl:absolute top-20 gap-y-2 gap-2 flex items-center    md:flex-col md:text-2xl  text-base  left-10">
-          <span className="font-medium max-w-md mx-auto flex flex-wrap">Quiz - {quiz.quiz.title}</span>
+          <span className="font-medium max-w-md mx-auto flex flex-wrap">
+            Quiz - {quiz.quiz.title}
+          </span>
           <span className="flex items-center text-xs gap-2">
             <FileText className="h-4 w-4" />
             {quiz.questions.length} questions

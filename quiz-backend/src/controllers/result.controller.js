@@ -11,6 +11,9 @@ export const PostResult = async (req, res) => {
         if (!totalScore || !optionsFilled || !quizId) return res.status(400).json({ error: "All fields are required" });
         const userId = req.user.id;
         const resultId = randomUUID();
+        const [quiz] = await db.select().from(quizzes).where(eq(quizzes.id, quizId));
+        // await db.update(quizzes).where(eq(quizzes.id, quizId)).set({ submitted: true });
+        await db.update(quizzes).set({ submitted: true }).where(eq(quizzes.id, quizId));
         const [result] = await db.insert(results).values({
             id: resultId,
             optionsReview: optionsFilled,

@@ -1,4 +1,4 @@
-import { pgTable, varchar, text, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, varchar, text, integer, timestamp, boolean } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
     id: varchar("id", { length: 36 }).primaryKey(),
@@ -14,6 +14,7 @@ export const quizzes = pgTable("quizzes", {
     title: varchar("title", { length: 200 }).notNull(),
     userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
+    submitted: boolean("submitted").notNull().default(false),
 });
 
 export const questions = pgTable("questions", {

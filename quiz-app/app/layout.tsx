@@ -7,6 +7,10 @@ import Image from "next/image";
 import logo from "../public/quizzy_metadata_logo.png";
 import Navbar from "@/components/Navbar";
 import { SessionProvider } from "@/components/Sessionprovider";
+import {
+  SmoothScrollWrapper,
+  useSmoothScroll,
+} from "@/components/SmoothScroll";
 const inter = Inter({ subsets: ["greek"] });
 
 export const metadata: Metadata = {
@@ -34,7 +38,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {/* <Navbar /> */}
-            {children}
+            <SmoothScrollWrapper>{children}</SmoothScrollWrapper>
           </ThemeProvider>
         </SessionProvider>
       </body>

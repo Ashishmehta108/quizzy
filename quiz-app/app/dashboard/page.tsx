@@ -42,7 +42,7 @@ export default function DashboardPage() {
             return;
           }
         } catch (error) {
-          router.push("/login");
+          router.push("/");
           return;
         }
       }

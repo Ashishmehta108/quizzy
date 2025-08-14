@@ -32,7 +32,7 @@ export const register = async (req, res) => {
 
   res
     .cookie("access_token", accessToken, { httpOnly: true, secure: true, sameSite: "none", expires: new Date(Date.now() + 60 * 60 * 24 * 1000) })
-    .cookie("refresh_token", refreshToken, { httpOnly: true, secure: true, sameSite: "none", expires: new Date(Date.now() + 60 * 60 * 24 * 1000) })
+    .cookie("refresh_token", refreshToken, { httpOnly: true, secure: true, sameSite: "none", expires: new Date(Date.now() + 7 * 60 * 60 * 24 * 1000) })
     .json({ user, token: accessToken });
 };
 
