@@ -1,0 +1,24 @@
+{
+    "score": 1,
+    "percentage": "9.09",
+    "totalQuestions": 11,
+    "selectedAnswers": [
+        {
+            "question": "What is the most commonly used library for routing in React applications?",
+            "selected": [
+                0
+            ],
+            "correct": 1,
+            "options": [
+                "`react-navigation`",
+                "`react-router-dom`",
+                "`react-path-manager`",
+                "`react-url-handler`"
+            ],
+            "explanation": "`react-router-dom` is the standard and most popular library for declarative client-side routing in React web applications. It provides components and hooks to manage application navigation.",
+            "createdAt": "2025-08-17T14:15:26.080Z",
+            "submittedAt": "2025-08-17T14:15:26.300Z"
+        }
+      
+    ]
+}

@@ -12,6 +12,7 @@ import { useAuthStore } from "@/store/auth";
 import api from "@/lib/api";
 import type { QuizResponse, Result } from "@/lib/types";
 import Link from "next/link";
+import { MarkdownRenderer } from "@/components/quiz-render/MarkdownRender";
 
 interface QuestionCardProps {
   question: Question;
@@ -89,14 +90,14 @@ export function QuestionCard({
                           : " bg-white dark:bg-zinc-900 dark:text-zinc-400 text-gray-600 "
                       }`}
                     >
-                      {optionLabel}
+                      <MarkdownRenderer>{optionLabel}</MarkdownRenderer>
                     </div>
 
                     <div className="flex-1">
                       <span
                         className={` text-sm sm:text-base  transition-colors duration-200`}
                       >
-                        {option}
+                        <MarkdownRenderer>{option}</MarkdownRenderer>
                       </span>
                     </div>
 
@@ -226,21 +227,22 @@ export default function TakeQuizPage({
         }
         return;
       }
-      fetchQuiz();
+      fetchQuiz(id);
+      //9aeebe3b-a71e-45c5-bd63-30869b52e49c
     }
   }, [user, router, id]);
 
-  const fetchQuiz = async () => {
+  const fetchQuiz = async (id: string) => {
     try {
-      const response = await api.get<QuizResponse[]>("/quizzes");
-      const foundQuiz = response.data.find((q) => q.quiz.id === id);
-
-      if (!foundQuiz) {
-        setError("Quiz not found");
-        return;
-      }
-
-      setQuiz(foundQuiz);
+      const response = await api.get<QuizResponse[]>(`/quizzes/${id}`, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
+      console.log("this is response", response.data);
+      //@ts-ignore
+      setQuiz(response.data);
       setLoading(false);
     } catch (error) {
       setError("Failed to load quiz");
@@ -253,6 +255,7 @@ export default function TakeQuizPage({
     const updatedAnswers = { ...answers, [currentQuestion.id]: answerId };
     setAnswers(updatedAnswers);
     setSelectedAnswer(answerId);
+    console.log(updatedAnswers);
   };
   const handleNext = async () => {
     if (!quiz) return;
@@ -285,7 +288,7 @@ export default function TakeQuizPage({
 
       quiz.questions.forEach((question) => {
         const userAnswer = answers[question.id];
-        optionsFilled[question.id] = userAnswer ?? 1;
+        optionsFilled[question.id] = userAnswer;
 
         if (userAnswer === question.answer) {
           totalScore++;

@@ -23,31 +23,40 @@ export const SessionProvider = ({
   children: React.ReactNode;
 }) => {
   const router = useRouter();
-
   const { token, restoreSession } = useAuthStore();
-  const [isRestored, setIsRestored] = useState(false);
-  const [localToken, setToken] = useState<string | null>(token);
 
+  // Initial token from store (which already hydrates from localStorage)
+  const [localToken, setToken] = useState<string | null>(token);
+  const [isChecking, setIsChecking] = useState(false);
+
+  // Verify token in background
   useEffect(() => {
-    const initSession = async () => {
+    const verify = async () => {
+      setIsChecking(true);
       try {
         await restoreSession();
         const newToken = useAuthStore.getState().token;
-        if (!newToken && window.location.pathname !== "/") {
+
+        if (!newToken && window.location.pathname !== "/login") {
           router.replace("/login");
         } else {
           setToken(newToken);
         }
-        setIsRestored(true);
       } catch (err) {
-        console.error("Session restoration error:", err);
-        router.replace("/");
-        setIsRestored(true);
+        console.error("Session verification failed:", err);
+        if (window.location.pathname !== "/login") {
+          router.replace("/login");
+        }
+      } finally {
+        setIsChecking(false);
       }
     };
-    initSession();
-  }, [router]);
-  if (!isRestored) return <Loader />;
+    verify();
+  }, [router, restoreSession]);
+
+  // Render instantly with token from localStorage, fallback loader only if
+  // you want to block rendering when there's truly no token
+  if (!localToken && isChecking) return <Loader />;
 
   return (
     <SessionContext.Provider value={{ tkn: localToken, setToken }}>

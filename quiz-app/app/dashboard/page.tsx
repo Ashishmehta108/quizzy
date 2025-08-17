@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArchiveBook, TableDocument, Add, Notepad2 } from "iconsax-reactjs";
@@ -16,69 +16,67 @@ import {
 import api from "@/lib/api";
 import type { QuizResponse, Result } from "@/lib/types";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import "../globals.css";
-import { useSession } from "@/components/Sessionprovider";
+import Loader from "@/components/loader/loader";
+
+const fetchQuizzesAndResults = async (token: string) => {
+  if (!token) {
+    token = localStorage.getItem("access_token") || "";
+  }
+  console.log("fetching quizzes and results");
+
+  const [quizzesRes, resultsRes] = await Promise.all([
+    api.get<QuizResponse[]>("/quizzes", {
+      withCredentials: true,
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+    api.get<{ data: Result[] }>("/results", {
+      withCredentials: true,
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+  ]);
+  console.log({ quizzes: quizzesRes.data, results: resultsRes.data.data });
+
+  return {
+    quizzes: quizzesRes.data,
+    results: resultsRes.data.data,
+  };
+};
 
 export default function DashboardPage() {
-  const [quizzes, setQuizzes] = useState<QuizResponse[]>([]);
-  const [results, setResults] = useState<Result[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { user, restoreSession, isLoading, token } = useAuthStore();
+  const {
+    user,
+    restoreSession,
+    isLoading: authLoading,
+    token,
+  } = useAuthStore();
   const router = useRouter();
-  const { tkn } = useSession();
 
   const [isMounted, setIsMounted] = useState(false);
-
   useEffect(() => {
     setIsMounted(true);
   }, []);
-  useEffect(() => {
-    if (!isLoading) {
-      if (!user?.id) {
-        try {
-          restoreSession();
-          if (!useAuthStore.getState().user) {
-            router.push("/login");
-            return;
-          }
-        } catch (error) {
-          router.push("/");
-          return;
-        }
-      }
-      fetchData();
-    }
-  }, [user, isLoading]);
 
-  const fetchData = async () => {
+  if (!authLoading && !user?.id) {
     try {
-      const [quizzesRes, resultsRes] = await Promise.all([
-        api.get<QuizResponse[]>("/quizzes", {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        }),
-        api.get<{
-          data: Result[];
-        }>("/results", {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        }),
-      ]);
-
-      console.log(resultsRes.data);
-      setQuizzes(quizzesRes.data);
-      setResults(resultsRes.data.data);
-    } catch (error) {
-      console.error("Failed to fetch data:", error);
-    } finally {
-      setLoading(false);
+      restoreSession();
+      if (!useAuthStore.getState().user) {
+        router.push("/login");
+      }
+    } catch {
+      router.push("/");
     }
-  };
+  }
 
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["quizzes-and-results"],
+    queryFn: () => fetchQuizzesAndResults(token!),
+    enabled: !!user?.id && !authLoading,
+  });
+  console.log(data);
+  if (isLoading) return <Loader />;
+  if (isError) return <p>Something went wrong</p>;
   if (!user) return null;
 
   if (!isMounted) return null;
@@ -110,13 +108,13 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            {loading ? (
+            {authLoading ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <QuizCardSkeleton key={i} />
                 ))}
               </div>
-            ) : quizzes.length === 0 ? (
+            ) : data?.quizzes.length === 0 ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <ArchiveBook size="48" className="text-zinc-400 mb-4" />
@@ -136,7 +134,7 @@ export default function DashboardPage() {
               </Card>
             ) : (
               <div className="flex flex-wrap justify-center gap-5 items-stretch max-w-6xl mx-auto">
-                <QuizTable quizzes={quizzes} />
+                <QuizTable quizzes={data?.quizzes || []} />
               </div>
             )}
           </TabsContent>
@@ -149,13 +147,13 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            {loading ? (
+            {authLoading ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <ResultCardSkeleton key={i} />
                 ))}
               </div>
-            ) : results.length === 0 ? (
+            ) : data?.results.length === 0 ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Notepad2 size="48" className="text-zinc-400 mb-4" />
@@ -169,7 +167,7 @@ export default function DashboardPage() {
               </Card>
             ) : (
               <div className="w-full">
-                <ResultTable results={results} />
+                <ResultTable results={data?.results || []} />
               </div>
             )}
           </TabsContent>

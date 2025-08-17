@@ -189,8 +189,7 @@ export function QuizTable({ quizzes }: QuizTableProps) {
               ? new Date(quiz.quiz.createdAt).toLocaleDateString()
               : "Date not specified";
 
-            const attempted = !!quiz.result;
-
+            const attempted = quiz.quiz.submitted;
             return (
               <div
                 key={quiz.quiz.id}
@@ -208,12 +207,12 @@ export function QuizTable({ quizzes }: QuizTableProps) {
                 <div className="text-sm mt-1 flex items-center gap-1">
                   {attempted ? (
                     <>
-                      <CheckCircle className="text-green-600 w-4 h-4" />
+                      <CheckCircle2 className="text-white fill-green-500 w-5 h-5" />
                       <span>Result</span>
                     </>
                   ) : (
                     <>
-                      <XCircle className="text-red-500 w-4 h-4" />
+                      <XCircle className="text-white fill-red-500 w-4 h-4" />
                       <span>Not Attempted</span>
                     </>
                   )}

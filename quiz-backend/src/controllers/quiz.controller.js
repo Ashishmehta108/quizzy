@@ -7,7 +7,6 @@ import { processPdf } from "../ai/parsedoc/doc.js";
 import { queryChunks, upsertChunks } from "../ai/pinecone.js";
 import { chunkText } from "../utils/chunk.js";
 import fs from "fs";
-// import { generateRelevantQuery } from "../utils/generateRelevantQuery.js";
 
 export const createQuiz = async (req, res) => {
     try {
@@ -72,7 +71,6 @@ export const getQuizzes = async (req, res) => {
         const all = await db.select()
             .from(quizzes)
             .where(eq(quizzes.userId, id));
-
         const result = [];
         for (let q of all) {
             console.log(all)

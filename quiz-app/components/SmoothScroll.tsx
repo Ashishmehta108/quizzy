@@ -23,11 +23,15 @@ export function useSmoothScroll() {
 }
 
 import React from "react";
-export  function SmoothScrollWrapper({
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+const queryClient = new QueryClient();
+export function SmoothScrollWrapper({
   children,
 }: {
   children: React.ReactNode;
 }) {
   // useSmoothScroll();
-  return <>{children}</>;
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
 }

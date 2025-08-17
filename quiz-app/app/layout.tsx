@@ -3,16 +3,11 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import Image from "next/image";
 import logo from "../public/quizzy_metadata_logo.png";
-import Navbar from "@/components/Navbar";
 import { SessionProvider } from "@/components/Sessionprovider";
-import {
-  SmoothScrollWrapper,
-  useSmoothScroll,
-} from "@/components/SmoothScroll";
+import { SmoothScrollWrapper } from "@/components/SmoothScroll";
+import { cookies } from "next/headers";
 const inter = Inter({ subsets: ["greek"] });
-
 export const metadata: Metadata = {
   title: "Quiz App - Create and Take Quizzes",
   description: "A modern quiz application built with Next.js",
@@ -22,11 +17,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const token = (await cookies()).get("auth_token")?.value || null;
+  console.log(token);
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
