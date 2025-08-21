@@ -75,7 +75,7 @@ export const login = async (req, res) => {
 
     console.log("Tokens generated and saved for user:", user.id);
 
-    res
+
     res
       .cookie("access_token", accessToken, {
         httpOnly: true,
