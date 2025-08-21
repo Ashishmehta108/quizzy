@@ -6,7 +6,7 @@ export default function middleware(req: NextRequest) {
     const token = req.cookies.get("access_token")?.value;
     const { pathname } = req.nextUrl;
     console.log(token);
-    const publicPaths = ["/", "/about", "/contact", "/login"];
+    const publicPaths = ["/", "/about", "/contact", "/login", "/register"];
     const isPublic = publicPaths.some((path) =>
       path === "/" ? pathname === "/" : pathname.startsWith(path)
     );

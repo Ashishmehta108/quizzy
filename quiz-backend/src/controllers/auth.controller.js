@@ -75,16 +75,20 @@ export const login = async (req, res) => {
     console.log("Tokens generated and saved for user:", user.id);
 
     res
+    res
       .cookie("access_token", accessToken, {
         httpOnly: true,
         secure: true,
-        sameSite: "none"
+        sameSite: "none",
+        expires: new Date(Date.now() + 60 * 60 * 24 * 1000) // 1 day
       })
       .cookie("refresh_token", refreshToken, {
         httpOnly: true,
         secure: true,
-        sameSite: "none"
-      }).json({
+        sameSite: "none",
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+      })
+      .json({
         user: {
           id: user.id,
           name: user.name,
