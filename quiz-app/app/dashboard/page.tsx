@@ -58,17 +58,6 @@ export default function DashboardPage() {
     setIsMounted(true);
   }, []);
 
-  if (!authLoading && !user?.id) {
-    try {
-      restoreSession();
-      if (!useAuthStore.getState().user) {
-        router.push("/login");
-      }
-    } catch {
-      router.push("/");
-    }
-  }
-
   const { data, isLoading, isError } = useQuery({
     queryKey: ["quizzes-and-results"],
     queryFn: () => fetchQuizzesAndResults(token!),
