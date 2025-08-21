@@ -10,7 +10,7 @@ const cookieOptions = (days) => ({
   httpOnly: true,
   secure: true,
   sameSite: "none",
-  domain: ".quizzyai.online",
+  domain: "www.quizzyai.online",
   maxAge: days * 24 * 60 * 60 * 1000
 });
 
