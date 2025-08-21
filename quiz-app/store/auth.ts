@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
         try {
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACK_URL}/auth/login`,
+            `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/login`,
             {
               method: "POST",
               headers: {
