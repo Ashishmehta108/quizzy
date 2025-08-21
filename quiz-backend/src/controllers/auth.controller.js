@@ -4,6 +4,7 @@ import { users } from "../config/db/schema.js";
 import { eq } from "drizzle-orm";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt.js";
 import { randomUUID } from "node:crypto";
+import "dotenv/config";
 
 export const register = async (req, res) => {
   console.log("register")
@@ -31,8 +32,8 @@ export const register = async (req, res) => {
     });
 
   res
-    .cookie("access_token", accessToken, { httpOnly: true, secure: true, sameSite: "none", expires: new Date(Date.now() + 60 * 60 * 24 * 1000) })
-    .cookie("refresh_token", refreshToken, { httpOnly: true, secure: true, sameSite: "none", expires: new Date(Date.now() + 7 * 60 * 60 * 24 * 1000) })
+    .cookie("access_token", accessToken, { httpOnly: true, secure: true, sameSite: "none", expires: new Date(Date.now() + 60 * 60 * 24 * 1000), domain: process.env.FRONTEND_URL })
+    .cookie("refresh_token", refreshToken, { httpOnly: true, secure: true, sameSite: "none", expires: new Date(Date.now() + 7 * 60 * 60 * 24 * 1000), domain: process.env.FRONTEND_URL })
     .json({ user, token: accessToken });
 };
 
@@ -80,13 +81,15 @@ export const login = async (req, res) => {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        expires: new Date(Date.now() + 60 * 60 * 24 * 1000) // 1 day
+        domain: process.env.FRONTEND_URL,
+        expires: new Date(Date.now() + 60 * 60 * 24 * 1000)
       })
       .cookie("refresh_token", refreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        domain: process.env.FRONTEND_URL
       })
       .json({
         user: {
