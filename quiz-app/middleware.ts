@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export default async function middleware(req: NextRequest) {
-  const token =
-    req.cookies.get("token")?.value || localStorage.getItem("access_token");
+  const token = req.cookies.get("token")?.value;
   const { pathname } = req.nextUrl;
 
   const publicPaths = ["/", "/about", "/contact", "/login"];
