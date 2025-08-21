@@ -29,17 +29,29 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         set({ isLoading: true });
         try {
-          const response = await api.post<AuthResponse>(
-            "/auth/login",
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BACK_URL}/auth/login`,
             {
-              email,
-              password,
-            },
-            {
-              withCredentials: true,
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ email, password }),
+              credentials: "include",
             }
           );
-          const { token, user } = response.data;
+          // const response = await api.post<AuthResponse>(
+          //   "/auth/login",
+          //   {
+          //     email,
+          //     password,
+          //   },
+          //   {
+          //     withCredentials: true,
+          //   }
+          // );
+          const { token, user } = await response.json();
+
           localStorage.setItem("access_token", token);
           set({ user, token, isLoading: false });
         } catch (error) {
