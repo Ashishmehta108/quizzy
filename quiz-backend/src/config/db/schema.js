@@ -42,3 +42,14 @@ export const results = pgTable("results", {
 export const test = pgTable("test", {
     name: varchar("name", { length: 100 }).notNull().primaryKey(),
 })
+
+
+
+
+export const userIntegrations = pgTable("user_integrations", {
+    id: varchar("id", { length: 36 }).primaryKey(),
+    
+    userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }),
+    integrationId: varchar("integration_id", { length: 36 }).references(() => test.name, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+})
