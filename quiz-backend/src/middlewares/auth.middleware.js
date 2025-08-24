@@ -9,15 +9,13 @@ const REFRESH_SECRET = process.env.REFRESH_SECRET;
 
 export const protect = async (req, res, next) => {
   try {
-    const headerToken = req.headers.authorization?.split(" ")[1];
     const cookieToken = req.cookies?.access_token;
     const refreshToken = req.cookies?.refresh_token;
-    const token = headerToken || cookieToken;
+    const token = cookieToken || refreshToken;
 
     if (!token) {
       return res.status(401).json({ message: "Access token missing" });
     }
-
     let decoded;
     try {
       decoded = jwt.verify(token, ACCESS_SECRET);

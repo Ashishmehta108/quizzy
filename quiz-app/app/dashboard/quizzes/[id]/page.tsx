@@ -236,9 +236,6 @@ export default function TakeQuizPage({
     try {
       const response = await api.get<QuizResponse[]>(`/quizzes/${id}`, {
         withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
       });
       console.log("this is response", response.data);
       //@ts-ignore
@@ -307,9 +304,6 @@ export default function TakeQuizPage({
         },
         {
           withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
         }
       );
       console.log("Result response:", response.data);

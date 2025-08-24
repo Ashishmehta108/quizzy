@@ -5,7 +5,7 @@ import type { User } from "@/lib/types";
 
 interface AuthState {
   user: User | null;
-  token: string | null;
+  isLogged: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
@@ -15,7 +15,7 @@ interface AuthState {
 }
 
 interface AuthResponse {
-  token: string;
+  isLogged: boolean;
   user: User;
 }
 
@@ -23,37 +23,25 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
-      token: null,
+      isLogged: false,
       isLoading: false,
 
       login: async (email: string, password: string) => {
         set({ isLoading: true });
         try {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_BACK_URL}/api/auth/login`,
+          const response = await api.post<AuthResponse>(
+            "/auth/login",
             {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ email, password }), 
-              credentials: "include",
+              email,
+              password,
+            },
+            {
+              withCredentials: true,
             }
           );
-          // const response = await api.post<AuthResponse>(
-          //   "/auth/login",
-          //   {
-          //     email,
-          //     password,
-          //   },
-          //   {
-          //     withCredentials: true,
-          //   }
-          // );
-          const { token, user } = await response.json();
-
-          localStorage.setItem("access_token", token);
-          set({ user, token, isLoading: false });
+          const { user } = response.data;
+          localStorage.setItem("isLogged", true.toString());
+          set({ user, isLogged: true, isLoading: false });
         } catch (error) {
           set({ isLoading: false });
           throw error;
@@ -75,9 +63,9 @@ export const useAuthStore = create<AuthState>()(
               withCredentials: true,
             }
           );
-          const { token, user } = response.data;
-          localStorage.setItem("access_token", token);
-          set({ user, token, isLoading: false });
+          const { user } = response.data;
+          localStorage.setItem("isLogged", true.toString());
+          set({ user, isLogged: true, isLoading: false });
         } catch (error) {
           set({ isLoading: false });
           throw error;
@@ -86,28 +74,22 @@ export const useAuthStore = create<AuthState>()(
 
       logout: async () => {
         await deleteToken();
-        localStorage.setItem("access_token", "");
-        set({ user: null, token: null });
+        localStorage.setItem("isLogged", false.toString());
+        set({ user: null, isLogged: false });
       },
 
       setUser: (user: User) => {
         set({ user });
       },
       restoreSession: async () => {
-        const token = localStorage.getItem("access_token");
-        if (!token) return;
+        const isLogged = localStorage.getItem("isLogged");
+        if (isLogged === "false") return;
         try {
           const res = await api.get<AuthResponse>("/auth/me", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
             withCredentials: true,
           });
-          //@ts-ignore
-
-          localStorage.setItem("access_token", res.data.token);
-          useAuthStore.setState({ user: res.data?.user, token });
-          //@ts-ignore
+          localStorage.setItem("isLogged", true.toString());
+          useAuthStore.setState({ user: res.data?.user });
           return res?.data?.user;
         } catch (error) {
           console.error("Failed to restore session:", error);
@@ -116,7 +98,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "quiz-app-auth",
-      partialize: (state) => ({ user: state.user, token: state.token }),
+      partialize: (state) => ({ user: state.user, isLogged: state.isLogged }),
     }
   )
 );

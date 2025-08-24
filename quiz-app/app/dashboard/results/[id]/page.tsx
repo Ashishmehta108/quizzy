@@ -88,7 +88,6 @@ export default function ResultViewPage(): React.JSX.Element | null {
       }
     };
     initializePage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isLoading, id]);
 
   const fetchResult = async () => {
@@ -96,9 +95,6 @@ export default function ResultViewPage(): React.JSX.Element | null {
       setLoading(true);
       const response = await api.get<any>(`/results/${id}`, {
         withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
       });
 
       const payload = response.data?.result;

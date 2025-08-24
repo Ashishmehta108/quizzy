@@ -63,8 +63,8 @@ export default function CreateQuizPage() {
       }>("/quizzes", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`
         },
+        withCredentials: true,
       });
       const quiz = response.data.quiz;
       setSuccess(quiz);
