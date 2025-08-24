@@ -42,7 +42,7 @@ export function QuestionCard({
   isLastQuestion,
 }: QuestionCardProps) {
   const q = JSON.parse(question.options);
-  console.log(q);
+
   return (
     <div className="w-full max-w-3xl mx-auto ">
       <Card className="shadow-none border border-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 bg-white">
@@ -237,7 +237,6 @@ export default function TakeQuizPage({
       const response = await api.get<QuizResponse[]>(`/quizzes/${id}`, {
         withCredentials: true,
       });
-      console.log("this is response", response.data);
       //@ts-ignore
       setQuiz(response.data);
       setLoading(false);
@@ -306,7 +305,6 @@ export default function TakeQuizPage({
           withCredentials: true,
         }
       );
-      console.log("Result response:", response.data);
       setResult(response.data.data);
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to submit quiz");
@@ -361,7 +359,6 @@ export default function TakeQuizPage({
     const scorePercentage = Math.round(
       (result.score / quiz?.questions?.length) * 100
     );
-    console.log(result);
     return (
       <div className="min-h-screen bg-white dark:bg-zinc-900 py-8 pt-20">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -420,7 +417,7 @@ export default function TakeQuizPage({
   if (!quiz) return null;
 
   const currentQuestion = quiz.questions[currentQuestionIndex];
-  console.log(answers);
+
   const canGoNext = selectedAnswer !== null;
   const canGoPrevious = currentQuestionIndex > 0;
   const isLastQuestion = currentQuestionIndex === quiz.questions.length - 1;

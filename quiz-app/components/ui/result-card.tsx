@@ -20,7 +20,6 @@ interface ResultTableProps {
 }
 
 export default function ResultTable({ results }: ResultTableProps) {
-  console.log(results);
   const [_, setIsMobile] = useState(false);
   const [sortDesc, setSortDesc] = useState(true);
 

@@ -20,23 +20,15 @@ import { useQuery } from "@tanstack/react-query";
 import "../globals.css";
 import Loader from "@/components/loader/loader";
 
-const fetchQuizzesAndResults = async (token: string) => {
-  if (!token) {
-    token = localStorage.getItem("access_token") || "";
-  }
-  console.log("fetching quizzes and results");
-
+const fetchQuizzesAndResults = async () => {
   const [quizzesRes, resultsRes] = await Promise.all([
     api.get<QuizResponse[]>("/quizzes", {
       withCredentials: true,
-      headers: { Authorization: `Bearer ${token}` },
     }),
     api.get<{ data: Result[] }>("/results", {
       withCredentials: true,
-      headers: { Authorization: `Bearer ${token}` },
     }),
   ]);
-  console.log({ quizzes: quizzesRes.data, results: resultsRes.data.data });
 
   return {
     quizzes: quizzesRes.data,
@@ -47,9 +39,9 @@ const fetchQuizzesAndResults = async (token: string) => {
 export default function DashboardPage() {
   const {
     user,
+    isLogged,
     restoreSession,
     isLoading: authLoading,
-    token,
   } = useAuthStore();
   const router = useRouter();
 
@@ -58,12 +50,12 @@ export default function DashboardPage() {
     setIsMounted(true);
   }, []);
 
+  if (!isLogged) router.push("/login");
   const { data, isLoading, isError } = useQuery({
     queryKey: ["quizzes-and-results"],
-    queryFn: () => fetchQuizzesAndResults(token!),
+    queryFn: () => fetchQuizzesAndResults(),
     enabled: !!user?.id && !authLoading,
   });
-  console.log(data);
   if (isLoading) return <Loader />;
   if (isError) return <p>Something went wrong</p>;
   if (!user) return null;

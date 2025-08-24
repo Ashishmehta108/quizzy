@@ -6,13 +6,13 @@ import { useAuthStore } from "@/store/auth";
 import Loader from "./loader/loader";
 
 interface SessionContextType {
-  tkn: string | null;
-  setToken: (tkn: string | null) => void;
+  logged: boolean;
+  setIslogged: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SessionContext = createContext<SessionContextType>({
-  tkn: null,
-  setToken: () => {},
+  logged: false,
+  setIslogged: () => {},
 });
 
 export const useSession = () => useContext(SessionContext);
@@ -23,9 +23,9 @@ export const SessionProvider = ({
   children: React.ReactNode;
 }) => {
   const router = useRouter();
-  const { token, restoreSession } = useAuthStore();
+  const { isLogged, restoreSession } = useAuthStore();
 
-  const [localToken, setToken] = useState<string | null>(token);
+  const [Islogged, setIslogged] = useState<boolean>(isLogged);
   const [isChecking, setIsChecking] = useState(false);
 
   useEffect(() => {
@@ -33,8 +33,8 @@ export const SessionProvider = ({
       setIsChecking(true);
       try {
         await restoreSession();
-        const newToken = useAuthStore.getState().token;
-        setToken(newToken);
+        const isLogged = useAuthStore.getState().isLogged;
+        setIslogged(true);
       } catch (err) {
         console.error("Session verification failed:", err);
       } finally {
@@ -44,10 +44,12 @@ export const SessionProvider = ({
     verify();
   }, [router, restoreSession]);
 
-  if (!localToken && isChecking) return <Loader />;
+  if (!isLogged && isChecking) return <Loader />;
 
   return (
-    <SessionContext.Provider value={{ tkn: localToken, setToken }}>
+    <SessionContext.Provider
+      value={{ logged: Islogged, setIslogged: setIslogged }}
+    >
       {children}
     </SessionContext.Provider>
   );

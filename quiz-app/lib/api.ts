@@ -16,6 +16,13 @@ export const deleteToken = async () => {
   });
 };
 
+export const setToken = async (token: string) => {
+  const t = await fetch("/api/cookie", {
+    method: "POST",
+    body: JSON.stringify({ token }),
+  });
+};
+
 api.interceptors.request.use(async (config) => {
   const token = await getToken();
   if (token) {

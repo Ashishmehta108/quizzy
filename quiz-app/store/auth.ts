@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import api, { deleteToken, getToken } from "@/lib/api";
+import api, { deleteToken, getToken, setToken } from "@/lib/api";
 import type { User } from "@/lib/types";
 
 interface AuthState {
@@ -15,7 +15,7 @@ interface AuthState {
 }
 
 interface AuthResponse {
-  isLogged: boolean;
+  token: string;
   user: User;
 }
 
@@ -39,7 +39,8 @@ export const useAuthStore = create<AuthState>()(
               withCredentials: true,
             }
           );
-          const { user } = response.data;
+          const { user, token } = response.data;
+          const tkn = await setToken(token);
           localStorage.setItem("isLogged", true.toString());
           set({ user, isLogged: true, isLoading: false });
         } catch (error) {
@@ -64,6 +65,7 @@ export const useAuthStore = create<AuthState>()(
             }
           );
           const { user } = response.data;
+          await setToken(response.data.token);
           localStorage.setItem("isLogged", true.toString());
           set({ user, isLogged: true, isLoading: false });
         } catch (error) {
@@ -88,6 +90,7 @@ export const useAuthStore = create<AuthState>()(
           const res = await api.get<AuthResponse>("/auth/me", {
             withCredentials: true,
           });
+          await setToken(res.data.token);
           localStorage.setItem("isLogged", true.toString());
           useAuthStore.setState({ user: res.data?.user });
           return res?.data?.user;
