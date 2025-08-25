@@ -1,16 +1,15 @@
 import { Router } from "express";
-import { protect } from "../middlewares/auth.middleware.js";
 import { PostResult, GetResultById, GetResults } from "../controllers/result.controller.js";
+import { checkAuth } from "../utils/checkAuth.js";
 const resultRouter = Router()
 
 
 
-resultRouter.post("/", protect, PostResult);
-resultRouter.get("/", protect, GetResults);
-resultRouter.get("/:id", protect, GetResultById);
+resultRouter.post("/", checkAuth, PostResult);
+resultRouter.get("/", checkAuth, GetResults);
+resultRouter.get("/:id", checkAuth, GetResultById);
 
 
 
 
-
-export { resultRouter }
+export default resultRouter;

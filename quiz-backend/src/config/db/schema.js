@@ -2,13 +2,13 @@ import { pgTable, varchar, text, integer, timestamp, boolean } from "drizzle-orm
 
 export const users = pgTable("users", {
     id: varchar("id", { length: 36 }).primaryKey(),
-    name: varchar("name", { length: 100 }).notNull(),
+    clerkId: varchar("clerk_id", { length: 255 }).notNull().unique(),
     email: varchar("email", { length: 255 }).notNull().unique(),
-    password: text("password").notNull(),
-    accessToken: text("access_token"),
-    refreshToken: text("refresh_token"),
+    name: varchar("name", { length: 100 }),
+    role: varchar("role", { length: 50 }).default("user").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
-
 export const quizzes = pgTable("quizzes", {
     id: varchar("id", { length: 36 }).primaryKey(),
     title: varchar("title", { length: 200 }).notNull(),
@@ -37,19 +37,27 @@ export const results = pgTable("results", {
     submittedAt: timestamp("submitted_at").notNull().defaultNow(),
 });
 
-
-
 export const test = pgTable("test", {
     name: varchar("name", { length: 100 }).notNull().primaryKey(),
-})
+});
 
-
-
-
-export const userIntegrations = pgTable("user_integrations", {
+export const NotionIntegration = pgTable("NotionIntegration", {
     id: varchar("id", { length: 36 }).primaryKey(),
-    
-    userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }),
-    integrationId: varchar("integration_id", { length: 36 }).references(() => test.name, { onDelete: "cascade" }),
+    userId: varchar("user_id", { length: 36 })
+        .references(() => users.id, { onDelete: "cascade" }),
+    notionAccessTokenHash: varchar("notion_access_token_hash", { length: 255 }),
+    notionRefreshTokenHash: varchar("notion_refresh_token_hash", { length: 255 }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
-})
+});
+
+export const leaderboard = pgTable("leaderboard", {
+    id: varchar("id", { length: 36 }).primaryKey(),
+    userId: varchar("user_id", { length: 36 })
+        .references(() => users.id, { onDelete: "cascade" })
+        .notNull(),
+    totalScore: integer("total_score").notNull().default(0),
+    highestScore: integer("highest_score").notNull().default(0),
+    quizzesPlayed: integer("quizzes_played").notNull().default(0),
+    rank: integer("rank"),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
