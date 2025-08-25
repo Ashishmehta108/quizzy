@@ -9,7 +9,7 @@ export const PostResult = async (req, res) => {
         const { totalScore, optionsFilled, quizId } = req.body;
         console.log(totalScore, optionsFilled, quizId)
         // if (!totalScore || !optionsFilled || !quizId) return res.status(400).json({ error: "All fields are required" });
-        const userId = req.user.id;
+        const userId = req.auth.userId;
         const resultId = randomUUID();
         const [quiz] = await db.select().from(quizzes).where(eq(quizzes.id, quizId));
         await db.update(quizzes).set({ submitted: true }).where(eq(quizzes.id, quizId));
@@ -21,7 +21,7 @@ export const PostResult = async (req, res) => {
             userId,
             submittedAt: new Date(),
         }).returning();
-    
+
         res.status(201).json({ data: result });
     } catch (error) {
         console.error(error);
@@ -31,7 +31,7 @@ export const PostResult = async (req, res) => {
 
 export const GetResults = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.auth.userId;
         if (!userId) return res.status(401).json({ error: "Unauthorized" });
         const data = await db.select().from(results).where(eq(results.userId, userId));
         if (!data) return res.status(404).json({ error: "No results found" });
@@ -42,7 +42,6 @@ export const GetResults = async (req, res) => {
                 title: title,
                 ...result
             }
-
         });
         res.json({
             data: await Promise.all(quizTitles)
@@ -56,7 +55,7 @@ export const GetResults = async (req, res) => {
 export const GetResultById = async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.user.id;
+        const userId = req.auth.userId;
         if (!userId) return res.status(401).json({ error: "Unauthorized" });
         const [data] = await db.select().from(results).where(and(eq(results.userId, userId), eq(results.id, id)))
         console.log(data)

@@ -6,7 +6,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArchiveBook, TableDocument, Add, Notepad2 } from "iconsax-reactjs";
-import { useAuthStore } from "@/store/auth";
 import { QuizTable } from "@/components/ui/quiz-card";
 import ResultTable from "@/components/ui/result-card";
 import {
@@ -37,12 +36,7 @@ const fetchQuizzesAndResults = async () => {
 };
 
 export default function DashboardPage() {
-  const {
-    user,
-    isLogged,
-    restoreSession,
-    isLoading: authLoading,
-  } = useAuthStore();
+
   const router = useRouter();
 
   const [isMounted, setIsMounted] = useState(false);
@@ -50,16 +44,13 @@ export default function DashboardPage() {
     setIsMounted(true);
   }, []);
 
-  if (!isLogged) router.push("/login");
   const { data, isLoading, isError } = useQuery({
     queryKey: ["quizzes-and-results"],
     queryFn: () => fetchQuizzesAndResults(),
-    enabled: !!user?.id && !authLoading,
+
   });
   if (isLoading) return <Loader />;
   if (isError) return <p>Something went wrong</p>;
-  if (!user) return null;
-
   if (!isMounted) return null;
 
   return (
@@ -89,15 +80,15 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            {authLoading ? (
+            {isLoading ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <QuizCardSkeleton key={i} />
                 ))}
               </div>
             ) : data?.quizzes.length === 0 ? (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
+              <Card className="container max-w-2xl mx-auto">
+                <CardContent className="flex flex-col  items-center justify-center py-12">
                   <ArchiveBook size="48" className="text-zinc-400 mb-4" />
                   <h3 className="text-lg font-medium dark:text-zinc-100 text-zinc-900 mb-2">
                     No quizzes yet
@@ -128,14 +119,14 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            {authLoading ? (
+            {isLoading ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <ResultCardSkeleton key={i} />
                 ))}
               </div>
             ) : data?.results.length === 0 ? (
-              <Card>
+              <Card className="container max-w-2xl mx-auto">
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Notepad2 size="48" className="text-zinc-400 mb-4" />
                   <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-2">

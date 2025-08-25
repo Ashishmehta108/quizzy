@@ -1,20 +1,18 @@
-// routes/quiz.routes.js
 import { Router } from "express";
 import { createQuiz, getQuizzes } from "../controllers/quiz.controller.js";
-import { protect } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/upload.middleware.js";
 import fs from "fs";
 import { db } from "../config/db/index.js";
 import { questions, quizzes } from "../config/db/schema.js";
 import { and, eq } from "drizzle-orm";
+import { checkAuth } from "../utils/checkAuth.js"
+const quizRouter = Router();
 
-const router = Router();
-
-router.post(
+quizRouter.post(
     "/",
-    protect,
+    checkAuth,
     upload.array("files", 5),
-    async (req, res, next) => {
+    async (req, res, nextquizRouter) => {
         try {
             await createQuiz(req, res);
         } finally {
@@ -29,17 +27,18 @@ router.post(
     }
 );
 
-router.get("/", protect, getQuizzes);
+quizRouter.get("/", checkAuth, getQuizzes);
 
-router.get("/:id", protect, async (req, res) => {
+quizRouter.get("/:id", checkAuth, async (req, res) => {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.auth.userId;
     console.log("this is id", id)
+    const [getUserId] = await db.select().from(quizzes).where(eq(quizzes.id, id))
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
     const [data] = await db.select().from(quizzes).where(
         and(
             eq(quizzes.id, id),
-            eq(quizzes.userId, userId)
+            // eq(quizzes.userId, getUserId.id)
         ));
     if (!data) return res.status(404).json({ error: "Quiz not found" });
     const questionsList = await db.select().from(questions).where(eq(questions.quizId, id));
@@ -47,4 +46,4 @@ router.get("/:id", protect, async (req, res) => {
 
 });
 
-export default router;
+export default quizRouter;

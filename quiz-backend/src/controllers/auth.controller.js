@@ -1,79 +1,51 @@
-import bcrypt from "bcrypt";
 import { db } from "../config/db/index.js";
 import { users } from "../config/db/schema.js";
 import { eq } from "drizzle-orm";
-import { generateAccessToken, generateRefreshToken } from "../utils/jwt.js";
 import { randomUUID } from "node:crypto";
-import "dotenv/config";
+import { clerkClient } from "../config/clerk/clerk.js";
 
-const cookieOptions = (days) => ({
-  httpOnly: true,
-  secure: true,
-  sameSite: "none",
-  maxAge: days * 24 * 60 * 60 * 1000
-});
-
-export const register = async (req, res) => {
-  const { name, email, password } = req.body;
-
-  const [existing] = await db
-    .select({ name: users.name })
-    .from(users)
-    .where(eq(users.email, email));
-
-  if (existing) return res.status(400).json({ message: "User already exists" });
-
-  const hashed = await bcrypt.hash(password, 10);
-  const id = randomUUID();
-  const accessToken = generateAccessToken(id);
-  const refreshToken = generateRefreshToken(id);
-
-  const [user] = await db
-    .insert(users)
-    .values({ id, name, email, password: hashed, accessToken, refreshToken })
-    .returning({ id: users.id, name: users.name, email: users.email });
-
-  res
-    .cookie("access_token", accessToken, cookieOptions(1))
-    .cookie("refresh_token", refreshToken, cookieOptions(7))
-    .json({ user, token: accessToken });
-};
-
-export const login = async (req, res) => {
+export const syncUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { userId } = req.auth;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
-    const [user] = await db
-      .select({
-        id: users.id,
-        name: users.name,
-        email: users.email,
-        password: users.password,
-      })
+    let [user] = await db
+      .select()
       .from(users)
-      .where(eq(users.email, email));
+      .where(eq(users.clerkId, userId));
 
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+    if (!user) {
+      const clerkUser = await clerkClient.users.getUser(userId);
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).json({ message: "Invalid credentials" });
+      const email = clerkUser.emailAddresses[0]?.emailAddress;
+      const name =
+        clerkUser.firstName || email?.split("@")[0] || "Anonymous";
 
-    const accessToken = generateAccessToken(user.id);
-    const refreshToken = generateRefreshToken(user.id);
+      [user] = await db
+        .insert(users)
+        .values({
+          id: randomUUID(),
+          clerkId: userId,
+          email,
+          name,
+          profileImage: clerkUser.imageUrl,
+        })
+        .onConflictDoUpdate({
+          target: users.clerkId,
+          set: {
+            email,
+            name,
+            profileImage: clerkUser.imageUrl,
+          },
+        })
+        .returning();
+    }
 
-    await db
-      .update(users)
-      .set({ accessToken, refreshToken })
-      .where(eq(users.id, user.id));
-
-    res
-      .cookie("access_token", accessToken, cookieOptions(1))
-      .cookie("refresh_token", refreshToken, cookieOptions(7))
-      .json({
-        user: { id: user.id, name: user.name, email: user.email },
-        token: accessToken,
-      });
+    res.json({ user });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Internal server error" });
   }
 };
