@@ -149,7 +149,6 @@ export default function CreateQuizPage() {
                 </Alert>
               )}
 
-              {/* Input */}
               <div className="space-y-2">
                 <Label htmlFor="title">Quiz Title</Label>
                 <Input
@@ -165,7 +164,6 @@ export default function CreateQuizPage() {
                 />
               </div>
 
-              {/* Textarea */}
               <div className="space-y-2">
                 <Label htmlFor="query">Quiz Description/Query</Label>
                 <Textarea
@@ -182,7 +180,6 @@ export default function CreateQuizPage() {
                 />
               </div>
 
-              {/* File Upload */}
               <div className="space-y-2 relative">
                 <Label htmlFor="files">Upload Documents (Optional)</Label>
                 <div
@@ -202,14 +199,14 @@ export default function CreateQuizPage() {
                       Upload files or drag and drop
                     </p>
                     <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                      pdf, text, csv up to 10MB each
+                      PDF, TXT, or Markdown — up to 5MB each, max 3 files
                     </span>
                   </div>
                   <Input
                     id="files"
                     type="file"
                     multiple
-                    accept=".pdf,.txt,.csv"
+                    accept=".pdf,.txt,.md,.markdown"
                     className="absolute inset-0 opacity-0 cursor-pointer"
                     {...register("files")}
                   />

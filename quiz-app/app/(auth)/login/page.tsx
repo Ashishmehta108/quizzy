@@ -1,6 +1,6 @@
 "use client";
 
-import { useSignIn } from "@clerk/nextjs";
+import { useAuth, useSignIn } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
@@ -26,6 +26,7 @@ interface LoginForm {
 
 export default function LoginPage() {
   const { isLoaded, signIn, setActive } = useSignIn();
+  const { getToken } = useAuth();
   const router = useRouter();
   const [error, setError] = useState<string>("");
 
@@ -37,9 +38,14 @@ export default function LoginPage() {
 
   const syncUser = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/sync`, {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL;
+      if (!backendUrl) throw new Error("Missing BACKEND URL env");
+      const jwt = await getToken();
+      if (!jwt) throw new Error("Missing Clerk session token");
+      const res = await fetch(`${backendUrl}/auth/sync`, {
         method: "GET",
-        credentials: "include",
+        headers: { Authorization: `Bearer ${jwt}` },
+
       });
       if (!res.ok) throw new Error("Sync failed");
     } catch (err) {

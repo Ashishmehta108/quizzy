@@ -1,5 +1,4 @@
 "use client";
-import { useAuthStore } from "@/store/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
@@ -10,7 +9,6 @@ const Profile = () => {
   useEffect(() => {
     setisMounted(true);
   }, []);
-  // const { user } = useAuthStore();
   const { userId } = useAuth()
   const { user } = useUser()
   console.log(userId)
@@ -21,18 +19,23 @@ const Profile = () => {
         <div className="flex items-center gap-4">
           <Avatar className="h-16 w-16">
             <AvatarImage src={user?.imageUrl || "https://github.com/shadcn.png"} alt="profile" />
-            <AvatarFallback>{user?.fullName?.toUpperCase()[0] || "U"}</AvatarFallback>
-          </Avatar>
-          <div>
+            <AvatarFallback>
+              {user?.fullName?.charAt(0)?.toUpperCase() ?? "U"}
+            </AvatarFallback> </Avatar><div>
             <CardTitle className="text-lg">Profile</CardTitle>
-            <p className="text-sm text-muted-foreground">{user?.emailAddresses[0].emailAddress}</p>
-          </div>
+            <p className="text-sm text-muted-foreground">
+              {user?.primaryEmailAddress?.emailAddress ??
+               user?.emailAddresses?.[0]?.emailAddress ??
+            "No email"}
+            </p> </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-2">
         <p>
           <span className="font-medium text-muted-foreground">Email:</span>{" "}
-          {user?.emailAddresses[0].emailAddress}
+         {user?.primaryEmailAddress?.emailAddress ??
+           user?.emailAddresses?.[0]?.emailAddress ??
+         "No email"}
         </p>
       </CardContent>
     </Card>

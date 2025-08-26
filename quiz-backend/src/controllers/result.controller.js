@@ -1,8 +1,8 @@
-import { db } from "../config/db/index.js";
-import { quizzes, results } from "../config/db/schema.js";
+import { db } from "../config/db/index";
+import { quizzes, results } from "../config/db/schema";
 import { and, eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
-import { calculateResult } from "../utils/calculateresult.js";
+import { calculateResult } from "../utils/calculateresult";
 
 export const PostResult = async (req, res) => {
     try {
