@@ -11,6 +11,7 @@ import Hero from "@/components/Landing/Hero";
 import { NavbarDemo } from "@/components/Landing/LandingNavbar";
 import Info from "@/components/Landing/Info";
 import { IphonePopup } from "@/components/Landing/Notification";
+import { PricingPage } from "@/components/pricing/pricing";
 
 interface AnimatedElementProps {
   children: React.ReactNode;
@@ -85,6 +86,10 @@ const QuizAppLanding = () => {
       {/* <Features /> */}
       <IphonePopup />
       <Info />
+      <div id="pricing">
+        <PricingPage />
+      </div>
+
       <TestimonialsSection />
       <CTA />
       <Footer />

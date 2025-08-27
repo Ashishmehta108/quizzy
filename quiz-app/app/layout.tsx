@@ -7,9 +7,10 @@ import logo from "../public/quizzy_metadata_logo.png";
 import { SmoothScrollWrapper } from "@/components/SmoothScroll";
 import { cookies } from "next/headers";
 import { ClerkProvider } from "@clerk/nextjs";
-const inter = Inter({
+import { Arimo } from "next/font/google";
+const arimo = Arimo({
   subsets: [
-    "vietnamese"
+    "greek"
   ]
 })
 export const metadata: Metadata = {
@@ -30,7 +31,7 @@ export default async function RootLayout({
   console.log(token);
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={arimo.className}>
         <ClerkProvider>
           {/* <SessionProvider> */}
           <ThemeProvider

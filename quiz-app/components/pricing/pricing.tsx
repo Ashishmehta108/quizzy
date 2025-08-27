@@ -1,73 +1,65 @@
-// src/components/pricing-page.tsx
 'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Define the structure for plan data
-interface PlanFeature {
-    text: string;
-    footnote?: string;
-}
-
+interface PlanFeature { text: string; }
 interface Plan {
     name: string;
-    price: {
-        monthly: number;
-        annual: number;
-    } | 'Custom';
+    price: { monthly: number; annual: number } | 'Custom';
     description: string;
     features: PlanFeature[];
     isPopular?: boolean;
     cta: string;
 }
 
-// Pricing data inspired by the image
 const plansData: Plan[] = [
     {
         name: 'Free',
         price: { monthly: 0, annual: 0 },
-        description: 'For your hobby projects',
+        description: 'For beginners starting their quiz journey',
         features: [
-            { text: 'Free e-mail alerts' },
-            { text: '3-minute checks' },
-            { text: 'Automatic data enrichment' },
-            { text: '10 monitors' },
-            { text: 'Up to 3 seats' },
+            { text: '30 quizzes per month' },
+            { text: '10 web searches per month' },
+            { text: '2 Notion page integrations' },
+            { text: 'Participate in tournaments' },
+            { text: 'Access to leaderboards' },
         ],
-        cta: 'Get started for free',
+        cta: 'Current Plan',
     },
     {
-        name: 'Pro',
-        price: { monthly: 99, annual: 85 }, // Assuming a monthly price for toggle functionality
-        description: 'Great for small businesses',
+        name: 'Chill',
+        price: { monthly: 449, annual: 349 },
+        description: 'For serious quiz makers who want more freedom',
         features: [
-            { text: 'Unlimited phone calls' },
-            { text: '30 second checks' },
-            { text: 'Single-user account' },
-            { text: '20 monitors' },
-            { text: 'Up to 6 seats' },
+            { text: '300 quizzes per month' },
+            { text: '100 web searches per month' },
+            { text: '20 Notion page integrations' },
+            { text: 'Create & manage tournaments' },
+            { text: 'Full leaderboard access' },
+            { text: 'Priority support' },
         ],
         isPopular: true,
-        cta: 'Get started with Pro',
+        cta: 'Upgrade to Chill',
     },
     {
-        name: 'Enterprise',
-        price: 'Custom',
-        description: 'For multiple teams',
+        name: 'Sigma',
+        price: { monthly: 999, annual: 749 },
+        description: 'Full-featured plan for power users and teams',
         features: [
-            { text: 'Everything in Pro' },
-            { text: 'Up to 5 team members' },
-            { text: '100 monitors' },
-            { text: '15 status pages' },
-            { text: '200+ integrations' },
+            { text: '1000 quizzes per month' },
+            { text: '300 web searches per month' },
+            { text: '20 Notion page integrations' },
+            { text: 'Full leaderboard access' },
+            { text: 'Full Notion workspace integration' },
+            { text: 'Create & manage unlimited tournaments' },
+            { text: 'Advanced leaderboard & analytics' },
+            { text: 'Team collaboration features' },
+            { text: 'Priority support' },
         ],
-        cta: 'Get started with Enterprise',
+        cta: 'Contact Sales',
     },
 ];
 
@@ -75,108 +67,88 @@ export function PricingPage() {
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
 
     return (
-        <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950/50">
-            <div className="container mx-auto px-4 py-12 sm:py-16 lg:py-24">
-                {/* Header */}
-                <div className="text-center">
-                    <h1 className="text-4xl font-semibold tracking-tight text-gray-900 dark:text-gray-50 sm:text-5xl lg:text-6xl">
-                        Plans and Pricing
-                    </h1>
-                    <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-500 dark:text-gray-400">
-                        Receive unlimited credits when you pay yearly, and save on your plan.
-                    </p>
-                </div>
+        <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center py-16 px-4 transition-colors duration-300 border-t border-b border-zinc-200 dark:border-zinc-800">
+            <div className="text-center mb-10">
+                <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">Choose the Plan!</h1>
+                <p className="text-zinc-600 dark:text-zinc-400 mt-2">Pick the plan that suits your quiz-making needs!</p>
+            </div>
 
-                {/* Pricing Toggle */}
-                <div className="mt-10 flex justify-center">
-                    <Tabs
-                        defaultValue="annual"
-                        onValueChange={(value) => setBillingCycle(value as 'monthly' | 'annual')}
-                        className="w-auto"
+            {/* Billing Toggle */}
+            <div className="relative w-full max-w-xs sm:max-w-[200px] bg-zinc-200 dark:bg-zinc-800 rounded-full shadow-inner overflow-hidden mb-12 mx-auto">
+                <div
+                    className={cn(
+                        'absolute top-0 left-0 h-full w-1/2 bg-zinc-900 dark:bg-zinc-100 rounded-full shadow-md transition-all duration-300'
+                    )}
+                    style={{ transform: billingCycle === 'monthly' ? 'translateX(0%)' : 'translateX(100%)' }}
+                />
+                <div className="relative flex">
+                    <button
+                        className={cn(
+                            'flex-1 py-2 rounded-full text-center transition-colors duration-300 z-10',
+                            billingCycle === 'monthly' ? 'text-white dark:text-zinc-900' : 'text-zinc-700 dark:text-zinc-300'
+                        )}
+                        onClick={() => setBillingCycle('monthly')}
                     >
-                        <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="monthly">Monthly</TabsTrigger>
-                            <TabsTrigger value="annual" className="relative">
-                                Annual
-                                <Badge
-                                    variant="secondary"
-                                    className="absolute -top-3 -right-8 bg-green-100 text-green-700 border-green-200"
-                                >
-                                    Save 36%
-                                </Badge>
-                            </TabsTrigger>
-                        </TabsList>
-                    </Tabs>
+                        Monthly
+                    </button>
+                    <button
+                        className={cn(
+                            'flex-1 py-2 rounded-full text-center transition-colors duration-300 z-10',
+                            billingCycle === 'annual' ? 'text-white dark:text-zinc-900' : 'text-zinc-700 dark:text-zinc-300'
+                        )}
+                        onClick={() => setBillingCycle('annual')}
+                    >
+                        Annual
+                    </button>
                 </div>
+            </div>
 
-                {/* Pricing Cards */}
-                <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start">
-                    {plansData.map((plan, index) => (
-                        <Card
-                            key={index}
+            {/* Pricing Cards */}
+            <div className="flex flex-col md:grid md:grid-cols-3 gap-6 sm:gap-8 w-full max-w-6xl">
+                {plansData.map((plan, idx) => (
+                    <div
+                        key={idx}
+                        className={cn(
+                            'relative rounded-2xl p-6 sm:p-8 flex flex-col border transition-colors duration-300 cursor-pointer mb-6 md:mb-0',
+                            plan.isPopular
+                                ? 'bg-zinc-900 text-zinc-100 border border-zinc-700 shadow-2xl'
+                                : 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700'
+                        )}
+                    >
+                        <h2 className="text-xl font-semibold mb-3 sm:mb-4">{plan.name}</h2>
+                        <div className="text-3xl sm:text-4xl font-extrabold mb-2">
+                            ₹{plan.price === 'Custom' ? 'Custom' : billingCycle === 'monthly' ? plan.price.monthly : plan.price.annual}
+                            <span className="text-base sm:text-lg font-medium text-zinc-400 dark:text-zinc-300 ml-1">/month</span>
+                        </div>
+                        <p className="mb-4 sm:mb-6 text-zinc-500 dark:text-zinc-400">{plan.description}</p>
+
+                        <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+                            {plan.features.map((f, i) => (
+                                <li key={i} className="flex items-center text-sm sm:text-base">
+                                    <Check
+                                        className={cn(
+                                            'w-5 h-5 mr-2 sm:mr-3 flex-shrink-0',
+                                            plan.isPopular ? 'text-zinc-200' : 'text-zinc-700 dark:text-zinc-300'
+                                        )}
+                                    />
+                                    <span>{f.text}</span>
+                                </li>
+                            ))}
+                        </ul>
+
+                        <Button
+                            variant={plan.isPopular ? 'default' : 'outline'}
                             className={cn(
-                                'relative flex flex-col h-full transition-transform duration-300 hover:scale-105 hover:shadow-xl',
-                                {
-                                    'border-2 border-primary shadow-lg': plan.isPopular,
-                                    'bg-gray-900 text-white border-gray-700': plan.name === 'Enterprise',
-                                }
+                                "w-full mt-auto transition-colors duration-300",
+                                plan.isPopular
+                                    ? "bg-zinc-800 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-200"
+                                    : "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 hover:text-zinc-800 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-800"
                             )}
                         >
-                            {plan.isPopular && (
-                                <Badge
-                                    className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground"
-                                >
-                                    Popular
-                                </Badge>
-                            )}
-                            <CardHeader className="pt-8">
-                                <CardTitle className={cn('text-2xl font-bold', { 'text-white': plan.name === 'Enterprise' })}>
-                                    {plan.name}
-                                </CardTitle>
-                                <div className="mt-4 flex items-baseline">
-                                    {plan.price === 'Custom' ? (
-                                        <span className="text-5xl font-extrabold tracking-tight">Custom</span>
-                                    ) : (
-                                        <>
-                                            <span className="text-5xl font-extrabold tracking-tight">
-                                                ${billingCycle === 'annual' ? plan.price.annual : plan.price.monthly}
-                                            </span>
-                                            <span className="ml-2 text-lg font-medium text-gray-500 dark:text-gray-400">
-                                                / user/month
-                                            </span>
-                                        </>
-                                    )}
-                                </div>
-                                <CardDescription className={cn({ 'text-gray-400': plan.name === 'Enterprise' })}>
-                                    Per user/month, billed {billingCycle}ly
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="flex-grow">
-                                <p className={cn("mt-2 mb-6 font-medium", { 'text-gray-300': plan.name === 'Enterprise' })}>{plan.description}</p>
-                                <ul className="space-y-4">
-                                    {plan.features.map((feature, idx) => (
-                                        <li key={idx} className="flex items-start">
-                                            <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                                            <span className={cn('text-sm', { 'text-gray-300': plan.name === 'Enterprise' })}>
-                                                {feature.text}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </CardContent>
-                            <CardFooter>
-                                <Button
-                                    className="w-full"
-                                    variant={
-                                        plan.isPopular ? 'default' : (plan.name === 'Enterprise' ? 'secondary' : 'outline')
-                                    }
-                                >
-                                    {plan.cta}
-                                </Button>
-                            </CardFooter>
-                        </Card>
-                    ))}
-                </div>
+                            {plan.cta}
+                        </Button>
+                    </div>
+                ))}
             </div>
         </div>
     );
