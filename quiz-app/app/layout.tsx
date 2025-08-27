@@ -4,12 +4,11 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import logo from "../public/quizzy_metadata_logo.png";
-import { SessionProvider } from "@/components/Sessionprovider";
 import { SmoothScrollWrapper } from "@/components/SmoothScroll";
 import { cookies } from "next/headers";
 import { ClerkProvider } from "@clerk/nextjs";
 const inter = Inter({
-  subsets:[
+  subsets: [
     "vietnamese"
   ]
 })
@@ -34,15 +33,15 @@ export default async function RootLayout({
       <body className={inter.className}>
         <ClerkProvider>
           {/* <SessionProvider> */}
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {/* <Navbar /> */}
-              <SmoothScrollWrapper>{children}</SmoothScrollWrapper>
-            </ThemeProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {/* <Navbar /> */}
+            <SmoothScrollWrapper>{children}</SmoothScrollWrapper>
+          </ThemeProvider>
           {/* </SessionProvider> */}
         </ClerkProvider>
       </body>
