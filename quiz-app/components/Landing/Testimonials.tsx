@@ -94,7 +94,7 @@ export function TestimonialsSection() {
       <div className="max-w-7xl mx-auto">
         <AnimatedElement>
           <div className="text-center mb-24">
-            <h2 className="text-2xl sm:text-5xl font-bold text-zinc-900 dark:text-white mb-8 tracking-tight">
+            <h2 className="text-4xl sm:text-5xl font-bold text-zinc-900 dark:text-white mb-8 tracking-tight">
               Loved by{" "}
               <span className="text-blue-600 dark:text-blue-400">learners</span>{" "}
               everywhere

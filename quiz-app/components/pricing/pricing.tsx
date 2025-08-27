@@ -45,7 +45,7 @@ const plansData: Plan[] = [
         cta: 'Upgrade to Chill',
     },
     {
-        name: 'Sigma',
+        name: 'Chigma',
         price: { monthly: 999, annual: 749 },
         description: 'Full-featured plan for power users and teams',
         features: [
@@ -72,9 +72,7 @@ export function PricingPage() {
                 <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">Choose the Plan!</h1>
                 <p className="text-zinc-600 dark:text-zinc-400 mt-2">Pick the plan that suits your quiz-making needs!</p>
             </div>
-
-            {/* Billing Toggle */}
-            <div className="relative w-full max-w-xs sm:max-w-[200px] bg-zinc-200 dark:bg-zinc-800 rounded-full shadow-inner overflow-hidden mb-12 mx-auto">
+            <div className="relative w-full max-w-[220px]  bg-zinc-200 dark:bg-zinc-800 rounded-full shadow-inner overflow-hidden mb-12 mx-auto">
                 <div
                     className={cn(
                         'absolute top-0 left-0 h-full w-1/2 bg-zinc-900 dark:bg-zinc-100 rounded-full shadow-md transition-all duration-300'
@@ -103,7 +101,6 @@ export function PricingPage() {
                 </div>
             </div>
 
-            {/* Pricing Cards */}
             <div className="flex flex-col md:grid md:grid-cols-3 gap-6 sm:gap-8 w-full md:max-w-6xl container max-w-md sm:max-w-2xl  ">
                 {plansData.map((plan, idx) => (
                     <div
@@ -139,14 +136,17 @@ export function PricingPage() {
                         <Button
                             variant={plan.isPopular ? 'default' : 'outline'}
                             className={cn(
-                                "w-full mt-auto transition-colors duration-300",
-                                plan.isPopular
-                                    ? "bg-zinc-800 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-200"
-                                    : "bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 hover:text-zinc-800 dark:hover:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-800"
+                                "w-full mt-auto relative overflow-hidden transition-colors duration-300",
+                                "bg-zinc-800 dark:bg-zinc-100 text-white dark:text-zinc-900",
+                                "hover:bg-zinc-900 dark:hover:bg-zinc-200",
+                                "shadow-inner"
                             )}
                         >
-                            {plan.cta}
+                            <span className="absolute inset-0 bg-gradient-to-b from-zinc-100/20 to-zinc-600/20 dark:from-zinc-900/20 dark:to-zinc-400/20  pointer-events-none"></span>
+                            <span className="relative z-10">{plan.cta}</span>
                         </Button>
+
+
                     </div>
                 ))}
             </div>

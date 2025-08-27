@@ -111,7 +111,7 @@ export function IphonePopup() {
   return (
     <div className="relative w-full max-w-xl mx-auto mt-16 mb-10">
       <div className="text-center mb-8 gap-y-3">
-        <h2 className="text-3xl sm:text-4xl  font-bold text-zinc-900 dark:text-white">
+        <h2 className="text-4xl   font-bold text-zinc-900 dark:text-white">
           Upcoming Quizzy App Features
         </h2>
         <p className="text-sm sm:text-base mt-2 text-zinc-600 dark:text-zinc-300">
