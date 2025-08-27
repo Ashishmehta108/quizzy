@@ -10,7 +10,8 @@ import fs from "fs/promises";
 import { Response, Request } from "express";
 import type { InferSelectModel } from "drizzle-orm";
 import { ReadStream } from "node:fs";
-import { QuizRequest, QuizResponse } from "@/types/routes/quiz";
+// import { QuizRequest, QuizResponse } from "@/types/routes/quiz";
+import { QuizRequest, QuizResponse } from "../types/routes/quiz";
 
 export interface QuizFile {
   fieldname: string;

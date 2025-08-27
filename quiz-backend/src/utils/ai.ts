@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import "dotenv/config";
-import { QuizQuestion, GenerateQuizQuestionsParams } from "@/types/utils/ai";
+import { QuizQuestion, GenerateQuizQuestionsParams } from "../types/utils/ai";
 
 export const genAI = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI! });
 

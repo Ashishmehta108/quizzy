@@ -1,6 +1,7 @@
 import { Annotation, MessagesAnnotation } from "@langchain/langgraph";
 import { Input, QuizQuestion } from "./ai.types";
-import { Chunk } from "@/types/ai/pinecone";
+// import { Chunk } from "../types/ai/pinecone";
+import {Chunk} from "../../types/ai/pinecone"
 
 export const QuizState = Annotation.Root({
   input: Annotation<Input>,

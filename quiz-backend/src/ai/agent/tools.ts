@@ -1,10 +1,11 @@
 import { generateEmbedding } from "../pinecone";
 import { QuizState } from "./Graph";
 import { index } from "../pinecone";
-import { Chunk } from "@/types/ai/pinecone";
-import { genAI, generateQuizQuestions } from "@/utils/ai";
-import { db } from "@/config/db";
-import { documents } from "@/config/db/schema";
+import { Chunk } from "../../types/ai/pinecone";
+
+import { genAI, generateQuizQuestions } from "../../utils/ai";
+import { db } from "../../config/db";
+import { documents } from "../../config/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function retrieveNode(state: typeof QuizState.State) {

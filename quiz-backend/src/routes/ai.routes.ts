@@ -4,7 +4,7 @@ export const aiRouter = Router();
 import { airaAgent } from "../ai/agent/airaAgent";
 import { Input, QuizQuestion } from "../ai/agent/ai.types";
 import { z } from "zod";
-import { searchWeb } from "@/ai/agent/tools/websearch.tool";
+import { searchWeb } from "../ai/agent/tools/websearch.tool";
 
 aiRouter.post("/quiz", async (req, res) => {
   const schema = z.object({
