@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { useAuthStore } from "@/store/auth";
+import { useUser, useAuth } from "@clerk/nextjs";
 import { ArchiveBook } from "iconsax-reactjs";
 
 import { MarkdownRenderer } from "@/components/quiz-render/MarkdownRender";
@@ -65,30 +65,18 @@ export default function ResultViewPage(): React.JSX.Element | null {
   const [result, setResult] = useState<QuizResult | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
-  const { user, isLoading, restoreSession } = useAuthStore();
+  const { user, isLoaded } = useUser();
   const router = useRouter();
   const { id } = useParams();
 
   useEffect(() => {
     const initializePage = async () => {
-      if (!isLoading) {
-        if (!user?.id) {
-          try {
-            await restoreSession();
-            if (!useAuthStore.getState().user) {
-              router.push("/login");
-              return;
-            }
-          } catch {
-            router.push("/login");
-            return;
-          }
-        }
+      if (!isLoaded) {
         await fetchResult();
       }
     };
     initializePage();
-  }, [user, isLoading, id]);
+  }, [user, isLoaded, id]);
 
   const fetchResult = async () => {
     try {
@@ -104,8 +92,8 @@ export default function ResultViewPage(): React.JSX.Element | null {
       console.error("Error fetching result:", err);
       setError(
         err?.response?.data?.message ??
-          err?.message ??
-          "Something went wrong while fetching the result"
+        err?.message ??
+        "Something went wrong while fetching the result"
       );
     } finally {
       setLoading(false);
@@ -128,8 +116,8 @@ export default function ResultViewPage(): React.JSX.Element | null {
       Array.isArray(a.selected)
         ? a.selected
         : a.selected !== undefined
-        ? [a.selected]
-        : []
+          ? [a.selected]
+          : []
     );
     const hasZero = flattenedSelected.some((v) => v === 0);
     const hasPositiveOnly =
@@ -141,8 +129,8 @@ export default function ResultViewPage(): React.JSX.Element | null {
       const selArrRaw = Array.isArray(a.selected)
         ? a.selected
         : a.selected !== undefined
-        ? [a.selected]
-        : [];
+          ? [a.selected]
+          : [];
 
       const selectedOptions = selArrRaw.map((s) =>
         typeof s === "number" ? (needsIndexShift ? s - 1 : s) : Number(s)
@@ -176,7 +164,7 @@ export default function ResultViewPage(): React.JSX.Element | null {
       typeof raw.score === "number"
         ? raw.score
         : transformed.filter((t) => t.selectedOptions.includes(t.correctOption))
-            .length;
+          .length;
     const totalQuestions =
       typeof raw.totalQuestions === "number"
         ? raw.totalQuestions

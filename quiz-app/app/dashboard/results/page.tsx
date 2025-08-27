@@ -4,25 +4,20 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Trophy } from "lucide-react";
-import { useAuthStore } from "@/store/auth";
 import ResultTable from "@/components/ui/result-card";
 import api from "@/lib/api";
 import type { Result } from "@/lib/types";
+import { useAuth, useUser } from "@clerk/nextjs";
 
 export default function DashboardPage() {
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user, restoreSession, isLoading } = useAuthStore();
+  const { isLoaded } = useAuth()
+  const { user } = useUser()
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!user?.id) {
-        const u = restoreSession();
-        if (!u) {
-          router.push("/login");
-        }
-      }
+    if (!isLoaded) {
       fetchData();
     }
   }, [user, router]);
@@ -55,7 +50,7 @@ export default function DashboardPage() {
             View your quiz performance and scores
           </p>
         </div>
-        {loading ? (
+        {!isLoaded ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[...Array(6)].map((_, i) => (
               <Card key={i} className="animate-pulse">

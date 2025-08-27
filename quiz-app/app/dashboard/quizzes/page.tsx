@@ -6,28 +6,25 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, BookOpen, Trophy, LogOut } from "lucide-react";
-import { useAuthStore } from "@/store/auth";
+
 import { QuizTable } from "@/components/ui/quiz-card";
 import api from "@/lib/api";
 import type { Quiz, QuizResponse, Result } from "@/lib/types";
 import Link from "next/link";
+import { useAuth, useUser } from "@clerk/nextjs";
 
 export default function DashboardPage() {
   const [quizzes, setQuizzes] = useState<QuizResponse[]>([]);
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user, logout, restoreSession, isLoading } = useAuthStore();
+  const { isLoaded } = useAuth()
+  const { user } = useUser()
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!user?.id) {
-        const u = restoreSession();
-        if (!u) {
-          router.push("/login");
-        }
-        return;
-      }
+    if (!isLoaded) {
+
+
       fetchData();
     }
   }, [user, router]);
@@ -47,12 +44,6 @@ export default function DashboardPage() {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  if (!user) return null;
-
   return (
     <div className="bg-white max-w-7xl mx-auto container px-4 sm:px-6 lg:px-8 py-8 dark:bg-zinc-900">
       <div className="flex items-center justify-between">
@@ -64,7 +55,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {loading ? (
+      {!isLoaded ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
             <Card key={i} className="animate-pulse">
