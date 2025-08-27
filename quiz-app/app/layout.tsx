@@ -27,13 +27,10 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const token = (await cookies()).get("auth_token")?.value || null;
-  console.log(token);
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={arimo.className}>
-        <ClerkProvider>
-          {/* <SessionProvider> */}
+        <ClerkProvider key={process.env.CLERK_SECRET_KEY}>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
