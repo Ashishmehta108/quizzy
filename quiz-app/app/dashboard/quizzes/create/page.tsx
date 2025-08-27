@@ -16,29 +16,35 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, Upload, FileText, Loader2 } from "lucide-react";
-import { useAuthStore } from "@/store/auth";
 import api from "@/lib/api";
 import type { Question, Quiz, QuizResponse } from "@/lib/types";
 import Link from "next/link";
-
-interface CreateQuizForm {
-  title: string;
-  query: string;
-  files: FileList;
-}
+import { useUser } from "@clerk/nextjs";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { createQuizSchema } from "@/utils/schema"
+import type { CreateQuizForm } from "@/utils/schema"
 
 export default function CreateQuizPage() {
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<Quiz | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuthStore();
+
   const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
-  } = useForm<CreateQuizForm>();
+  } = useForm<CreateQuizForm>(
+    {
+      resolver: zodResolver(createQuizSchema),
+      defaultValues: {
+        title: "",
+        query: "",
+        files: [],
+      },
+    }
+  );
   const files = watch("files");
   const inputRef = register("files").ref;
 
@@ -52,7 +58,7 @@ export default function CreateQuizPage() {
       formData.append("query", data.query);
 
       if (data.files && data.files.length > 0) {
-        Array.from(data.files).forEach((file) => {
+        Array.from(data.files as FileList).forEach((file: File) => {
           formData.append("files", file);
         });
       }
@@ -113,18 +119,32 @@ export default function CreateQuizPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-900 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Card>
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Card
+          className="
+    rounded-2xl border
+    backdrop-blur-md 
+    
+    border-zinc-200/70 dark:border-white/10
+    transition-colors
+  "
+        >
           <CardHeader>
-            <CardTitle className="text-2xl">Create New Quiz</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-700 dark:from-white dark:to-zinc-400">
+              Create New Quiz
+            </CardTitle>
+            <CardDescription className="text-zinc-600 dark:text-zinc-400">
               Upload documents and create a quiz based on the content
             </CardDescription>
           </CardHeader>
+
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {error && (
-                <Alert variant="destructive">
+                <Alert
+                  variant="destructive"
+                  className="rounded-xl bg-red-100/70 dark:bg-red-900/30 border-red-300/50 dark:border-red-800/50"
+                >
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
@@ -133,107 +153,98 @@ export default function CreateQuizPage() {
                 <Label htmlFor="title">Quiz Title</Label>
                 <Input
                   id="title"
-                  className="focus-visible:border-zinc-400 focus-visible:ring-transparent"
+                  className="
+            rounded-xl bg-white/60 dark:bg-zinc-800/40
+            border border-zinc-300/60 dark:border-white/10
+            focus-visible:ring-0 focus-visible:border-zinc-400 dark:focus-visible:border-zinc-600
+            transition-colors
+          "
                   placeholder="Enter quiz title"
-                  {...register("title", {
-                    required: "Title is required",
-                    minLength: {
-                      value: 3,
-                      message: "Title must be at least 3 characters",
-                    },
-                  })}
+                  {...register("title", { required: "Title is required" })}
                 />
-                {errors.title && (
-                  <p className="text-sm text-destructive">
-                    {errors.title.message}
-                  </p>
-                )}
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="query">Quiz Description/Query</Label>
                 <Textarea
                   id="query"
-                  className="focus-visible:border-zinc-400 focus-visible:ring-transparent"
+                  className="
+            rounded-xl bg-white/60 dark:bg-zinc-800/40
+            border border-zinc-300/60 dark:border-white/10
+            focus-visible:ring-0 focus-visible:border-zinc-400 dark:focus-visible:border-zinc-600
+            transition-colors
+          "
                   placeholder="Describe what the quiz should focus on..."
                   rows={4}
-                  {...register("query", {
-                    required: "Description is required",
-                    minLength: {
-                      value: 10,
-                      message: "Description must be at least 10 characters",
-                    },
-                  })}
+                  {...register("query", { required: "Description is required" })}
                 />
-                {errors.query && (
-                  <p className="text-sm text-destructive">
-                    {errors.query.message}
-                  </p>
-                )}
               </div>
 
-              <div className="space-y-2 relative  ">
+              <div className="space-y-2 relative">
                 <Label htmlFor="files">Upload Documents (Optional)</Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-zinc-400  cursor-pointer dark:hover:border-zinc-500 dark:border-zinc-600">
+                <div
+                  className="
+            border-2 border-dashed
+            border-zinc-300/60 dark:border-white/20
+            rounded-xl p-6
+            hover:border-zinc-400 dark:hover:border-zinc-500
+            transition-colors
+            bg-white/40 dark:bg-zinc-900/20
+            backdrop-blur-sm
+          "
+                >
                   <div className="text-center">
-                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                    <div className="mt-4">
-                      <Label htmlFor="files" className="cursor-pointer">
-                        <span className="mt-2 block text-sm font-medium text-gray-900">
-                          Upload files or drag and drop
-                        </span>
-                        <span className="mt-1 block text-sm dark:text-zinc-300 text-gray-600">
-                          pdf, text, csv files up to 10MB each
-                        </span>
-                      </Label>
-                      <Input
-                        id="files"
-                        type="file"
-                        multiple
-                        accept=".pdf,.txt,.csv"
-                        className="w-full h-full left-0 top-8 absolute opacity-0 cursor-pointer"
-                        {...register("files")}
-                      />
-                    </div>
-                  </div>
-                </div>
-                {files && files.length > 0 && (
-                  <div className="mt-2">
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                      Selected files:
+                    <Upload className="mx-auto h-12 w-12 text-zinc-500 dark:text-zinc-400" />
+                    <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300">
+                      Upload files or drag and drop
                     </p>
-                    <ul className="mt-1 text-sm text-zinc-900 dark:text-zinc-300">
-                      {Array.from(files).map((file, index) => (
-                        <li key={index} className="flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
-                          {file.name} ({Math.round(file.size / 1024)}KB)
-                        </li>
-                      ))}
-                    </ul>
+                    <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                      PDF, TXT, or Markdown — up to 5MB each, max 3 files
+                    </span>
                   </div>
-                )}
+                  <Input
+                    id="files"
+                    type="file"
+                    multiple
+                    accept=".pdf,.txt,.md,.markdown"
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                    {...register("files")}
+                  />
+                </div>
               </div>
 
+              {/* Button */}
               <div className="flex justify-end">
                 <Button
                   type="submit"
-                  className="dark:bg-white dark:hover:bg-zinc-200 dark:text-black text-white bg-zinc-900 hover:bg-zinc-800"
                   disabled={isLoading}
                   size="lg"
+                  className="
+            relative overflow-hidden
+            rounded-xl px-6 py-3 font-semibold
+            transition-all duration-300
+            backdrop-blur-md
+            border
+            text-zinc-900 bg-white/50 border-zinc-300/50
+            dark:text-white dark:bg-zinc-800/30 dark:border-white/10
+            hover:bg-zinc-200/60 dark:hover:bg-white/[0.1]
+            disabled:opacity-60 disabled:cursor-not-allowed
+          "
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Creating Quiz...
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>Creating Quiz...</span>
                     </>
                   ) : (
-                    "Create Quiz"
+                    <span>Create Quiz</span>
                   )}
                 </Button>
               </div>
             </form>
           </CardContent>
         </Card>
+
       </div>
     </div>
   );

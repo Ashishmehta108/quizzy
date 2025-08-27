@@ -5,14 +5,13 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { Question, ResultResponse } from "@/lib/types";
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CardDescription, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, Clock, FileText } from "lucide-react";
-import { useAuthStore } from "@/store/auth";
+import { Clock, FileText } from "lucide-react";
 import api from "@/lib/api";
 import type { QuizResponse, Result } from "@/lib/types";
 import Link from "next/link";
 import { MarkdownRenderer } from "@/components/quiz-render/MarkdownRender";
+import { useUser } from "@clerk/nextjs";
 
 interface QuestionCardProps {
   question: Question;
@@ -45,7 +44,7 @@ export function QuestionCard({
 
   return (
     <div className="w-full max-w-3xl mx-auto ">
-      <Card className="shadow-none border border-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 bg-white">
+      <Card className="bg-white/20 dark:bg-zinc-800/40 border border-white/20 dark:border-white/10 backdrop-blur-md rounded-2xl transition-all duration-300">
         <CardHeader className="pb-4">
           <div className="flex justify-between items-center mb-3">
             <div className="flex items-center gap-1">
@@ -56,10 +55,10 @@ export function QuestionCard({
             </div>
           </div>
           <div className="space-y-3">
-            <h2 className="md:text-2xl  text-xl font-semibold text-zinc-900 dark:text-white leading-tight">
+            <h2 className="md:text-2xl text-xl font-semibold text-zinc-900 dark:text-white leading-tight">
               {question.question}
             </h2>
-            <p className="text-zinc-600 text-xs md:text-base dark:text-zinc-400">
+            <p className="text-zinc-600 dark:text-zinc-400 text-sm md:text-base">
               Choose the best answer from the options below
             </p>
           </div>
@@ -69,133 +68,82 @@ export function QuestionCard({
             {q.map((option: string, index: number) => {
               const isSelected = selectedAnswer === index;
               const optionLabel = String.fromCharCode(65 + index);
+
               return (
                 <button
                   key={index}
-                  onClick={() => {
-                    console.log(index);
-                    onAnswerSelect(index);
-                  }}
-                  className={`group w-full px-2 py-2 dark:bg-zinc-900 text-left rounded-xl border-2 transition-all duration-200 hover:shadow-md  ${
-                    isSelected
-                      ? "border-blue-500 text-zinc-900 dark:text-white    bg-zinc-50 shadow-md scale-[1.01]"
-                      : "border-gray-200  dark:border-zinc-700 bg-white dark:bg-zinc-900"
-                  }`}
+                  onClick={() => onAnswerSelect(index)}
+                  className={`group w-full px-4 py-3 text-left rounded-2xl border transition-all duration-200 flex items-center gap-4 ${isSelected
+                      ? "bg-blue-200/30 border-blue-400 dark:bg-blue-700/30 dark:border-blue-500 scale-[1.02]"
+                      : "bg-white/10 dark:bg-zinc-900/30 border-white/20 dark:border-white/10 hover:bg-white/20 dark:hover:bg-white/10"
+                    }`}
                 >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`w-7 h-7 rounded-full border-2 flex items-center justify-center font-semibold text-xs transition-all duration-200 ${
-                        isSelected
-                          ? " bg-blue-500  text-white"
-                          : " bg-white dark:bg-zinc-900 dark:text-zinc-400 text-gray-600 "
+                  <div
+                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-semibold text-xs transition-all duration-200 ${isSelected
+                        ? "bg-blue-500 text-white border-blue-500"
+                        : "bg-white/20 dark:bg-zinc-800/40 text-gray-600 dark:text-zinc-300 border-white/20 dark:border-white/10"
                       }`}
-                    >
-                      <MarkdownRenderer>{optionLabel}</MarkdownRenderer>
-                    </div>
-
-                    <div className="flex-1">
-                      <span
-                        className={` text-sm sm:text-base  transition-colors duration-200`}
-                      >
-                        <MarkdownRenderer>{option}</MarkdownRenderer>
-                      </span>
-                    </div>
-
-                    {isSelected && (
-                      <div className="sm:w-5 sm:h-5 h-4 w-4 rounded-full bg-blue-500 flex items-center justify-center">
-                        <div className="w-2 h-2 bg-white rounded-full" />
-                      </div>
-                    )}
+                  >
+                    {optionLabel}
                   </div>
+
+                  <div className="flex-1 text-sm sm:text-base">
+                    <MarkdownRenderer>{option}</MarkdownRenderer>
+                  </div>
+
+                  {isSelected && (
+                    <div className="w-4 h-4 rounded-full bg-blue-500 flex items-center justify-center">
+                      <div className="w-2 h-2 bg-white rounded-full" />
+                    </div>
+                  )}
                 </button>
               );
             })}
           </div>
 
           {!canGoNext && (
-            <div className="mb-6 p-3 bg-amber-50  dark:bg-zinc-800 border border-amber-200 dark:border-zinc-700 rounded-lg">
+            <div className="mb-6 p-3 bg-amber-50/20 dark:bg-zinc-800/30 border border-amber-200 dark:border-zinc-700 rounded-lg">
               <p className="text-sm text-amber-800 dark:text-amber-50 text-center">
                 Please select an answer to continue
               </p>
             </div>
           )}
 
-          <div className="flex justify-between items-center pt-4 border-t border-gray-100 dark:border-zinc-800">
+          <div className="flex justify-between items-center pt-4 border-t border-white/20 dark:border-white/10">
             <Button
               variant="outline"
               onClick={onPrevious}
               disabled={!canGoPrevious}
-              className="flex items-center dark:hover:bg-zinc-800 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 gap-2 px-6 py-3 disabled:opacity-50 "
+              className="flex items-center gap-2 px-6 py-2 text-sm dark:text-zinc-200 disabled:opacity-50"
             >
               <ChevronLeft className="h-4 w-4" />
               Previous
             </Button>
 
-            <div className="flex items-center gap-3">
-              <div className="hidden sm:flex items-center gap-1">
-                {Array.from({ length: Math.min(totalQuestions, 5) }, (_, i) => {
-                  let dotIndex;
-                  if (totalQuestions <= 5) {
-                    dotIndex = i;
-                  } else {
-                    // Show current question in center with 2 on each side
-                    const offset = Math.max(
-                      0,
-                      Math.min(questionIndex - 2, totalQuestions - 5)
-                    );
-                    dotIndex = offset + i;
-                  }
-
-                  const isCurrentDot = dotIndex === questionIndex;
-                  const isAnsweredDot = dotIndex < questionIndex;
-
-                  return (
-                    <div
-                      key={dotIndex}
-                      className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                        isCurrentDot
-                          ? "bg-blue-500 scale-125"
-                          : isAnsweredDot
-                          ? "bg-green-400"
-                          : "bg-gray-300"
-                      }`}
-                    />
-                  );
-                })}
-                {totalQuestions > 5 && questionIndex < totalQuestions - 3 && (
-                  <span className="text-gray-400 text-sm ml-1">...</span>
-                )}
-              </div>
-
-              <Button
-                onClick={onNext}
-                disabled={!canGoNext || isSubmitting}
-                className={`flex items-center gap-2 px-6 py-3 font-semibold transition-all duration-200 ${
-                  isLastQuestion
-                    ? "bg-green-600 hover:bg-green-700 text-white"
-                    : "bg-blue-600 hover:bg-blue-700 text-white"
+            <Button
+              onClick={onNext}
+              disabled={!canGoNext || isSubmitting}
+              className={`flex items-center gap-2 px-6 py-2 font-semibold text-white transition-all duration-200 ${isLastQuestion
+                  ? "bg-green-600/80 hover:bg-green-700/70"
+                  : "bg-blue-600/80 hover:bg-blue-700/70"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
-              >
-                {isLastQuestion ? (
-                  isSubmitting ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    "Submit Quiz"
-                  )
-                ) : (
-                  <>
-                    Next
-                    <ChevronRight className="h-4 w-4" />
+            >
+              {isLastQuestion
+                ? isSubmitting
+                  ? <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Submitting...
                   </>
-                )}
-              </Button>
-            </div>
+                  : "Submit Quiz"
+                : <>
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </>}
+            </Button>
           </div>
         </CardContent>
       </Card>
+
     </div>
   );
 }
@@ -213,22 +161,19 @@ export default function TakeQuizPage({
   const [result, setResult] = useState<Result | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
-  const { user, isLoading, restoreSession } = useAuthStore();
+  const { user, isLoaded } = useUser()
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
 
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!user?.id) {
-        const u = restoreSession();
-        if (!u) {
-          router.push("/login");
-        }
-        return;
+    if (isLoaded) {
+      if (!user) {
+        router.push("/post-login");
       }
-      fetchQuiz(id);
-      //9aeebe3b-a71e-45c5-bd63-30869b52e49c
+      if (id) {
+        fetchQuiz(id);
+      }
     }
   }, [user, router, id]);
 
@@ -365,22 +310,20 @@ export default function TakeQuizPage({
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <div
-                className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 ${
-                  scorePercentage >= 80
-                    ? "bg-green-100"
-                    : scorePercentage >= 60
+                className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 ${scorePercentage >= 80
+                  ? "bg-green-100"
+                  : scorePercentage >= 60
                     ? "bg-yellow-100"
                     : "bg-red-100"
-                }`}
+                  }`}
               >
                 <span
-                  className={`text-3xl font-bold ${
-                    scorePercentage >= 80
-                      ? "text-green-600 dark:text-green-500"
-                      : scorePercentage >= 60
+                  className={`text-3xl font-bold ${scorePercentage >= 80
+                    ? "text-green-600 dark:text-green-500"
+                    : scorePercentage >= 60
                       ? "text-yellow-600 dark:text-yellow-500"
                       : "text-red-600 dark:tex-red-500"
-                  }`}
+                    }`}
                 >
                   {scorePercentage}%
                 </span>
@@ -396,8 +339,8 @@ export default function TakeQuizPage({
                 {scorePercentage >= 80
                   ? "Excellent work!"
                   : scorePercentage >= 60
-                  ? "Good job!"
-                  : "Keep practicing!"}
+                    ? "Good job!"
+                    : "Keep practicing!"}
               </p>
               <div className="flex gap-4">
                 <Link href={`/dashboard/results/${result.id}`}>

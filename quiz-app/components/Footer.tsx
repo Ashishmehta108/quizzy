@@ -75,7 +75,7 @@ export default function Footer() {
                   <motion.a
                     key={item.name}
                     href={item.href}
-                    className="block text-zinc-300 hover:text-blue-400 transition-colors text-sm font-medium flex items-center group"
+                    className="block text-zinc-400 hover:text-zinc-300 transition-colors text-sm font-medium flex items-center group"
                     whileHover="hover"
                   >
                     <span>{item.name}</span>
@@ -108,7 +108,7 @@ export default function Footer() {
                   <motion.a
                     key={item.name}
                     href={item.href}
-                    className="block text-zinc-300 hover:text-blue-400 transition-colors text-sm font-medium flex items-center group"
+                    className="block text-zinc-400 hover:text-zinc-300 transition-colors text-sm font-medium flex items-center group"
                     whileHover="hover"
                   >
                     <span>{item.name}</span>
@@ -144,7 +144,7 @@ export default function Footer() {
                   <div key={item} className="flex items-center">
                     <a
                       href="#"
-                      className="text-zinc-400 hover:text-blue-400 transition-colors text-sm font-medium"
+                      className="text-zinc-400 hover:text-zinc-300 transition-colors text-sm font-medium"
                     >
                       {item}
                     </a>

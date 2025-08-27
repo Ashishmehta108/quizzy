@@ -7,7 +7,12 @@ import logo from "../public/quizzy_metadata_logo.png";
 import { SessionProvider } from "@/components/Sessionprovider";
 import { SmoothScrollWrapper } from "@/components/SmoothScroll";
 import { cookies } from "next/headers";
-const inter = Inter({ subsets: ["greek"] });
+import { ClerkProvider } from "@clerk/nextjs";
+const inter = Inter({
+  subsets:[
+    "vietnamese"
+  ]
+})
 export const metadata: Metadata = {
   title: "Quiz App - Create and Take Quizzes",
   description: "A modern quiz application built with Next.js",
@@ -27,17 +32,19 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <SessionProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {/* <Navbar /> */}
-            <SmoothScrollWrapper>{children}</SmoothScrollWrapper>
-          </ThemeProvider>
-        </SessionProvider>
+        <ClerkProvider>
+          {/* <SessionProvider> */}
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {/* <Navbar /> */}
+              <SmoothScrollWrapper>{children}</SmoothScrollWrapper>
+            </ThemeProvider>
+          {/* </SessionProvider> */}
+        </ClerkProvider>
       </body>
     </html>
   );

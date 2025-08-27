@@ -7,7 +7,6 @@ import { useRef } from "react";
 import { TestimonialsSection } from "@/components/Landing/Testimonials";
 import Footer from "@/components/Footer";
 import CTA from "@/components/Landing/CTA";
-import Navbar from "@/components/Navbar";
 import Hero from "@/components/Landing/Hero";
 import { NavbarDemo } from "@/components/Landing/LandingNavbar";
 import Info from "@/components/Landing/Info";

@@ -27,17 +27,18 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Logo from "../../public/quizzy_logo.png";
-import { useAuthStore } from "@/store/auth";
 import Image from "next/image";
 import { FavoriteChart, Home, Note, Notepad2 } from "iconsax-reactjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 export default function AppSidebar() {
-  const { user, logout } = useAuthStore();
+  const { user } = useUser();
+  const { signOut } = useAuth()
 
   const handleLogout = async () => {
-    await logout();
+    await signOut();
     window.location.href = "/";
   };
-  if (!user) return null;
+  // if (!user) return null;
 
   return (
     <Sidebar className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
@@ -133,15 +134,15 @@ export default function AppSidebar() {
             className="flex items-center gap-3 p-2  -translate-x-4 rounded-md"
           >
             <Avatar className="w-8 h-8">
-              <AvatarImage src={"https://github.com/shadcn.png"} alt="@user" />
+              <AvatarImage src={user?.imageUrl || "https://github.com/shadcn.png"} alt="@user" />
               <AvatarFallback>
                 <User className="w-4 h-4" />
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <span className="text-sm font-medium">{user?.name}</span>
+              <span className="text-sm font-medium">{user?.firstName}</span>
               <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                {user?.email}
+                {user?.emailAddresses[0].emailAddress}
               </span>
             </div>
           </Link>
