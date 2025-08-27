@@ -1,8 +1,9 @@
 "use client";
-import React, { useEffect, useState } from "react";
+
+import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function NotionLoginPage() {
+function NotionLoginHandler() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const [status, setStatus] = useState("Checking login...");
@@ -38,5 +39,13 @@ export default function NotionLoginPage() {
                 Go Home
             </button>
         </main>
+    );
+}
+
+export default function NotionLoginPage() {
+    return (
+        <Suspense fallback={<p>Loading...</p>}>
+            <NotionLoginHandler />
+        </Suspense>
     );
 }
