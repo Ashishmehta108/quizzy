@@ -104,14 +104,14 @@ export function PricingPage() {
             </div>
 
             {/* Pricing Cards */}
-            <div className="flex flex-col md:grid md:grid-cols-3 gap-6 sm:gap-8 w-full max-w-6xl">
+            <div className="flex flex-col md:grid md:grid-cols-3 gap-6 sm:gap-8 w-full md:max-w-6xl container max-w-md sm:max-w-2xl  ">
                 {plansData.map((plan, idx) => (
                     <div
                         key={idx}
                         className={cn(
-                            'relative rounded-2xl p-6 sm:p-8 flex flex-col border transition-colors duration-300 cursor-pointer mb-6 md:mb-0',
+                            'relative rounded-2xl p-6 sm:p-8 flex flex-col border transition-colors duration-300 cursor-pointer mb-6 md:mb-0 py-12 sm:py-6',
                             plan.isPopular
-                                ? 'bg-zinc-900 text-zinc-100 border border-zinc-700 shadow-2xl'
+                                ? 'bg-zinc-900 lg:scale-[1.1] text-zinc-100 border border-zinc-700 shadow-2xl'
                                 : 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700'
                         )}
                     >
