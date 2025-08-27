@@ -8,7 +8,11 @@ import { SessionProvider } from "@/components/Sessionprovider";
 import { SmoothScrollWrapper } from "@/components/SmoothScroll";
 import { cookies } from "next/headers";
 import { ClerkProvider } from "@clerk/nextjs";
-const inter = Inter({ subsets: ["greek"] });
+const inter = Inter({
+  subsets:[
+    "vietnamese"
+  ]
+})
 export const metadata: Metadata = {
   title: "Quiz App - Create and Take Quizzes",
   description: "A modern quiz application built with Next.js",

@@ -9,6 +9,7 @@ import { clerkClient } from "./config/clerk/clerk";
 import notionRouter from "./routes/notion.route";
 import authRouter from "./routes/auth.routes";
 import quizRouter from "./routes/quiz.routes";
+import aiRouter from "./routes/ai.routes";
 // import resultRouter from "./routes/result.routes";
 
 const app = express();
@@ -34,6 +35,8 @@ app.use("/api/quizzes", quizRouter);
 // app.use("/api/results", resultRouter);
 
 app.use("/api/notion", notionRouter);
+
+app.use("/api/ai", aiRouter);
 
 app.get("/", (_req: Request, res: Response) => {
   res.cookie("test", "test", {

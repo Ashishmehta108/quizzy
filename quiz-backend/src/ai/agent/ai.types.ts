@@ -1,4 +1,5 @@
 type Input = {
+  title: string;
   query: string;
 };
 

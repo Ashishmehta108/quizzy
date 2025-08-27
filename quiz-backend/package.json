@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register  src/server.ts",
     "build": "tsc && npx drizzle-kit push && npx drizzle-kit generate",
     "start": "node dist/server.js",
     "build:types": "tsc --build tsconfig.json",
@@ -31,6 +31,7 @@
     "@langchain/core": "^0.3.72",
     "@langchain/google-genai": "^0.2.16",
     "@langchain/langgraph": "^0.4.6",
+    "@langchain/tavily": "^0.1.5",
     "@notionhq/client": "^4.0.2",
     "@pinecone-database/pinecone": "^6.1.2",
     "@supabase/supabase-js": "^2.56.0",
@@ -51,6 +52,8 @@
     "pg": "^8.16.3",
     "postgres": "^3.4.7",
     "rimraf": "^6.0.1",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "zod": "^4.1.3"
   }
 }
