@@ -94,7 +94,7 @@ export const createQuiz = async (req: QuizRequest, res: Response) => {
       }
 
       if (query) {
-        const chunks = await queryChunks(query, getUserId.id, 4, docId);
+        const chunks = await queryChunks(query, 4, docId);
         retrivalcontext = chunks.map((chunk) => chunk.text);
       }
     }
