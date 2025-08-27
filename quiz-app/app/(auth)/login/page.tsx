@@ -18,6 +18,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import Image from "next/image";
 import Logo from "@/public/quizzy_logo.png";
 import { Loader, Github, Mail, Chrome } from "lucide-react";
+import google from "@/public/google.svg"
 
 interface LoginForm {
   email: string;
@@ -38,14 +39,14 @@ export default function LoginPage() {
 
   const syncUser = async () => {
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL;
+      const backendUrl =
+        process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL;
       if (!backendUrl) throw new Error("Missing BACKEND URL env");
       const jwt = await getToken();
       if (!jwt) throw new Error("Missing Clerk session token");
       const res = await fetch(`${backendUrl}/auth/sync`, {
         method: "GET",
         headers: { Authorization: `Bearer ${jwt}` },
-
       });
       if (!res.ok) throw new Error("Sync failed");
     } catch (err) {
@@ -89,8 +90,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className=" flex pt-20 justify-center bg-white dark:bg-zinc-900 px-4">
-      <Card className="w-full max-w-md border rounded-2xl">
+    <div className="flex pt-20 justify-center bg-white dark:bg-zinc-900 px-4">
+      <Card className="w-full max-w-md border-none shadow-none  rounded-2xl">
         <CardHeader className="space-y-2">
           <CardTitle className="text-2xl md:text-3xl font-bold text-center flex items-center justify-center">
             Sign in to
@@ -99,8 +100,10 @@ export default function LoginPage() {
               alt="logo"
               width={60}
               height={60}
-              className="ml-2"
+              className="ml-2 bg-transparent dark:mix-blend-lighten"
             />
+
+
           </CardTitle>
           <CardDescription className="text-center text-sm text-muted-foreground">
             Welcome back! Choose a method to sign in
@@ -114,28 +117,30 @@ export default function LoginPage() {
             </Alert>
           )}
 
-          {/* OAuth Buttons */}
           <div className="flex flex-col gap-2 mb-4">
             <Button
               onClick={() => oauthLogin("oauth_google")}
               variant="outline"
-              className="w-full flex items-center gap-2"
+              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100 
+               dark:border-zinc-700 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:text-white"
             >
-              <Chrome className="h-4 w-4" /> Sign in with Google
+              <Image src={google} alt="Google" className="h-4 w-4" /> Sign in with Google
             </Button>
             <Button
               onClick={() => oauthLogin("oauth_github")}
               variant="outline"
-              className="w-full flex items-center gap-2"
+              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100 
+               dark:border-zinc-700  hover:text-zinc-900 dark:hover:bg-zinc-800 dark:text-white"
             >
               <Github className="h-4 w-4" /> Sign in with GitHub
             </Button>
           </div>
 
+
           <div className="relative flex items-center my-4">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="mx-2 text-xs uppercase text-gray-500">or</span>
-            <div className="flex-grow border-t border-gray-300"></div>
+            <div className="flex-grow border-t border-gray-300 dark:border-zinc-700"></div>
+            <span className="mx-2 text-xs uppercase text-zinc-500 dark:text-zinc-400">or</span>
+            <div className="flex-grow border-t border-gray-300 dark:border-zinc-700"></div>
           </div>
 
           {/* Email + Password form */}
@@ -145,6 +150,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
+                className="focus-visible:ring-transparent focus-visible:border-zinc-700"
                 placeholder="Enter your email"
                 {...register("email", {
                   required: "Email is required",
@@ -166,6 +172,7 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type="password"
+                className=" focus-visible:ring-transparent focus-visible:border-zinc-700"
                 placeholder="Enter your password"
                 {...register("password", {
                   required: "Password is required",
@@ -184,7 +191,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -204,7 +211,7 @@ export default function LoginPage() {
             Don&apos;t have an account?{" "}
             <a
               href="/sign-up"
-              className="text-blue-600 hover:underline dark:text-blue-400"
+              className="text-blue-600 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
             >
               Sign up
             </a>
