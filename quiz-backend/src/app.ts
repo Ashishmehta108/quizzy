@@ -1,6 +1,8 @@
 import { configDotenv } from "dotenv";
 configDotenv();
 import cors from "cors";
+import compression from "compression";
+import helmet from "helmet";
 import express, { NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
@@ -10,6 +12,8 @@ import notionRouter from "./routes/notion.route";
 import authRouter from "./routes/auth.routes";
 import quizRouter from "./routes/quiz.routes";
 import aiRouter from "./routes/ai.routes";
+import conversationRoute from "./routes/conversation.route";
+import goalRouter from "./routes/goals.route";
 // import resultRouter from "./routes/result.routes";
 
 const app = express();
@@ -21,31 +25,27 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+app.use(helmet());
 
 app.use(clerkMiddleware({ clerkClient }));
 app.use(cookieParser("superSecret"));
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
+app.use(compression());
 
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan("dev"));
+app.use(morgan("tiny"));
 
-// Routes
 app.use("/api/auth", authRouter);
 app.use("/api/quizzes", quizRouter);
 // app.use("/api/results", resultRouter);
-
+app.use("/api/conversation", conversationRoute);
+app.use("/api/goals", goalRouter);
 app.use("/api/notion", notionRouter);
 
 app.use("/api/ai", aiRouter);
 
-app.get("/", (_req: Request, res: Response) => {
-  res.cookie("test", "test", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    maxAge: 60 * 60 * 24 * 1000,
-  });
-  res.send("hello");
+app.get("health", (_req: Request, res: Response) => {
+  res.status(200).json({ status: "OK" });
 });
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {

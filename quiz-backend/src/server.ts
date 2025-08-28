@@ -1,10 +1,15 @@
 import dotenv from "dotenv";
-import app from "./app";
-
 dotenv.config();
+import app from "./app";
+import { createServer } from "http";
+import { initSockets } from "./socket";
 
-const PORT: number = parseInt(process.env.PORT || '3000', 10);
+const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+const server = createServer(app);
+
+initSockets(server);
+
+server.listen(PORT, () => {
+  console.log(`✅ Server started on http://localhost:${PORT}`);
 });

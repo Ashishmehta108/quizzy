@@ -6,6 +6,7 @@ import logo from "../public/quizzy_metadata_logo.png";
 import { SmoothScrollWrapper } from "@/components/SmoothScroll";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Arimo } from "next/font/google";
+import { SocketProvider } from "./context/socket.context";
 const arimo = Arimo({
   subsets: [
     "greek"
@@ -29,16 +30,20 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={arimo.className}>
         <ClerkProvider key={process.env.CLERK_SECRET_KEY}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {/* <Navbar /> */}
-            <SmoothScrollWrapper>{children}</SmoothScrollWrapper>
-          </ThemeProvider>
-          {/* </SessionProvider> */}
+          <SocketProvider >
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+
+              <SmoothScrollWrapper>{children}</SmoothScrollWrapper>
+            </ThemeProvider>
+
+          </SocketProvider>
+
+
         </ClerkProvider>
       </body>
     </html>
