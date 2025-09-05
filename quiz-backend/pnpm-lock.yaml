@@ -16,7 +16,7 @@ importers:
         version: 1.11.0
       '@langchain/community':
         specifier: ^0.3.53
-        version: 0.3.53(@browserbasehq/sdk@2.6.0)(@browserbasehq/stagehand@1.14.0(@playwright/test@1.55.0)(deepmerge@4.3.1)(dotenv@17.2.1)(openai@5.12.0(ws@8.18.3)(zod@4.1.3))(zod@4.1.3))(@ibm-cloud/watsonx-ai@1.6.10)(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3)))(@langchain/google-genai@0.2.16(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3))))(@notionhq/client@4.0.2)(@pinecone-database/pinecone@6.1.2)(@supabase/supabase-js@2.56.0)(axios@1.11.0)(google-auth-library@9.15.1)(ibm-cloud-sdk-core@5.4.2)(jsonwebtoken@9.0.2)(notion-to-md@3.1.9)(openai@5.12.0(ws@8.18.3)(zod@4.1.3))(pdf-parse@1.1.1)(pg@8.16.3)(playwright@1.55.0)(weaviate-client@3.8.1)(ws@8.18.3)
+        version: 0.3.53(@browserbasehq/sdk@2.6.0)(@browserbasehq/stagehand@1.14.0(@playwright/test@1.55.0)(deepmerge@4.3.1)(dotenv@17.2.1)(openai@5.12.0(ws@8.18.3)(zod@4.1.3))(zod@4.1.3))(@ibm-cloud/watsonx-ai@1.6.10)(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3)))(@langchain/google-genai@0.2.16(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3))))(@notionhq/client@4.0.2)(@pinecone-database/pinecone@6.1.2)(@supabase/supabase-js@2.56.0)(axios@1.11.0(debug@4.4.1))(google-auth-library@9.15.1)(ibm-cloud-sdk-core@5.4.2)(jsonwebtoken@9.0.2)(lodash@4.17.21)(notion-to-md@3.1.9)(openai@5.12.0(ws@8.18.3)(zod@4.1.3))(pdf-parse@1.1.1)(pg@8.16.3)(playwright@1.55.0)(redis@5.8.2)(weaviate-client@3.8.1)(ws@8.18.3)
       '@langchain/core':
         specifier: ^0.3.72
         version: 0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3))
@@ -41,6 +41,9 @@ importers:
       '@types/cookie-parser':
         specifier: ^1.4.9
         version: 1.4.9(@types/express@5.0.3)
+      cloudinary:
+        specifier: ^2.7.0
+        version: 2.7.0
       compression:
         specifier: ^1.8.1
         version: 1.8.1
@@ -50,6 +53,9 @@ importers:
       cors:
         specifier: ^2.8.5
         version: 2.8.5
+      debug:
+        specifier: ^4.4.1
+        version: 4.4.1(supports-color@5.5.0)
       dotenv:
         specifier: ^17.2.1
         version: 17.2.1
@@ -92,12 +98,18 @@ importers:
       postgres:
         specifier: ^3.4.7
         version: 3.4.7
+      redis:
+        specifier: ^5.8.2
+        version: 5.8.2
       rimraf:
         specifier: ^6.0.1
         version: 6.0.1
       socket.io:
         specifier: ^4.8.1
         version: 4.8.1
+      tesseract.js:
+        specifier: 4.1.1
+        version: 4.1.1
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.3.0)(typescript@5.9.2)
@@ -1037,6 +1049,34 @@ packages:
   '@protobufjs/utf8@1.1.0':
     resolution: {integrity: sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==}
 
+  '@redis/bloom@5.8.2':
+    resolution: {integrity: sha512-855DR0ChetZLarblio5eM0yLwxA9Dqq50t8StXKp5bAtLT0G+rZ+eRzzqxl37sPqQKjUudSYypz55o6nNhbz0A==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      '@redis/client': ^5.8.2
+
+  '@redis/client@5.8.2':
+    resolution: {integrity: sha512-WtMScno3+eBpTac1Uav2zugXEoXqaU23YznwvFgkPwBQVwEHTDgOG7uEAObtZ/Nyn8SmAMbqkEubJaMOvnqdsQ==}
+    engines: {node: '>= 18'}
+
+  '@redis/json@5.8.2':
+    resolution: {integrity: sha512-uxpVfas3I0LccBX9rIfDgJ0dBrUa3+0Gc8sEwmQQH0vHi7C1Rx1Qn8Nv1QWz5bohoeIXMICFZRcyDONvum2l/w==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      '@redis/client': ^5.8.2
+
+  '@redis/search@5.8.2':
+    resolution: {integrity: sha512-cNv7HlgayavCBXqPXgaS97DRPVWFznuzsAmmuemi2TMCx5scwLiP50TeZvUS06h/MG96YNPe6A0Zt57yayfxwA==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      '@redis/client': ^5.8.2
+
+  '@redis/time-series@5.8.2':
+    resolution: {integrity: sha512-g2NlHM07fK8H4k+613NBsk3y70R2JIM2dPMSkhIjl2Z17SYvaYKdusz85d7VYOrZBWtDrHV/WD2E3vGu+zni8A==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      '@redis/client': ^5.8.2
+
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
 
@@ -1264,6 +1304,9 @@ packages:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
     engines: {node: '>=8'}
 
+  bmp-js@0.1.0:
+    resolution: {integrity: sha512-vHdS19CnY3hwiNdkaqk93DvjVLfbEcI8mys4UjuWrlX1haDmroo8o4xCzh4wD6DGV6HxRCyauwhHRqMTfERtjw==}
+
   body-parser@2.2.0:
     resolution: {integrity: sha512-02qvAaxv8tp7fBa/mw1ga98OGm+eCbqzJOKoRt70sLmfEEi+jyBYVTDGfCL/k06/4EMk/z01gCe7HoCH/f2LTg==}
     engines: {node: '>=18'}
@@ -1315,6 +1358,14 @@ packages:
   cliui@8.0.1:
     resolution: {integrity: sha512-BSeNnyus75C4//NQ9gQt1/csTXyo/8Sb+afLAkzAptFuMsod9HFokGNudZpi/oQV73hnVK+sR+5PVRMd+Dr7YQ==}
     engines: {node: '>=12'}
+
+  cloudinary@2.7.0:
+    resolution: {integrity: sha512-qrqDn31+qkMCzKu1GfRpzPNAO86jchcNwEHCUiqvPHNSFqu7FTNF9FuAkBUyvM1CFFgFPu64NT0DyeREwLwK0w==}
+    engines: {node: '>=9'}
+
+  cluster-key-slot@1.1.2:
+    resolution: {integrity: sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==}
+    engines: {node: '>=0.10.0'}
 
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
@@ -1834,6 +1885,9 @@ packages:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
 
+  idb-keyval@6.2.2:
+    resolution: {integrity: sha512-yjD9nARJ/jb1g+CvD0tlhUHOrJ9Sy0P8T9MF3YaLlHnSRpwPfpTX0XIvpmw3gAJUmEu3FiICLBDPXVwyEvrleg==}
+
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
 
@@ -1859,6 +1913,9 @@ packages:
     resolution: {integrity: sha512-UfoeMA6fIJ8wTYFEUjelnaGI67v6+N7qXJEvQuIGa99l4xsCruSYOVSQ0uPANn4dAzm8lkYPaKLrrijLq7x23w==}
     engines: {node: '>= 0.4'}
 
+  is-electron@2.2.2:
+    resolution: {integrity: sha512-FO/Rhvz5tuw4MCWkpMzHFKWD2LsfHzIb7i6MdPYZ/KW7AlxawyLkqdy+jPZP1WubqEADE3O4FUENlJHDfQASRg==}
+
   is-extglob@2.1.1:
     resolution: {integrity: sha512-SbKbANkN603Vi4jEZv49LeVJMn4yGwsbzZworEoyEiutsN3nJYdbO36zfhGJ6QEDpOZIFkDtnq5JRxmvl3jsoQ==}
     engines: {node: '>=0.10.0'}
@@ -1881,6 +1938,9 @@ packages:
   is-stream@2.0.1:
     resolution: {integrity: sha512-hFoiJiTl63nn+kstHGBtewWSKnQLpyb155KHheA1l39uvtO9nWIop1p3udqPcUd/xbF1VLMO4n7OI6p7RbngDg==}
     engines: {node: '>=8'}
+
+  is-url@1.2.4:
+    resolution: {integrity: sha512-ITvGim8FhRiYe4IQ5uHSkj7pVaPDrCTkNd3yq3cV7iZAcJdHTUMPMEHcqSOy9xZ9qFenQCvi+2wjH9a1nXqHww==}
 
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
@@ -2033,6 +2093,9 @@ packages:
 
   lodash.once@4.1.1:
     resolution: {integrity: sha512-Sb487aTOCr9drQVL8pIxOzVhafOjZN9UU54hiN8PU3uAiSV7lx1yYNpbNmex2PK6dSJoNTSJUUswT651yww3Mg==}
+
+  lodash@4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
 
   long@5.3.2:
     resolution: {integrity: sha512-mNAgZ1GmyNhD7AuqnTG3/VQ26o760+ZYBPKjPvugO8+nLbYfX6TVpJPseBvopbdY+qpZ/lKUnmEc1LeZYS3QAA==}
@@ -2225,6 +2288,10 @@ packages:
   openapi-types@12.1.3:
     resolution: {integrity: sha512-N4YtSYJqghVu4iek2ZUvcN/0aqH1kRDuNqzcycDxhOUpg7GdvLa2F3DgS6yBNhInhv2r/6I0Flkn7CqL8+nIcw==}
 
+  opencollective-postinstall@2.0.3:
+    resolution: {integrity: sha512-8AV/sCtuzUeTo8gQK5qDZzARrulB3egtLzFgteqB2tcT4Mw7B8Kt7JcDHmltjz6FOAHsvTevk70gZEbhM4ZS9Q==}
+    hasBin: true
+
   p-finally@1.0.0:
     resolution: {integrity: sha512-LICb2p9CB7FS+0eR1oqWnHhp0FljGLZCWBE9aix0Uye9W8LTQPwMTYVGWQWIw9RdQiDg4+epXQODwIYJtSJaow==}
     engines: {node: '>=4'}
@@ -2368,6 +2435,14 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
+  q@1.5.1:
+    resolution: {integrity: sha512-kV/CThkXo6xyFEZUugw/+pIOywXcDbFYgSct5cT3gqlbkBE1SJdwy6UQoZvodiWF/ckQLZyDE/Bu1M6gVu5lVw==}
+    engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
+    deprecated: |-
+      You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+
+      (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
+
   qs@6.14.0:
     resolution: {integrity: sha512-YWWTjgABSKcvs/nWBi9PycY/JiPJqOD4JA6o9Sej2AtvSGarXxKC3OQSk4pAarbdQlKAh5D4FCQkJNkW+GAn3w==}
     engines: {node: '>=0.6'}
@@ -2402,6 +2477,13 @@ packages:
   readdirp@3.6.0:
     resolution: {integrity: sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==}
     engines: {node: '>=8.10.0'}
+
+  redis@5.8.2:
+    resolution: {integrity: sha512-31vunZj07++Y1vcFGcnNWEf5jPoTkGARgfWI4+Tk55vdwHxhAvug8VEtW7Cx+/h47NuJTEg/JL77zAwC6E0OeA==}
+    engines: {node: '>= 18'}
+
+  regenerator-runtime@0.13.11:
+    resolution: {integrity: sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==}
 
   repeat-string@1.6.1:
     resolution: {integrity: sha512-PV0dzCYDNfRi1jCDbJzpW7jNNDRuCOG/jI5ctQcGKt/clZD+YcPS3yIlWuTJMmESC8aevCFmWJy5wjAFgNqN6w==}
@@ -2594,6 +2676,12 @@ packages:
     peerDependencies:
       react: ^16.11.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
+  tesseract.js-core@4.0.4:
+    resolution: {integrity: sha512-MJ+vtktjAaT0681uPl6TDUPhbRbpD/S9emko5rtorgHRZpQo7R3BG7h+3pVHgn1KjfNf1bvnx4B7KxEK8YKqpg==}
+
+  tesseract.js@4.1.1:
+    resolution: {integrity: sha512-2a9ej6FmtNtRKdFpjvjUpz0zGJRQgPlj/oyJxRBzMN7+2dXKeZwrIDF1b4B7xslrhlE5xpL0TYLpwhpMwsb/rw==}
+
   to-regex-range@5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
     engines: {node: '>=8.0'}
@@ -2722,6 +2810,9 @@ packages:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
 
+  wasm-feature-detect@1.8.0:
+    resolution: {integrity: sha512-zksaLKM2fVlnB5jQQDqKXXwYHLQUVH9es+5TOOHwGOVJOCeRBCiPjwSg+3tN2AdTCzjgli4jijCH290kXb/zWQ==}
+
   weaviate-client@3.8.1:
     resolution: {integrity: sha512-/bH5SO31gGGiI5RhvOEwQBs2DtORsssVjenWxdOQzGToAdmqRC4Oo9HZLIITX5BdFD0IqKDnY81nOZlJlHzn+g==}
     engines: {node: '>=18.0.0'}
@@ -2804,6 +2895,9 @@ packages:
   yn@3.1.1:
     resolution: {integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==}
     engines: {node: '>=6'}
+
+  zlibjs@0.3.1:
+    resolution: {integrity: sha512-+J9RrgTKOmlxFSDHo0pI1xM6BLVUv+o0ZT9ANtCxGkjIVCCUdx9alUF8Gm+dGLKbkkkidWIHFDZHDMpfITt4+w==}
 
   zod-to-json-schema@3.24.6:
     resolution: {integrity: sha512-h/z3PKvcTcTetyjl1fkj79MHNEjm+HpD6NXheWjzOekY7kV+lwDYnHw+ivHkijnCSMz1yJaWBD9vu/Fcmk+vEg==}
@@ -3119,7 +3213,7 @@ snapshots:
 
   '@js-sdsl/ordered-map@4.4.2': {}
 
-  '@langchain/community@0.3.53(@browserbasehq/sdk@2.6.0)(@browserbasehq/stagehand@1.14.0(@playwright/test@1.55.0)(deepmerge@4.3.1)(dotenv@17.2.1)(openai@5.12.0(ws@8.18.3)(zod@4.1.3))(zod@4.1.3))(@ibm-cloud/watsonx-ai@1.6.10)(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3)))(@langchain/google-genai@0.2.16(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3))))(@notionhq/client@4.0.2)(@pinecone-database/pinecone@6.1.2)(@supabase/supabase-js@2.56.0)(axios@1.11.0)(google-auth-library@9.15.1)(ibm-cloud-sdk-core@5.4.2)(jsonwebtoken@9.0.2)(notion-to-md@3.1.9)(openai@5.12.0(ws@8.18.3)(zod@4.1.3))(pdf-parse@1.1.1)(pg@8.16.3)(playwright@1.55.0)(weaviate-client@3.8.1)(ws@8.18.3)':
+  '@langchain/community@0.3.53(@browserbasehq/sdk@2.6.0)(@browserbasehq/stagehand@1.14.0(@playwright/test@1.55.0)(deepmerge@4.3.1)(dotenv@17.2.1)(openai@5.12.0(ws@8.18.3)(zod@4.1.3))(zod@4.1.3))(@ibm-cloud/watsonx-ai@1.6.10)(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3)))(@langchain/google-genai@0.2.16(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3))))(@notionhq/client@4.0.2)(@pinecone-database/pinecone@6.1.2)(@supabase/supabase-js@2.56.0)(axios@1.11.0(debug@4.4.1))(google-auth-library@9.15.1)(ibm-cloud-sdk-core@5.4.2)(jsonwebtoken@9.0.2)(lodash@4.17.21)(notion-to-md@3.1.9)(openai@5.12.0(ws@8.18.3)(zod@4.1.3))(pdf-parse@1.1.1)(pg@8.16.3)(playwright@1.55.0)(redis@5.8.2)(weaviate-client@3.8.1)(ws@8.18.3)':
     dependencies:
       '@browserbasehq/stagehand': 1.14.0(@playwright/test@1.55.0)(deepmerge@4.3.1)(dotenv@17.2.1)(openai@5.12.0(ws@8.18.3)(zod@4.1.3))(zod@4.1.3)
       '@ibm-cloud/watsonx-ai': 1.6.10
@@ -3131,7 +3225,7 @@ snapshots:
       flat: 5.0.2
       ibm-cloud-sdk-core: 5.4.2
       js-yaml: 4.1.0
-      langchain: 0.3.31(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3)))(@langchain/google-genai@0.2.16(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3))))(axios@1.11.0)(openai@5.12.0(ws@8.18.3)(zod@4.1.3))(ws@8.18.3)
+      langchain: 0.3.31(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3)))(@langchain/google-genai@0.2.16(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3))))(axios@1.11.0(debug@4.4.1))(openai@5.12.0(ws@8.18.3)(zod@4.1.3))(ws@8.18.3)
       langsmith: 0.3.63(openai@5.12.0(ws@8.18.3)(zod@4.1.3))
       openai: 5.12.0(ws@8.18.3)(zod@4.1.3)
       uuid: 10.0.0
@@ -3143,10 +3237,12 @@ snapshots:
       '@supabase/supabase-js': 2.56.0
       google-auth-library: 9.15.1
       jsonwebtoken: 9.0.2
+      lodash: 4.17.21
       notion-to-md: 3.1.9
       pdf-parse: 1.1.1
       pg: 8.16.3
       playwright: 1.55.0
+      redis: 5.8.2
       weaviate-client: 3.8.1
       ws: 8.18.3
     transitivePeerDependencies:
@@ -3281,6 +3377,26 @@ snapshots:
   '@protobufjs/pool@1.1.0': {}
 
   '@protobufjs/utf8@1.1.0': {}
+
+  '@redis/bloom@5.8.2(@redis/client@5.8.2)':
+    dependencies:
+      '@redis/client': 5.8.2
+
+  '@redis/client@5.8.2':
+    dependencies:
+      cluster-key-slot: 1.1.2
+
+  '@redis/json@5.8.2(@redis/client@5.8.2)':
+    dependencies:
+      '@redis/client': 5.8.2
+
+  '@redis/search@5.8.2(@redis/client@5.8.2)':
+    dependencies:
+      '@redis/client': 5.8.2
+
+  '@redis/time-series@5.8.2(@redis/client@5.8.2)':
+    dependencies:
+      '@redis/client': 5.8.2
 
   '@socket.io/component-emitter@3.1.2': {}
 
@@ -3522,6 +3638,8 @@ snapshots:
 
   binary-extensions@2.3.0: {}
 
+  bmp-js@0.1.0: {}
+
   body-parser@2.2.0:
     dependencies:
       bytes: 3.1.2
@@ -3594,6 +3712,13 @@ snapshots:
       string-width: 4.2.3
       strip-ansi: 6.0.1
       wrap-ansi: 7.0.0
+
+  cloudinary@2.7.0:
+    dependencies:
+      lodash: 4.17.21
+      q: 1.5.1
+
+  cluster-key-slot@1.1.2: {}
 
   color-convert@2.0.1:
     dependencies:
@@ -4116,7 +4241,7 @@ snapshots:
       isstream: 0.1.2
       jsonwebtoken: 9.0.2
       mime-types: 2.1.35
-      retry-axios: 2.6.0(axios@1.11.0)
+      retry-axios: 2.6.0(axios@1.11.0(debug@4.4.1))
       tough-cookie: 4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -4124,6 +4249,8 @@ snapshots:
   iconv-lite@0.6.3:
     dependencies:
       safer-buffer: 2.1.2
+
+  idb-keyval@6.2.2: {}
 
   ieee754@1.2.1: {}
 
@@ -4146,6 +4273,8 @@ snapshots:
     dependencies:
       hasown: 2.0.2
 
+  is-electron@2.2.2: {}
+
   is-extglob@2.1.1: {}
 
   is-fullwidth-code-point@3.0.0: {}
@@ -4159,6 +4288,8 @@ snapshots:
   is-promise@4.0.0: {}
 
   is-stream@2.0.1: {}
+
+  is-url@1.2.4: {}
 
   isexe@2.0.0: {}
 
@@ -4224,7 +4355,7 @@ snapshots:
   kysely@0.28.5:
     optional: true
 
-  langchain@0.3.31(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3)))(@langchain/google-genai@0.2.16(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3))))(axios@1.11.0)(openai@5.12.0(ws@8.18.3)(zod@4.1.3))(ws@8.18.3):
+  langchain@0.3.31(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3)))(@langchain/google-genai@0.2.16(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3))))(axios@1.11.0(debug@4.4.1))(openai@5.12.0(ws@8.18.3)(zod@4.1.3))(ws@8.18.3):
     dependencies:
       '@langchain/core': 0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3))
       '@langchain/openai': 0.6.9(@langchain/core@0.3.72(openai@5.12.0(ws@8.18.3)(zod@4.1.3)))(ws@8.18.3)
@@ -4275,6 +4406,8 @@ snapshots:
   lodash.isstring@4.0.1: {}
 
   lodash.once@4.1.1: {}
+
+  lodash@4.17.21: {}
 
   long@5.3.2: {}
 
@@ -4437,6 +4570,8 @@ snapshots:
 
   openapi-types@12.1.3: {}
 
+  opencollective-postinstall@2.0.3: {}
+
   p-finally@1.0.0: {}
 
   p-queue@6.6.2:
@@ -4568,6 +4703,8 @@ snapshots:
 
   punycode@2.3.1: {}
 
+  q@1.5.1: {}
+
   qs@6.14.0:
     dependencies:
       side-channel: 1.1.0
@@ -4607,6 +4744,16 @@ snapshots:
     dependencies:
       picomatch: 2.3.1
 
+  redis@5.8.2:
+    dependencies:
+      '@redis/bloom': 5.8.2(@redis/client@5.8.2)
+      '@redis/client': 5.8.2
+      '@redis/json': 5.8.2(@redis/client@5.8.2)
+      '@redis/search': 5.8.2(@redis/client@5.8.2)
+      '@redis/time-series': 5.8.2(@redis/client@5.8.2)
+
+  regenerator-runtime@0.13.11: {}
+
   repeat-string@1.6.1: {}
 
   require-directory@2.1.1: {}
@@ -4621,7 +4768,7 @@ snapshots:
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
 
-  retry-axios@2.6.0(axios@1.11.0):
+  retry-axios@2.6.0(axios@1.11.0(debug@4.4.1)):
     dependencies:
       axios: 1.11.0(debug@4.4.1)
 
@@ -4824,6 +4971,23 @@ snapshots:
       react: 19.1.1
       use-sync-external-store: 1.5.0(react@19.1.1)
 
+  tesseract.js-core@4.0.4: {}
+
+  tesseract.js@4.1.1:
+    dependencies:
+      bmp-js: 0.1.0
+      idb-keyval: 6.2.2
+      is-electron: 2.2.2
+      is-url: 1.2.4
+      node-fetch: 2.7.0
+      opencollective-postinstall: 2.0.3
+      regenerator-runtime: 0.13.11
+      tesseract.js-core: 4.0.4
+      wasm-feature-detect: 1.8.0
+      zlibjs: 0.3.1
+    transitivePeerDependencies:
+      - encoding
+
   to-regex-range@5.0.1:
     dependencies:
       is-number: 7.0.0
@@ -4947,6 +5111,8 @@ snapshots:
 
   vary@1.1.2: {}
 
+  wasm-feature-detect@1.8.0: {}
+
   weaviate-client@3.8.1:
     dependencies:
       abort-controller-x: 0.4.3
@@ -5012,6 +5178,8 @@ snapshots:
       yargs-parser: 21.1.1
 
   yn@3.1.1: {}
+
+  zlibjs@0.3.1: {}
 
   zod-to-json-schema@3.24.6(zod@3.25.76):
     dependencies:

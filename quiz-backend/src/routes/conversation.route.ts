@@ -1,13 +1,13 @@
-import { Router } from "express";
-import {
-  getExplanation,
-  askFollowUp,
-} from "@/controllers/conversation.controller";
+// import { Router } from "express";
+// import {
+//   getExplanation,
+//   askFollowUp,
+// } from "@/controllers/conversation.controller";
 
-const conversationRoute = Router();
+// const conversationRoute = Router();
 
-conversationRoute.get("/:questionId/explanation", getExplanation);
+// conversationRoute.get("/:questionId/explanation", getExplanation);
 
-conversationRoute.post("/ask", askFollowUp);
+// conversationRoute.post("/ask", askFollowUp);
 
-export default conversationRoute;
+// export default conversationRoute;

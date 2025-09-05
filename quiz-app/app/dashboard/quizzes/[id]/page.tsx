@@ -40,6 +40,7 @@ export function QuestionCard({
   isSubmitting,
   isLastQuestion,
 }: QuestionCardProps) {
+  console.log(question)
   const q = JSON.parse(question.options);
 
   return (
@@ -74,14 +75,14 @@ export function QuestionCard({
                   key={index}
                   onClick={() => onAnswerSelect(index)}
                   className={`group w-full px-4 py-3 text-left rounded-2xl border transition-all duration-200 flex items-center gap-4 ${isSelected
-                      ? "bg-blue-200/30 border-blue-400 dark:bg-blue-700/30 dark:border-blue-500 scale-[1.02]"
-                      : "bg-white/10 dark:bg-zinc-900/30 border-white/20 dark:border-white/10 hover:bg-white/20 dark:hover:bg-white/10"
+                    ? "bg-blue-200/30 border-blue-400 dark:bg-blue-700/30 dark:border-blue-500 scale-[1.02]"
+                    : "bg-white/10 dark:bg-zinc-900/30 border-white/20 dark:border-white/10 hover:bg-white/20 dark:hover:bg-white/10"
                     }`}
                 >
                   <div
                     className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-semibold text-xs transition-all duration-200 ${isSelected
-                        ? "bg-blue-500 text-white border-blue-500"
-                        : "bg-white/20 dark:bg-zinc-800/40 text-gray-600 dark:text-zinc-300 border-white/20 dark:border-white/10"
+                      ? "bg-blue-500 text-white border-blue-500"
+                      : "bg-white/20 dark:bg-zinc-800/40 text-gray-600 dark:text-zinc-300 border-white/20 dark:border-white/10"
                       }`}
                   >
                     {optionLabel}
@@ -124,8 +125,8 @@ export function QuestionCard({
               onClick={onNext}
               disabled={!canGoNext || isSubmitting}
               className={`flex items-center gap-2 px-6 py-2 font-semibold text-white transition-all duration-200 ${isLastQuestion
-                  ? "bg-green-600/80 hover:bg-green-700/70"
-                  : "bg-blue-600/80 hover:bg-blue-700/70"
+                ? "bg-green-600/80 hover:bg-green-700/70"
+                : "bg-blue-600/80 hover:bg-blue-700/70"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {isLastQuestion
@@ -182,6 +183,7 @@ export default function TakeQuizPage({
       const response = await api.get<QuizResponse[]>(`/quizzes/${id}`, {
         withCredentials: true,
       });
+      console.log()
       //@ts-ignore
       setQuiz(response.data);
       setLoading(false);

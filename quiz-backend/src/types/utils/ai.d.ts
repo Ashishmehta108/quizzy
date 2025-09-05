@@ -1,7 +1,11 @@
+import { QuizState } from "@/ai/agent/Graph";
+import { Tool } from "@langchain/core/tools";
+
 export interface GenerateQuizQuestionsParams {
   title: string;
   context: string;
   morecontext?: string;
+  State: typeof QuizState.State;
 }
 
 export interface QuizQuestion {

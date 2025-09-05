@@ -1,0 +1,1 @@
+ALTER TABLE "quizzes" ALTER COLUMN "description" SET DEFAULT '';

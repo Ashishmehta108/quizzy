@@ -10,4 +10,8 @@ type QuizQuestion = {
   explanation?: string;
 };
 
-export { Input, QuizQuestion };
+type Usage = {
+  webSearchesDone: number;
+};
+
+export { Input, QuizQuestion, Usage };

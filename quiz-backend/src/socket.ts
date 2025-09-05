@@ -14,6 +14,7 @@ interface ActiveTimer {
 }
 
 export const initSockets = (server: HTTPServer) => {
+  console.log("started");
   const io = new SocketIOServer(server, {
     cors: {
       origin: process.env.FRONTEND_URL || "*",
@@ -21,98 +22,89 @@ export const initSockets = (server: HTTPServer) => {
       credentials: true,
     },
   });
+  console.log("io");
 
   const userSockets: Map<string, Set<string>> = new Map();
   const activeTimers: Record<string, ActiveTimer> = {};
 
   io.on("connection", (socket: Socket) => {
-    const { userId } = socket.handshake.query as { userId?: string };
-    if (!userId) {
-      socket.disconnect();
-      return;
-    }
+    console.log(` connected: ${socket.id}`);
 
-    if (!userSockets.has(userId)) userSockets.set(userId, new Set());
-    userSockets.get(userId)!.add(socket.id);
+    // socket.on(
+    //   "startQuiz",
+    //   ({ quizId, duration }: { quizId: string; duration: number }) => {
+    //     const key = `${userId}_${quizId}`;
 
-    console.log(`User ${userId} connected: ${socket.id}`);
+    //     // Clear existing timer if exists
+    //     if (activeTimers[key]?.interval)
+    //       clearInterval(activeTimers[key].interval);
 
-    // Start quiz timer
-    socket.on(
-      "startQuiz",
-      ({ quizId, duration }: { quizId: string; duration: number }) => {
-        const key = `${userId}_${quizId}`;
+    //     activeTimers[key] = { quizId, timeLeft: duration };
 
-        // Clear existing timer if exists
-        if (activeTimers[key]?.interval)
-          clearInterval(activeTimers[key].interval);
+    //     activeTimers[key].interval = setInterval(() => {
+    //       const timer = activeTimers[key];
+    //       if (!timer) return;
 
-        activeTimers[key] = { quizId, timeLeft: duration };
+    //       timer.timeLeft -= 1;
 
-        activeTimers[key].interval = setInterval(() => {
-          const timer = activeTimers[key];
-          if (!timer) return;
+    //       // Broadcast timer update to all sockets of this user
+    //       userSockets
+    //         .get(userId)
+    //         ?.forEach((sId) =>
+    //           io
+    //             .to(sId)
+    //             .emit("timerUpdate", { quizId, timeLeft: timer.timeLeft })
+    //         );
 
-          timer.timeLeft -= 1;
+    //       if (timer.timeLeft <= 0) {
+    //         // Broadcast timeUp
+    //         userSockets
+    //           .get(userId)
+    //           ?.forEach((sId) => io.to(sId).emit("timeUp", { quizId }));
+    //         clearInterval(timer.interval!);
+    //         delete activeTimers[key];
+    //       }
+    //     }, 1000);
+    //   }
+    // );
 
-          // Broadcast timer update to all sockets of this user
-          userSockets
-            .get(userId)
-            ?.forEach((sId) =>
-              io
-                .to(sId)
-                .emit("timerUpdate", { quizId, timeLeft: timer.timeLeft })
-            );
+    // // Get current timer state
+    // socket.on("getTimerState", ({ quizId }: { quizId: string }) => {
+    //   const key = `${userId}_${quizId}`;
+    //   const remaining = activeTimers[key]?.timeLeft;
+    //   socket.emit("timerState", { timeLeft: remaining });
+    // });
 
-          if (timer.timeLeft <= 0) {
-            // Broadcast timeUp
-            userSockets
-              .get(userId)
-              ?.forEach((sId) => io.to(sId).emit("timeUp", { quizId }));
-            clearInterval(timer.interval!);
-            delete activeTimers[key];
-          }
-        }, 1000);
-      }
-    );
-
-    // Get current timer state
-    socket.on("getTimerState", ({ quizId }: { quizId: string }) => {
-      const key = `${userId}_${quizId}`;
-      const remaining = activeTimers[key]?.timeLeft;
-      socket.emit("timerState", { timeLeft: remaining });
-    });
-
-    // End quiz manually
-    socket.on("endQuiz", ({ quizId }: { quizId: string }) => {
-      const key = `${userId}_${quizId}`;
-      if (activeTimers[key]?.interval)
-        clearInterval(activeTimers[key].interval);
-      delete activeTimers[key];
-      // Notify user sockets
-      userSockets
-        .get(userId)
-        ?.forEach((sId) => io.to(sId).emit("quizEnded", { quizId }));
-    });
+    // // End quiz manually
+    // socket.on("endQuiz", ({ quizId }: { quizId: string }) => {
+    //   const key = `${userId}_${quizId}`;
+    //   if (activeTimers[key]?.interval)
+    //     clearInterval(activeTimers[key].interval);
+    //   delete activeTimers[key];
+    //   // Notify user sockets
+    //   userSockets
+    //     .get(userId)
+    //     ?.forEach((sId) => io.to(sId).emit("quizEnded", { quizId }));
+    // });
 
     // Cleanup on disconnect
-    socket.on("disconnect", () => {
-      const sockets = userSockets.get(userId);
-      if (sockets) {
-        sockets.delete(socket.id);
-        if (sockets.size === 0) {
-          // Clear all active timers for this user if needed
-          Object.keys(activeTimers).forEach((key) => {
-            if (key.startsWith(userId + "_")) {
-              clearInterval(activeTimers[key].interval!);
-              delete activeTimers[key];
-            }
-          });
-          userSockets.delete(userId);
-        }
-      }
-      console.log(`User ${userId} disconnected: ${socket.id}`);
-    });
+    // socket.on("disconnect", () => {
+    //   const sockets = userSockets.get(userId);
+    //   if (sockets) {
+    //     sockets.delete(socket.id);
+    //     if (sockets.size === 0) {
+    //       // Clear all active timers for this user if needed
+    //       Object.keys(activeTimers).forEach((key) => {
+    //         if (key.startsWith(userId + "_")) {
+    //           clearInterval(activeTimers[key].interval!);
+    //           delete activeTimers[key];
+    //         }
+    //       });
+    //       userSockets.delete(userId);
+    //     }
+    //   }
+    //   console.log(`User ${userId} disconnected: ${socket.id}`);
+    // });
   });
 
   const sendFollowUp = (data: FollowUpMessage): void => {

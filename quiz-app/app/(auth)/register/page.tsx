@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import {
@@ -97,7 +97,7 @@ export default function RegisterPage() {
     try {
       await signUp.authenticateWithRedirect({
         strategy: provider,
-        redirectUrl: "/sso-callback",
+        redirectUrl: "/sso-callback?redirect=/post-login",
         redirectUrlComplete: "/post-login",
       });
     } catch (err) {
@@ -107,7 +107,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-900 py-12 px-4 sm:px-6 lg:px-8 clerk-captcha">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="md:text-2xl text-xl flex justify-center items-center font-bold text-center">
@@ -173,7 +173,9 @@ export default function RegisterPage() {
                 })}
               />
               {errors.name && (
-                <p className="text-sm text-destructive">{errors.name.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.name.message}
+                </p>
               )}
             </div>
 
@@ -193,7 +195,9 @@ export default function RegisterPage() {
                 })}
               />
               {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 

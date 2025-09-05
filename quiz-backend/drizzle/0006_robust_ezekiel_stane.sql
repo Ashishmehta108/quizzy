@@ -1,0 +1,1 @@
+ALTER TABLE "users" ALTER COLUMN "api_key" DROP NOT NULL;

@@ -18,7 +18,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import Image from "next/image";
 import Logo from "@/public/quizzy_logo.png";
 import { Loader, Github, Mail, Chrome } from "lucide-react";
-import google from "@/public/google.svg"
+import google from "@/public/google.svg";
 
 interface LoginForm {
   email: string;
@@ -80,7 +80,7 @@ export default function LoginPage() {
     try {
       await signIn.authenticateWithRedirect({
         strategy: provider,
-        redirectUrl: "/sso-callback",
+        redirectUrl: `/sso-callback?redirect=/post-login`,
         redirectUrlComplete: "/post-login",
       });
     } catch (err) {
@@ -102,8 +102,6 @@ export default function LoginPage() {
               height={60}
               className="ml-2 bg-transparent dark:mix-blend-lighten"
             />
-
-
           </CardTitle>
           <CardDescription className="text-center text-sm text-muted-foreground">
             Welcome back! Choose a method to sign in
@@ -124,7 +122,8 @@ export default function LoginPage() {
               className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100 
                dark:border-zinc-700 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:text-white"
             >
-              <Image src={google} alt="Google" className="h-4 w-4" /> Sign in with Google
+              <Image src={google} alt="Google" className="h-4 w-4" /> Sign in
+              with Google
             </Button>
             <Button
               onClick={() => oauthLogin("oauth_github")}
@@ -136,10 +135,11 @@ export default function LoginPage() {
             </Button>
           </div>
 
-
           <div className="relative flex items-center my-4">
             <div className="flex-grow border-t border-gray-300 dark:border-zinc-700"></div>
-            <span className="mx-2 text-xs uppercase text-zinc-500 dark:text-zinc-400">or</span>
+            <span className="mx-2 text-xs uppercase text-zinc-500 dark:text-zinc-400">
+              or
+            </span>
             <div className="flex-grow border-t border-gray-300 dark:border-zinc-700"></div>
           </div>
 

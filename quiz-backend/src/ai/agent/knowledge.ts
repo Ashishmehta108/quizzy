@@ -1,59 +1,67 @@
-// import { searchWeb } from "./tools/websearch.tool";
-// // import { notionRetriever } from "./tools/notion";
-// import { QuizState } from "./Graph";
-
-// export async function CollectKnowledge(
-//   state: typeof QuizState.State,
-//   config?: { configurable?: { userId?: string } }
-// ): Promise<Partial<typeof QuizState.State>> {
-//   const queries = [state.input.title, state.context].filter(
-//     (q): q is string => typeof q === "string"
-//   );
-
-//   const [
-//     webResults,
-//     // , notionResults
-//   ] = await Promise.all([
-//     searchWeb(queries.join(" ")),
-//     // notionRetriever(config?.configurable?.userId ?? "", queries),
-//   ]);
-
-//   const knowledgeChunks = [
-//     ...(webResults ?? []),
-//     // , ...(notionResults ?? [])
-//   ];
-
-//   return {
-//     context: knowledgeChunks.join("\n\n"),
-//   };
-// }
-
 import { searchWeb } from "./tools/websearch.tool";
+import { notionRetriever } from "./tools/notion";
 import { QuizState } from "./Graph";
+import { ApiError } from "../../utils/apiError";
+import { RunnableConfig } from "@langchain/core/runnables";
 
 export async function CollectKnowledge(
   state: typeof QuizState.State,
-  config?: { configurable?: { userId?: string } }
+  config?: RunnableConfig
 ): Promise<Partial<typeof QuizState.State>> {
-  console.log("[CollectKnowledge] State received:", state);
+  try {
+    console.log("[CollectKnowledge] State received:", state, config);
 
-  const queries = [state.input.title, state.context].filter(
-    (q): q is string => typeof q === "string"
-  );
+    const queries = [state.input.title, state.context].filter(
+      (q): q is string => typeof q === "string" && q.trim().length > 0
+    );
 
-  console.log("[CollectKnowledge] Queries formed:", queries);
+    if (!queries.length) {
+      console.warn("[CollectKnowledge] No queries found from state input.");
+      return { context: "", summary: state.summary ?? "" };
+    }
 
-  const [webResults] = await Promise.all([
-    searchWeb(queries.join(" ")),
-    // notionRetriever(config?.configurable?.userId ?? "", queries),
-  ]);
+    console.log(
+      "[CollectKnowledge] Running web and notion retrieval for queries:",
+      queries
+    );
 
-  console.log("[CollectKnowledge] Web results:", webResults);
+    const [webResults, notionResults] = await Promise.all([
+      config?.configurable?.websearchOn ? searchWeb(queries.join(" ")) : [],
+      config?.configurable?.notionSearchon
+        ? notionRetriever(config?.configurable?.userId ?? "", queries)
+        : [],
+    ]);
 
-  const knowledgeChunks = [...(webResults ?? [])];
-  console.log("[CollectKnowledge] Knowledge Chunks:", knowledgeChunks);
+    const knowledgeChunks = [...(webResults ?? []), ...(notionResults ?? [])];
 
-  return {
-    context: knowledgeChunks.join("\n\n"),
-  };
+    if (!knowledgeChunks.length) {
+      console.warn("[CollectKnowledge] No knowledge chunks retrieved.");
+      return { context: "", summary: state.summary ?? "" };
+    }
+
+    console.log(
+      "[CollectKnowledge] Retrieved knowledge chunks:",
+      knowledgeChunks
+    );
+
+    let summary;
+    try {
+      summary = state.summary + JSON.parse(knowledgeChunks.join("\n\n"));
+    } catch (e: any) {
+      console.error(
+        "[CollectKnowledge] Failed to parse summary JSON:",
+        e.message
+      );
+      throw new ApiError(500, "Failed to parse knowledge chunks into summary.");
+    }
+
+    return {
+      context: knowledgeChunks.join("\n\n"),
+      summary,
+    };
+  } catch (err: any) {
+    console.error("[CollectKnowledge] Error:", err);
+    if (err instanceof ApiError) throw err;
+    throw new ApiError(500, `CollectKnowledge failed: ${err.message || err}`);
+  }
 }

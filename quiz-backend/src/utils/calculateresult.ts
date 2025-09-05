@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
-import { db } from "../config/db/index.js";
-import { results, questions } from "../config/db/schema.js";
+import { db } from "../config/db/index";
+import { results, questions } from "../config/db/schema";
 
 export const calculateResult = async (
   resultId: string,

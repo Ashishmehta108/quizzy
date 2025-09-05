@@ -1,0 +1,110 @@
+import { Router } from "express";
+import { quizAI, ensureSession } from "@/services/aiservice";
+import { db } from "@/config/db";
+import { chatMessages, questions } from "@/config/db/schema";
+import { eq, desc, asc, and } from "drizzle-orm";
+import { asyncHandler } from "@/utils/asyncHandler";
+import { ApiError } from "@/utils/apiError";
+
+const chatRouter = Router();
+
+/**
+ * GET /api/chat/:id
+ * → Returns session + previous messages
+ */
+chatRouter.get(
+  "/chat/:id",
+  asyncHandler(async (req, res) => {
+    const { id: quizId } = req.params;
+    const { userId } = req.query as { userId?: string };
+
+    if (!userId) {
+      return res.status(400).json({ error: "Missing userId" });
+    }
+
+    // ensure session
+    const sessionId = await ensureSession(quizId, userId);
+
+    // fetch messages
+    const messages = await db
+      .select()
+      .from(chatMessages)
+      .where(eq(chatMessages.sessionId, sessionId))
+      .orderBy(asc(chatMessages.createdAt));
+
+    res.json({ sessionId, messages });
+  })
+);
+
+/**
+ * POST /api/chat/:id
+ * → Saves user/assistant messages manually (frontend + socket sync)
+ */
+chatRouter.post(
+  "/chat/:id",
+  asyncHandler(async (req, res) => {
+    const { id: quizId } = req.params;
+    const { role, content, sessionId, userId } = req.body;
+
+    if (!sessionId || !userId) {
+      return res.status(400).json({ error: "Missing sessionId or userId" });
+    }
+
+    await db.insert(chatMessages).values({
+      sessionId,
+      quizId,
+      role,
+      content,
+      status: role === "user" ? "sent" : "received",
+      tokensIn: 0,
+      tokensOut: 0,
+      createdAt: new Date(),
+    });
+
+    res.json({ success: true });
+  })
+);
+
+/**
+ * (Optional) POST /api/chat/:id/ai
+ * → Directly call AI service from HTTP without socket
+ */
+chatRouter.post(
+  "/chat/:id/ai",
+  asyncHandler(async (req, res) => {
+    const { id: quizId } = req.params;
+    const { userId, question, explanation, userQuery, type } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ error: "Missing userId" });
+    }
+
+    const result = await quizAI(type || "chat", {
+      quizId,
+      userId,
+      question,
+      explanation,
+      userQuery,
+    });
+
+    res.json(result);
+  })
+);
+
+chatRouter.get(
+  "/chat/:id/questions",
+  asyncHandler(async (req, res) => {
+    const { id: quizId } = req.params;
+    const userId = req.auth?.userId;
+    const qns = await db
+      .select()
+      .from(questions)
+      .where(eq(questions.quizId, quizId));
+    console.log(qns[0].id);
+    if (!qns) {
+      throw new ApiError(404, "Questions not found");
+    }
+    res.json({ questions: qns });
+  })
+);
+export default chatRouter;

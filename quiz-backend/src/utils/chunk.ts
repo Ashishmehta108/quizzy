@@ -8,7 +8,6 @@ export function chunkText(text: string, chunkSize = 1000, overlap = 100) {
     if (end > text.length) end = text.length;
 
     const chunkText = text.slice(start, end);
-    console.log(chunkText);
     chunks.push({
       id: `chunk-${idx++}`,
       text: chunkText,

@@ -96,25 +96,36 @@
   }
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 /* Scrollbar styling */
+/* Hide scrollbars unless scrolling (simulate behavior) */
+
+/* Default scrollbar — very minimal and subtle */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 2px;
+  height: 2px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-zinc-100 dark:bg-zinc-800;
+  background-color: transparent;
 }
 
+/* Subtle thumb for light and dark themes */
 ::-webkit-scrollbar-thumb {
-  @apply bg-blue-400 dark:bg-blue-600 rounded-full;
+  background-color: rgba(113, 113, 122, 0.2); /* zinc-500 @ 20% opacity */
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
 }
 
+/* Slightly more visible on hover */
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-blue-500 dark:bg-blue-500;
+  background-color: rgba(113, 113, 122, 0.4); /* zinc-500 @ 40% opacity */
+}
+
+/* Firefox support */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(113, 113, 122, 0.2) transparent;
+  scrollbar-gutter: stable;
 }
 
 @theme inline {
@@ -138,6 +149,6 @@ html {
   gap: 1rem;
 }
 
-html {
+:root {
   scroll-behavior: smooth;
 }

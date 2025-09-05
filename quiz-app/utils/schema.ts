@@ -39,6 +39,11 @@ export const createQuizSchema = z.object({
           "Files must be PDF, TXT, or Markdown Max 5MB each, up to 3 files allowed.",
       }
     ),
+  description: z
+    .string()
+    .min(10, "Description must be at least 10 characters")
+    .max(300, "Description must not exceed 300 characters"),
+  websearch: z.boolean(),
 });
 
 export type CreateQuizForm = z.infer<typeof createQuizSchema>;

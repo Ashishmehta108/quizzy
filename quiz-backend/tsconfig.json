@@ -23,7 +23,7 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts"
-, "src/controllers/result.controller.js"  ],
+, "src/controllers/result.controller.ts"  ],
   "exclude": [
     "node_modules"
   ]

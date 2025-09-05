@@ -27,6 +27,15 @@ export interface Quiz {
   submitted: boolean;
 }
 
+export interface QuizWithQuestions {
+  id: string;
+  title: string;
+  userId: string;
+  createdAt: string;
+  submitted: boolean;
+  questions: Question[];
+}
+
 export interface Document {
   id: string;
   userId: string;
@@ -72,4 +81,11 @@ export interface CreateQuizRequest {
   title: string;
   query: string;
   files: File[];
+}
+
+export interface EmptyStateProps {
+  icon: React.ComponentType<{ size?: string | number; className?: string }>;
+  title: string;
+  description: string;
+  action?: React.ReactNode;
 }

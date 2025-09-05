@@ -20,7 +20,7 @@ import {
   XCircle,
   CheckCircle2,
 } from "lucide-react";
-import { QuizResponse } from "@/lib/types";
+import { QuizResponse, QuizWithQuestions } from "@/lib/types";
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import { Label } from "@/components/ui/label";
@@ -34,29 +34,30 @@ import {
 import { SearchNormal } from "iconsax-reactjs";
 
 interface QuizTableProps {
-  quizzes: QuizResponse[];
+  quizzes: QuizWithQuestions[];
 }
 
 export function QuizTable({ quizzes }: QuizTableProps) {
   const [search, setSearch] = useState("");
   const [minQuestions, setMinQuestions] = useState("0");
   const [sortDesc, setSortDesc] = useState(true);
-
+  console.log(quizzes)
   const filteredQuizzes = useMemo(() => {
     return quizzes
       .filter((quiz) => {
-        const matchesTitle = quiz.quiz.title
+        const matchesTitle = quiz.title
           .toLowerCase()
           .includes(search.toLowerCase());
         const hasMinQuestions = quiz.questions.length >= parseInt(minQuestions);
         return matchesTitle && hasMinQuestions;
       })
       .sort((a, b) => {
-        const dateA = a.quiz?.createdAt
-          ? new Date(a.quiz.createdAt).getTime()
+
+        const dateA = a?.createdAt
+          ? new Date(a.createdAt).getTime()
           : 0;
-        const dateB = b.quiz?.createdAt
-          ? new Date(b.quiz.createdAt).getTime()
+        const dateB = b?.createdAt
+          ? new Date(b.createdAt).getTime()
           : 0;
         return sortDesc ? dateB - dateA : dateA - dateB;
       });
@@ -64,33 +65,36 @@ export function QuizTable({ quizzes }: QuizTableProps) {
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-6 space-y-6">
-      <div className="flex flex-row items-stretch items-end  gap-4">
-        <div className="max-w-md">
-          <Label htmlFor="search">Search by title</Label>
-          <div className="relative">
+      <div className="flex flex-row sm:justify-center   gap-4">
+        <div className="max-w-md pb-10">
+          <Label htmlFor="search mb-10 bg-white">Search by title</Label>
+          <div className="relative mt-2">
             <SearchNormal className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               id="search"
               placeholder="Search quizzes..."
-              className="pl-8"
+              className="pl-8 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-zinc-300  dark:focus-visible:border-zinc-700"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
         </div>
-        <div className="w-48">
+        <div className="w-48 gap-y-10">
           <Label>Min Questions</Label>
-          <Select value={minQuestions} onValueChange={setMinQuestions}>
-            <SelectTrigger>
-              <SelectValue placeholder="Min Questions" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="0">Any</SelectItem>
-              <SelectItem value="5">5+</SelectItem>
-              <SelectItem value="10">10+</SelectItem>
-              <SelectItem value="15">15+</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="mt-2">
+            <Select value={minQuestions} onValueChange={setMinQuestions}>
+              <SelectTrigger className="focus:ring-0 focus:ring-offset-0  ">
+                <SelectValue placeholder="Min Questions" />
+              </SelectTrigger>
+              <SelectContent className="" >
+                <SelectItem value="0">Any</SelectItem>
+                <SelectItem value="5">5+</SelectItem>
+                <SelectItem value="10">10+</SelectItem>
+                <SelectItem value="15">15+</SelectItem>
+              </SelectContent>
+            </Select>
+
+          </div>
         </div>
       </div>
 
@@ -120,16 +124,16 @@ export function QuizTable({ quizzes }: QuizTableProps) {
           <TableBody>
             {filteredQuizzes.length > 0 ? (
               filteredQuizzes.map((quiz, index) => {
-                const createdDate = quiz.quiz?.createdAt
-                  ? new Date(quiz.quiz.createdAt).toLocaleDateString()
+                const createdDate = quiz?.createdAt
+                  ? new Date(quiz.createdAt).toLocaleDateString()
                   : "Date not specified";
 
-                const attempted = quiz.quiz.submitted;
+                const attempted = quiz.submitted;
 
                 return (
-                  <TableRow key={quiz.quiz.id}>
+                  <TableRow key={quiz.id}>
                     <TableCell className="font-medium py-3">
-                      {quiz.quiz.title}
+                      {quiz.title}
                     </TableCell>
                     <TableCell className="py-3">
                       {quiz.questions.length}{" "}
@@ -153,8 +157,8 @@ export function QuizTable({ quizzes }: QuizTableProps) {
                       <Link
                         href={
                           attempted
-                            ? `/dashboard/results/${quiz.result?.id}`
-                            : `/dashboard/quizzes/${quiz.quiz.id}`
+                            ? `/dashboard/results/${quiz?.id}` //result id here
+                            : `/dashboard/quizzes/${quiz.id}`
                         }
                       >
                         <Button
@@ -185,17 +189,17 @@ export function QuizTable({ quizzes }: QuizTableProps) {
       <div className="lg:hidden max-w-sm mx-auto space-y-4">
         {filteredQuizzes.length > 0 ? (
           filteredQuizzes.map((quiz) => {
-            const createdDate = quiz.quiz?.createdAt
-              ? new Date(quiz.quiz.createdAt).toLocaleDateString()
+            const createdDate = quiz?.createdAt
+              ? new Date(quiz.createdAt).toLocaleDateString()
               : "Date not specified";
 
-            const attempted = quiz.quiz.submitted;
+            const attempted = quiz.submitted;
             return (
               <div
-                key={quiz.quiz.id}
+                key={quiz.id}
                 className="rounded-xl border px-4 py-4 shadow-sm bg-background hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
               >
-                <div className="font-semibold text-base">{quiz.quiz.title}</div>
+                <div className="font-semibold text-base">{quiz.title}</div>
                 <div className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
                   <FileText className="h-4 w-4" />
                   {quiz.questions.length} questions
@@ -218,7 +222,7 @@ export function QuizTable({ quizzes }: QuizTableProps) {
                   )}
                 </div>
                 <div className="mt-3">
-                  <Link href={`/dashboard/quizzes/${quiz.quiz.id}`}>
+                  <Link href={`/dashboard/quizzes/${quiz.id}`}>
                     <Button
                       size="sm"
                       className="p-3 bg-blue-900 hover:bg-blue-800 dark:bg-blue-900 dark:hover:bg-blue-800"

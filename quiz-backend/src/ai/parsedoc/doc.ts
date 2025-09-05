@@ -8,18 +8,19 @@ export async function processPdf(
   filePath: string,
   userId: string,
   docId: string,
-  files: QuizFile[]
+  file: QuizFile
 ) {
   const text = await extractPdfText(filePath);
+  console.log(text);
   const chunks = chunkText(text, 1000, 100);
-  for (const file of files) {
-    uploadFile(
-      file.buffer,
-      `file:
+  console.log(file);
+  uploadFile(
+    file.buffer,
+    `file:
       ${userId}:${docId}`,
-      file.mimetype
-    );
-  }
+    file.mimetype
+  );
+
   await upsertChunks(userId, docId, chunks);
   console.log(`Processed ${chunks.length} chunks from ${filePath}`);
   return text;
