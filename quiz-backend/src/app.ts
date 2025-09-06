@@ -11,7 +11,6 @@ import { clerkClient } from "./config/clerk/clerk";
 import notionRouter from "./routes/notion.route";
 import authRouter from "./routes/auth.routes";
 import quizRouter from "./routes/quiz.routes";
-import aiRouter from "./routes/ai.routes";
 import updateUsageRouter from "./routes/usage.reset.route";
 import { errorHandler } from "./middlewares/errorHanlder";
 import resultRouter from "./routes/result.routes";
@@ -59,7 +58,6 @@ app.use("/api/notion", notionRouter);
 app.use("/api", dummyRouter);
 app.use("/api/utility", utilityRouter);
 app.use("/api", chatRouter);
-app.use("/api/ai", aiRouter);
 
 app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({ status: "OK" });

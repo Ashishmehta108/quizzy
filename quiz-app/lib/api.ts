@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL!,
+  baseURL: process.env.NEXT_PUBLIC_BACK_URL!+"/api",
   withCredentials: true,
 });
 export const getToken = async () => {

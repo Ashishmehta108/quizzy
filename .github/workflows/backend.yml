@@ -1,0 +1,66 @@
+name: Backend CI
+
+on:
+  push:
+    paths:
+      - "quiz-backend/**"
+      - ".github/workflows/backend.yml"
+  pull_request:
+    paths:
+      - "quiz-backend/**"
+      - ".github/workflows/backend.yml"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: quiz-backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: quiz-backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Type check
+        run: npm run build:types
+
+      - name: Build + Migrate DB + Generate Drizzle
+        run: npm run build
+        env:
+          PORT: ${{ secrets.PORT }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          GOOGLE_GEMINI: ${{ secrets.GOOGLE_GEMINI }}
+          PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          NODE_ENV: ${{ secrets.NODE_ENV }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          ACCESS_SECRET: ${{ secrets.ACCESS_SECRET }}
+          REFRESH_SECRET: ${{ secrets.REFRESH_SECRET }}
+          CLERK_PUBLISHABLE_KEY: ${{ secrets.CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          NOTION_CLIENT_ID: ${{ secrets.NOTION_CLIENT_ID }}
+          NOTION_CLIENT_SECRET: ${{ secrets.NOTION_CLIENT_SECRET }}
+          NOTION_REDIRECT_URI: ${{ secrets.NOTION_REDIRECT_URI }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          TAVILY_API: ${{ secrets.TAVILY_API }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          REDIS_USERNAME: ${{ secrets.REDIS_USERNAME }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          ENCRYPTION_SECRET: ${{ secrets.ENCRYPTION_SECRET }}

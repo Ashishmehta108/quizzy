@@ -39,12 +39,11 @@ export default function LoginPage() {
 
   const syncUser = async () => {
     try {
-      const backendUrl =
-        process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL;
+      const backendUrl = process.env.NEXT_PUBLIC_BACk_URL;
       if (!backendUrl) throw new Error("Missing BACKEND URL env");
       const jwt = await getToken();
       if (!jwt) throw new Error("Missing Clerk session token");
-      const res = await fetch(`${backendUrl}/auth/sync`, {
+      const res = await fetch(`${backendUrl}/api/auth/sync`, {
         method: "GET",
         headers: { Authorization: `Bearer ${jwt}` },
       });
