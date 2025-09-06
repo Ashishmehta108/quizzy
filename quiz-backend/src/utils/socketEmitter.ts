@@ -8,5 +8,5 @@ export const emitSocketEvent = (
   const payload = { message };
 
   io.to(socketId).emit(event, payload);
-  console.log(`[SocketEmitter] Sent ${event} to ${socketId}:`, payload);
+  console.log(`[SocketEmitter] Sent ${event} to ${socketId}:`);
 };

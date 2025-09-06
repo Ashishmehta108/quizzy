@@ -13,8 +13,8 @@ export const model = genAI;
 
 function cleanJson(raw: string): string {
   return raw
-    .replace(/```json|```/g, "") // strip code fences
-    .replace(/[\u0000-\u001F\u007F-\u009F]/g, ""); // remove control chars
+    .replace(/```json|```/g, "")
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
 }
 
 export type QuizResult =
@@ -62,12 +62,12 @@ export const generateQuizQuestions = async ({
 
   try {
     const messages = [new HumanMessage(prompt)];
-    console.log("[generateQuizQuestions] Messages sent to Gemini:", messages);
+    console.log("[generateQuizQuestions] Messages sent to Gemini:");
 
     const result = await model.invoke(messages);
     console.log(result);
     let raw = result.text?.trim() ?? "";
-    console.log("[generateQuizQuestions] Raw Gemini response:", raw);
+    console.log("[generateQuizQuestions] Raw Gemini response:");
 
     if (raw.toLowerCase() === "no tool needed") {
       console.log(
@@ -76,14 +76,11 @@ export const generateQuizQuestions = async ({
       return { type: "tool", data: [] };
     }
 
-    console.log(
-      "[generateQuizQuestions] Cleaned response for JSON parsing:",
-      raw
-    );
+    console.log("[generateQuizQuestions] Cleaned response for JSON parsing:");
     const cleaned = cleanJson(raw);
     const parsed = JSON.parse(cleaned);
 
-    console.log("[generateQuizQuestions] Parsed JSON:", parsed);
+    console.log("[generateQuizQuestions] Parsed JSON:");
 
     if (!parsed.quiz || !Array.isArray(parsed.quiz)) {
       console.error(

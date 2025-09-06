@@ -22,10 +22,8 @@ async function seed() {
   const questionId = randomUUID();
   const billingId = randomUUID();
 
-  // Delete existing dummy user
   await db.delete(users).where(eq(users.email, "john@example.com"));
 
-  // Insert user
   await db.insert(users).values({
     id: userId,
     clerkId: "user_" + randomUUID(),
@@ -34,7 +32,6 @@ async function seed() {
     role: "user",
   });
 
-  // Fetch Free plan
   const freePlan = await db
     .select()
     .from(plans)
@@ -43,7 +40,6 @@ async function seed() {
   if (freePlan.length === 0) throw new Error("Free plan does not exist.");
   const freePlanId = freePlan[0].id;
 
-  // Insert billing
   await db.insert(billings).values({
     id: billingId,
     userId: userId,
@@ -51,7 +47,6 @@ async function seed() {
     status: "active",
   });
 
-  // Insert quiz
   await db.insert(quizzes).values({
     id: quizId,
     title: "JavaScript Basics",
@@ -59,7 +54,6 @@ async function seed() {
     submitted: false,
   });
 
-  // Insert question
   await db.insert(questions).values({
     id: questionId,
     quizId: quizId,
@@ -75,7 +69,6 @@ async function seed() {
       "A closure is a function that retains access to variables from its outer scope.",
   });
 
-  // Create multiple dummy results to simulate activity over last 30 days
   const dummyResults = Array.from({ length: 15 }, (_, i) => {
     const resultId = randomUUID();
     const submittedAt = randomDateInLast30Days();
@@ -108,7 +101,6 @@ async function seed() {
     };
   });
 
-  // Insert dummy results
   for (const r of dummyResults) {
     await db.insert(results).values(r);
   }

@@ -1,5 +1,5 @@
-import { db } from "@/config/db";
-import { results, users } from "@/config/db/schema";
+import { db } from "../config/db/index";
+import { results, users } from "../config/db/schema";
 import { and, eq, gte, sql } from "drizzle-orm";
 import { Request, Response } from "express";
 export const quizzesThisMonth = async (req: Request, res: Response) => {

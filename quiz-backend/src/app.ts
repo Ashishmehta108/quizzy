@@ -12,20 +12,16 @@ import notionRouter from "./routes/notion.route";
 import authRouter from "./routes/auth.routes";
 import quizRouter from "./routes/quiz.routes";
 import aiRouter from "./routes/ai.routes";
-// import conversationRoute from "./routes/conversation.route";
-
 import updateUsageRouter from "./routes/usage.reset.route";
 import { errorHandler } from "./middlewares/errorHanlder";
 import resultRouter from "./routes/result.routes";
 import dummyRouter from "./routes/dummy.routes";
 import { utilityRouter } from "./routes/utility.routes";
-// import resultRouter from "./routes/result.routes";
 import chatRouter from "./routes/chat.routes";
-// import {
-//   rateLimitByIP,
-//   rateLimitByKey,
-// } from "./middlewares/ratelimit.middleware";
-
+import {
+  rateLimitByIP,
+  rateLimitByKey,
+} from "./middlewares/ratelimit.middleware";
 const app = express();
 app.use(
   cors({
@@ -45,21 +41,19 @@ app.use(compression());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("tiny"));
 
-// app.use(rateLimitByIP({ windowSec: 60, max: 300, burst: 150 }));
+app.use(rateLimitByIP({ windowSec: 60, max: 300, burst: 150 }));
 
-// Example: protect a write API with API-key limiter
-// app.post(
-//   "/api/create",
-//   rateLimitByKey({ windowSec: 60, max: 60, burst: 30 }),
-//   (req, res) => {
-//     res.json({ ok: true });
-//   }
-// );
+app.post(
+  "/api/create",
+  rateLimitByKey({ windowSec: 60, max: 60, burst: 30 }),
+  (req, res) => {
+    res.json({ ok: true });
+  }
+);
 
 app.use("/api/auth", authRouter);
 app.use("/api/quizzes", quizRouter);
 app.use("/api/results", resultRouter);
-// app.use("/api/conversation", conversationRoute);
 app.use("/api/resetusage", updateUsageRouter);
 app.use("/api/notion", notionRouter);
 app.use("/api", dummyRouter);

@@ -6,19 +6,14 @@ import { db } from "../config/db/index";
 import { questions, quizzes } from "../config/db/schema";
 import { eq } from "drizzle-orm";
 import { QuizRequest, QuizResponse } from "../types/routes/quiz";
-import { quizChecks } from "@/checks/quiz.checks";
+import { quizChecks } from "../checks/quiz.checks";
 
 const quizRouter = Router();
 
 quizRouter.post("/check", checkAuth, quizChecks, (req, res) => {
   res.json({ ok: true });
 });
-quizRouter.post(
-  "/",
-  checkAuth,
-  upload.array("files", 5),
-  createQuiz
-);
+quizRouter.post("/", checkAuth, upload.array("files", 5), createQuiz);
 
 quizRouter.get("/", checkAuth, getQuizzes);
 
@@ -35,7 +30,6 @@ quizRouter.get(
     if (!userId) {
       return res.status(401).json({ error: "Unauthorized" });
     }
-
     const [quizRecord] = await db
       .select()
       .from(quizzes)

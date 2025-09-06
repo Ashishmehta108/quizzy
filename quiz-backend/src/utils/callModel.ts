@@ -1,9 +1,9 @@
-import { ensureConfiguration } from "@/ai/agent/config";
+import { ensureConfiguration } from "../ai/agent/config";
 import { RunnableConfig } from "@langchain/core/runnables";
 import { MessagesAnnotation } from "@langchain/langgraph";
-import { tools } from "@/ai/agent/tools";
+import { tools } from "../ai/agent/tools";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { QuizState } from "@/ai/agent/Graph";
+import { QuizState } from "../ai/agent/Graph";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 
 export const genAI = new ChatGoogleGenerativeAI({
@@ -27,7 +27,7 @@ Task:
 `;
 
   const userQuery = state.input.query ?? "";
-  console.log("[callModel] User query:", userQuery);
+  console.log("[callModel] User query:");
 
   const userMessage = new HumanMessage(
     `User query: ${userQuery}\nReturn a minimal quiz draft in JSON only.`
@@ -39,10 +39,10 @@ Task:
     ...state.messages,
   ];
 
-  console.log("[callModel] Messages sent to model:", messages);
+  console.log("[callModel] Messages sent to model:");
 
   const response = await model.invoke(messages);
-  console.log("[callModel] Raw model response:", response);
+  console.log("[callModel] Raw model response:");
 
   return { messages: [response] };
 }

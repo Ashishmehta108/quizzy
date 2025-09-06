@@ -1,8 +1,8 @@
-import { db } from "@/config/db";
-import { results, users, billings, plans, usage } from "@/config/db/schema";
-import { processActivityData, Result } from "@/services/activity.service";
-import { ApiError } from "@/utils/apiError";
-import { asyncHandler } from "@/utils/asyncHandler";
+import { db } from "../config/db";
+import { results, users, billings, plans, usage } from "../config/db/schema";
+import { processActivityData, Result } from "../services/activity.service";
+import { ApiError } from "../utils/apiError";
+import { asyncHandler } from "../utils/asyncHandler";
 import { and, eq, gte } from "drizzle-orm";
 import { Router } from "express";
 
@@ -15,7 +15,7 @@ utilityRouter.route("/activityData").post(
       const userId = req.auth?.userId;
       const { resultId } = req.body;
 
-      console.log("[ActivityData] userId:", userId, "resultId:", resultId);
+      console.log("[ActivityData] userId:", userId, "resultId:");
       if (!userId) throw new ApiError(400, "Missing userId in request body");
 
       const [user] = await db
@@ -27,7 +27,7 @@ utilityRouter.route("/activityData").post(
 
       const date30DaysAgo = new Date();
       date30DaysAgo.setDate(date30DaysAgo.getDate() - 30);
-      console.log("[ActivityData] date30DaysAgo:", date30DaysAgo);
+      console.log("[ActivityData] date30DaysAgo:");
 
       const selectCols = {
         id: results.id,
@@ -64,7 +64,7 @@ utilityRouter.route("/activityData").post(
           );
       }
 
-      console.log("[ActivityData] dbResults fetched:", dbResults?.length);
+      console.log("[ActivityData] dbResults fetched:");
       if (!dbResults || dbResults.length === 0) {
         return res.json({ success: false, data: [] });
       }
@@ -76,7 +76,7 @@ utilityRouter.route("/activityData").post(
       }));
 
       const data = processActivityData(resultData);
-      console.log("[ActivityData] Processed data:", data.length);
+      console.log("[ActivityData] Processed data:");
 
       res.json({ success: true, data });
     } catch (err) {
@@ -112,7 +112,7 @@ utilityRouter.route("/usage").post(
         })
         .from(billings)
         .where(eq(billings.userId, user.id));
-      console.log("[Usage] Billing fetched:", billing);
+      console.log("[Usage] Billing fetched:");
       if (!billing) throw new ApiError(404, "No billing found for this user");
 
       const [plan] = await db
@@ -138,7 +138,7 @@ utilityRouter.route("/usage").post(
         })
         .from(usage)
         .where(eq(usage.billingId, billing.id));
-      console.log("[Usage] Usage fetched:", billingUsage);
+      console.log("[Usage] Usage fetched:");
 
       res.json({
         success: true,

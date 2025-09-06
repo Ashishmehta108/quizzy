@@ -1,7 +1,6 @@
-// src/services/quiz.service.ts
 import { GoogleGenAI } from "@google/genai";
-import { db } from "@/config/db";
-import { chatMessages, chatSessions } from "@/config/db/schema";
+import { db } from "../config/db";
+import { chatMessages, chatSessions } from "../config/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 
 const client = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI || "" });
@@ -56,7 +55,6 @@ export async function quizAI(
 
   const sid = sessionId || (await ensureSession(quizId, userId));
 
-  // 🟢 Load last N messages for context
   const history = await db
     .select()
     .from(chatMessages)
@@ -69,7 +67,6 @@ export async function quizAI(
     .map((m) => `${m.role.toUpperCase()}: ${m.content}`)
     .join("\n");
 
-  // 🟢 Load quiz questions + explanations
   const quizQs = await db
     .select()
     .from(questions)

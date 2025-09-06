@@ -1,4 +1,3 @@
-// server.ts
 import dotenv from "dotenv";
 dotenv.config();
 import app from "./app";
@@ -37,8 +36,6 @@ io.on("connection", (socket) => {
 
   socket.on("quiz_chat", async ({ quizId, sessionId, userId, query }) => {
     const room = `quiz_${quizId}_${sessionId}`;
-
-    // broadcast user message to room
     io.to(room).emit("user_message", { userId, content: query });
 
     try {

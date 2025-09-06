@@ -1,6 +1,7 @@
 // middleware/rateLimit.ts
 import { Request, Response, NextFunction } from "express";
-import { redisclient } from "@/utils/redis";
+// import { redisclient } from "@/utils/redis";
+import { redisclient } from "../utils/redis";
 
 interface LimiterOptions {
   prefix: string;
@@ -25,7 +26,7 @@ interface ConsumeResult {
 function makeLimiter({ prefix, windowSec, max, burst = 0 }: LimiterOptions) {
   return async function consume(id: string): Promise<ConsumeResult> {
     const now = Math.floor(Date.now() / 1000);
-    const pipeline = redisclient;
+    const pipeline = (redisclient as any).multi();
     const keys: string[] = [];
 
     for (let i = 0; i < windowSec; i++) {
@@ -37,17 +38,23 @@ function makeLimiter({ prefix, windowSec, max, burst = 0 }: LimiterOptions) {
 
     // Execute reads
     const res = await pipeline.exec();
-    const counts = (res ?? []).map(([err, v]) =>
-      err ? 0 : v ? parseInt(v as string, 10) : 0
+    const counts = (res ?? []).map((result: any) =>
+      Array.isArray(result)
+        ? result[0]
+          ? 0
+          : result[1]
+          ? parseInt(result[1], 10)
+          : 0
+        : 0
     );
-    const sum = counts.reduce((a, b) => a + b, 0);
+    const sum = counts.reduce((a: number, b: number) => a + b, 0);
 
     if (sum >= max + burst) {
       return { allowed: false, remaining: 0, resetIn: 1 };
     }
 
     const curKey = `${prefix}:${id}:${now}`;
-    const incRes = await (redis as Redis)
+    const incRes = await (redisclient as any)
       .multi()
       .incr(curKey)
       .expire(curKey, windowSec) // seconds

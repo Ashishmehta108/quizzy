@@ -1,8 +1,8 @@
 import { Request, Response, Router } from "express";
-import { db } from "@/config/db";
-import { usage } from "@/config/db/schema";
+import { db } from "../config/db";
+import { usage } from "../config/db/schema";
 import { isNull } from "drizzle-orm";
-import { asyncHandler } from "@/utils/asyncHandler";
+import { asyncHandler } from "../utils/asyncHandler";
 
 const updateUsageRouter = Router();
 export const resetUsage = async () => {
