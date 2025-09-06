@@ -25,17 +25,20 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: quiz-app/package-lock.json
+          cache: pnpm
+          cache-dependency-path: quiz-app/pnpm-lock.yaml
+
+      - name: Install pnpm
+        run: npm install -g pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Lint code
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Build frontend
-        run: npm run build
+        run: pnpm run build
         env:
           FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
           NEXT_PUBLIC_BACK_URL: ${{ secrets.NEXT_PUBLIC_BACK_URL }}
