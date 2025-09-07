@@ -9,7 +9,7 @@ export default function GetUserButton() {
 
   const handleGetUser = async () => {
     const token = await getToken();
-    const res = await fetch(`${BACKEND_URL}/api/user`, {
+    const res = await fetch(`${BACKEND_URL}/user`, {
       headers: { Authorization: `Bearer ${token}` },
       credentials: "include",
     });
