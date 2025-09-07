@@ -40,7 +40,7 @@ export function QuestionCard({
   isSubmitting,
   isLastQuestion,
 }: QuestionCardProps) {
-  console.log(question)
+  console.log(question);
   const q = JSON.parse(question.options);
 
   return (
@@ -57,7 +57,7 @@ export function QuestionCard({
           </div>
           <div className="space-y-3">
             <h2 className="md:text-2xl text-xl font-semibold text-zinc-900 dark:text-white leading-tight">
-              {question.question}
+              <MarkdownRenderer>{question.question}</MarkdownRenderer>
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400 text-sm md:text-base">
               Choose the best answer from the options below
@@ -74,16 +74,18 @@ export function QuestionCard({
                 <button
                   key={index}
                   onClick={() => onAnswerSelect(index)}
-                  className={`group w-full px-4 py-3 text-left rounded-2xl border transition-all duration-200 flex items-center gap-4 ${isSelected
-                    ? "bg-blue-200/30 border-blue-400 dark:bg-blue-700/30 dark:border-blue-500 scale-[1.02]"
-                    : "bg-white/10 dark:bg-zinc-900/30 border-white/20 dark:border-white/10 hover:bg-white/20 dark:hover:bg-white/10"
-                    }`}
+                  className={`group w-full px-4 py-3 text-left rounded-2xl border transition-all duration-200 flex items-center gap-4 ${
+                    isSelected
+                      ? "bg-blue-200/30 border-blue-400 dark:bg-blue-700/30 dark:border-blue-500 scale-[1.02]"
+                      : "bg-white/10 dark:bg-zinc-900/30 border-white/20 dark:border-white/10 hover:bg-white/20 dark:hover:bg-white/10"
+                  }`}
                 >
                   <div
-                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-semibold text-xs transition-all duration-200 ${isSelected
-                      ? "bg-blue-500 text-white border-blue-500"
-                      : "bg-white/20 dark:bg-zinc-800/40 text-gray-600 dark:text-zinc-300 border-white/20 dark:border-white/10"
-                      }`}
+                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-semibold text-xs transition-all duration-200 ${
+                      isSelected
+                        ? "bg-blue-500 text-white border-blue-500"
+                        : "bg-white/20 dark:bg-zinc-800/40 text-gray-600 dark:text-zinc-300 border-white/20 dark:border-white/10"
+                    }`}
                   >
                     {optionLabel}
                   </div>
@@ -124,27 +126,31 @@ export function QuestionCard({
             <Button
               onClick={onNext}
               disabled={!canGoNext || isSubmitting}
-              className={`flex items-center gap-2 px-6 py-2 font-semibold text-white transition-all duration-200 ${isLastQuestion
-                ? "bg-green-600/80 hover:bg-green-700/70"
-                : "bg-blue-600/80 hover:bg-blue-700/70"
-                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              className={`flex items-center gap-2 px-6 py-2 font-semibold text-white transition-all duration-200 ${
+                isLastQuestion
+                  ? "bg-green-600/80 hover:bg-green-700/70"
+                  : "bg-blue-600/80 hover:bg-blue-700/70"
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
-              {isLastQuestion
-                ? isSubmitting
-                  ? <>
+              {isLastQuestion ? (
+                isSubmitting ? (
+                  <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Submitting...
                   </>
-                  : "Submit Quiz"
-                : <>
+                ) : (
+                  "Submit Quiz"
+                )
+              ) : (
+                <>
                   Next
                   <ChevronRight className="h-4 w-4" />
-                </>}
+                </>
+              )}
             </Button>
           </div>
         </CardContent>
       </Card>
-
     </div>
   );
 }
@@ -162,7 +168,7 @@ export default function TakeQuizPage({
   const [result, setResult] = useState<Result | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
-  const { user, isLoaded } = useUser()
+  const { user, isLoaded } = useUser();
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
 
   const router = useRouter();
@@ -183,7 +189,7 @@ export default function TakeQuizPage({
       const response = await api.get<QuizResponse[]>(`/quizzes/${id}`, {
         withCredentials: true,
       });
-      console.log()
+      console.log();
       //@ts-ignore
       setQuiz(response.data);
       setLoading(false);
@@ -312,20 +318,22 @@ export default function TakeQuizPage({
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <div
-                className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 ${scorePercentage >= 80
-                  ? "bg-green-100"
-                  : scorePercentage >= 60
+                className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 ${
+                  scorePercentage >= 80
+                    ? "bg-green-100"
+                    : scorePercentage >= 60
                     ? "bg-yellow-100"
                     : "bg-red-100"
-                  }`}
+                }`}
               >
                 <span
-                  className={`text-3xl font-bold ${scorePercentage >= 80
-                    ? "text-green-600 dark:text-green-500"
-                    : scorePercentage >= 60
+                  className={`text-3xl font-bold ${
+                    scorePercentage >= 80
+                      ? "text-green-600 dark:text-green-500"
+                      : scorePercentage >= 60
                       ? "text-yellow-600 dark:text-yellow-500"
                       : "text-red-600 dark:tex-red-500"
-                    }`}
+                  }`}
                 >
                   {scorePercentage}%
                 </span>
@@ -341,8 +349,8 @@ export default function TakeQuizPage({
                 {scorePercentage >= 80
                   ? "Excellent work!"
                   : scorePercentage >= 60
-                    ? "Good job!"
-                    : "Keep practicing!"}
+                  ? "Good job!"
+                  : "Keep practicing!"}
               </p>
               <div className="flex gap-4">
                 <Link href={`/dashboard/results/${result.id}`}>

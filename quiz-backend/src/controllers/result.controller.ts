@@ -78,7 +78,9 @@ export const GetResults = async (req: Request, res: Response) => {
 
     res.json({ data: quizTitles });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || "Failed to fetch results" });
+    res
+      .status(500)
+      .json({ error: error.message || "Failed to fetch results", data: [] });
   }
 };
 

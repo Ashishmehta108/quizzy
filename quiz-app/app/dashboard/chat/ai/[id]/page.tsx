@@ -262,8 +262,8 @@ export default function QuizChatPage() {
   };
 
   return (
-    <div className="max-h-[650px] flex flex-col bg-background">
-      <main className="overflow-y-auto max-w-3xl container mx-auto px-4 py-6 space-y-6">
+    <div className="relative flex flex-col h-screen bg-background">
+      <main className="flex-1 overflow-y-auto max-w-3xl container mx-auto px-4 py-6 space-y-6">
         {historyLoading ? (
           <div className="space-y-6">
             <div className="flex items-end gap-2 justify-end">
@@ -345,11 +345,9 @@ export default function QuizChatPage() {
         )}
         <div ref={messagesEndRef} />
       </main>
-
-      {/* Footer: input + question picker */}
-      <footer className="border-t p-3 bg-card">
-        <div className="max-w-3xl mx-auto w-full flex items-center gap-3 relative">
-          {/* Questions picker button */}
+      <footer className="sticky bottom-0 z-10 bg-card px-4 pt-6 pb-4">
+        <div className="max-w-3xl mx-auto flex items-center gap-3 relative">
+          {/* Questions picker */}
           <div className="relative">
             <Button
               onClick={() => setShowQuestions((s) => !s)}
@@ -358,7 +356,6 @@ export default function QuizChatPage() {
               aria-expanded={showQuestions}
               title="Pick a quiz question"
             >
-              {/* simple icon: number or Q */}
               <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
                 Q
               </span>
@@ -421,8 +418,7 @@ export default function QuizChatPage() {
           </div>
 
           {/* Auto-resize textarea */}
-          {/* Auto-resize textarea wrapper */}
-          <div className="flex-1 flex items-center">
+          <div className="flex-1 flex items-center border-t border-zinc-200 dark:border-zinc-700 rounded-full px-3 py-1 shadow-sm">
             <AutoResizeTextarea
               ref={inputRef}
               value={input}
@@ -433,10 +429,7 @@ export default function QuizChatPage() {
               }
               disabled={loading}
               rows={1}
-              className={cn(
-                "w-full px-5 py-2 text-sm text-foreground placeholder:text-zinc-400 shadow-sm transition resize-none",
-                input.split("\n").length > 1 ? "rounded-2xl" : "rounded-full"
-              )}
+              className="w-full text-sm text-foreground placeholder:text-zinc-400 resize-none bg-transparent outline-none"
               style={{ minHeight: "40px", maxHeight: "200px" }}
             />
           </div>

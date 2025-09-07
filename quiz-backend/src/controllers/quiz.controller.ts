@@ -266,7 +266,9 @@ export const getQuizzes = async (req: QuizRequest, res: QuizResponse) => {
       .from(quizzes)
       .where(eq(quizzes.userId, user.id))
       .execute();
-
+    if (userQuizzes.length === 0) {
+      return res.json([]);
+    }
     const quizzesWithQuestions = await Promise.all(
       userQuizzes.map(async (quiz) => {
         const questionsList = await db
@@ -297,7 +299,6 @@ export const getQuizzes = async (req: QuizRequest, res: QuizResponse) => {
       })
     );
 
-    console.log(quizzesWithQuestions);
     res.json(quizzesWithQuestions);
   } catch (error) {
     console.error("Error fetching quizzes:", error);
