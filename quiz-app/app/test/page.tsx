@@ -106,7 +106,6 @@
 
 // export default QuizPage;
 
-("use client");
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/nextjs";
 
