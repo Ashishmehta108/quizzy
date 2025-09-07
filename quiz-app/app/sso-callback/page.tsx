@@ -1,10 +1,11 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthenticateWithRedirectCallback } from "@clerk/nextjs";
 import { useEffect } from "react";
 
-export default function SsoCallback() {
+async function SsoCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -13,10 +14,18 @@ export default function SsoCallback() {
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push(redirectTo);
-    }, 3000); // fallback redirect in case Clerk doesn't auto-redirect
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, [redirectTo, router]);
 
   return <AuthenticateWithRedirectCallback />;
+}
+
+export default function SsoCallbackPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SsoCallback />
+    </Suspense>
+  );
 }
