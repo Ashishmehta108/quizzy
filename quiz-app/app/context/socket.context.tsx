@@ -56,7 +56,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
 
   // --- Socket setup ---
   useEffect(() => {
-    const socketIo = io("http://localhost:5000", {
+    const socketIo = io(`${process.env.BACK_URL}`, {
       transports: ["websocket"], // force pure WS, avoid handshake issues
     });
 

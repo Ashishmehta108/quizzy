@@ -6,9 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
-import StatusUpdates  from "@/components/agent/animateUpdate";
+import StatusUpdates from "@/components/agent/animateUpdate";
 //  { AnimateUpdate }
- 
 
 interface AppState {
   socketId: string | null;
@@ -69,7 +68,6 @@ export default function SocketTestPage() {
     };
   }, [socket]);
 
-  // keep latest followUp in sync
   useEffect(() => {
     if (followUps.length > 0) {
       setState((prev) => ({
@@ -179,9 +177,7 @@ export default function SocketTestPage() {
 
             {state.latestStatus && (
               <div className="mt-2 text-sm border-b pb-1">
-                <StatusUpdates
-                 text={state.latestStatus}
-                  />
+                <StatusUpdates text={state.latestStatus} />
               </div>
             )}
           </div>
