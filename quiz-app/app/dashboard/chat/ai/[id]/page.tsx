@@ -125,7 +125,6 @@ export default function QuizChatPage() {
     inputRef.current?.focus();
   }, []);
 
-  // join session + load history
   useEffect(() => {
     if (!socket || !isLoaded || !userId || !quizId) return;
 
@@ -188,7 +187,6 @@ export default function QuizChatPage() {
 
   useEffect(() => {
     if (!socket) return;
-
     const handler = (msg: { content: string }) => {
       const assistant: Message = {
         role: "assistant",

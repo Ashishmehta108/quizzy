@@ -5,10 +5,10 @@ import {
   AreaChart,
   CartesianGrid,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
-import Tooltip from "../Tooltip";
 
 interface ActivityChartProps {
   data: Array<{

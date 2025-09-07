@@ -6,7 +6,7 @@ import helmet from "helmet";
 import express, { NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import { clerkMiddleware } from "@clerk/express";
+import { clerkMiddleware, requireAuth } from "@clerk/express";
 import { clerkClient } from "./config/clerk/clerk";
 import notionRouter from "./routes/notion.route";
 import authRouter from "./routes/auth.routes";
@@ -59,7 +59,8 @@ app.use("/api", dummyRouter);
 app.use("/api/utility", utilityRouter);
 app.use("/api", chatRouter);
 
-app.get("/health", (_req: Request, res: Response) => {
+app.get("/health", requireAuth(), (req: Request, res: Response) => {
+  console.log(req.auth?.userId);
   res.status(200).json({ status: "OK" });
 });
 app.use(errorHandler);

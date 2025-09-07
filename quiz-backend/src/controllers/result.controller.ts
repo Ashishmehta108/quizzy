@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { calculateResult } from "../utils/calculateresult";
 import { Request, Response } from "express";
+import { asyncHandler } from "@/utils/asyncHandler";
 
 export const PostResult = async (req: Request, res: Response) => {
   try {
@@ -56,7 +57,10 @@ export const GetResults = async (req: Request, res: Response) => {
       .where(eq(results.userId, user.userId));
     console.log(data);
 
-    if (!data) return res.status(404).json({ error: "No results found" });
+    if (data.length == 0)
+      return res.json({
+        data: [],
+      });
     const quizTitles = data.map(async (result) => {
       const [quiz] = await db
         .select()
@@ -73,8 +77,8 @@ export const GetResults = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to fetch results" });
   }
+  res.status(500).json({ error: "Failed to fetch results" });
 };
 
 export const GetResultById = async (req: Request, res: Response) => {
@@ -92,12 +96,7 @@ export const GetResultById = async (req: Request, res: Response) => {
       .from(results)
       .where(and(eq(results.userId, user.id), eq(results.id, id!)));
     console.log(data);
-    // const userId = req.auth?.userId;
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
-    // const [data] = await db
-    //   .select()
-    //   .from(results)
-    //   .where(and(eq(results.userId, userId), eq(results.id, id)));
     console.log(data);
     if (!data || data.length === 0) {
       return res.status(404).json({ error: "Result not found" });

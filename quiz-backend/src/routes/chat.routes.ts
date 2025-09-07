@@ -1,12 +1,36 @@
 import { Router } from "express";
 import { quizAI, ensureSession } from "../services/aiservice";
 import { db } from "../config/db/index";
-import { chatMessages, questions } from "../config/db/schema";
+import {
+  chatMessages,
+  chatSessions,
+  questions,
+  quizzes,
+} from "../config/db/schema";
 import { eq, desc, asc, and } from "drizzle-orm";
 import { asyncHandler } from "../utils/asyncHandler";
 import { ApiError } from "../utils/apiError";
 
 const chatRouter = Router();
+
+chatRouter.get(
+  "/chats",
+  asyncHandler(async (req, res) => {
+    const userId = req.auth?.userId;
+    if (!userId) return res.status(400).json({ error: "Missing userId" });
+    const quizzesWithChats = await db
+      .select({
+        id: chatSessions.id,
+        title: quizzes.title,
+      })
+      .from(chatSessions)
+      .where(eq(chatSessions.userId, userId))
+      .leftJoin(quizzes, eq(chatSessions.quizId, quizzes.id));
+    if (!quizzesWithChats) return res.json({ chats: [] });
+
+    res.json({ chats: quizzesWithChats });
+  })
+);
 
 chatRouter.get(
   "/chat/:id",

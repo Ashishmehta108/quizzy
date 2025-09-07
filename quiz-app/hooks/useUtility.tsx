@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
-// import type { Result } from "@/lib/types";
 interface Result {
   name: string;
   quizzes: number;
@@ -16,8 +15,6 @@ export const useActivityData = () => {
       const res = await api.post<{ success: boolean; data: Result[] }>(
         "/utility/activityData",
         {
-          userId: "d61d5cac-4079-4a80-93e9-a6be7e385c0c",
-
           resultId: null,
         },
         { withCredentials: true }
@@ -60,9 +57,6 @@ export const useUsageData = () => {
     queryFn: async () => {
       const res = await api.post<{ success: boolean; data: UsageData }>(
         "/utility/usage",
-        {
-          userId: "d61d5cac-4079-4a80-93e9-a6be7e385c0c",
-        },
         { withCredentials: true }
       );
       console.log(res.data.data);

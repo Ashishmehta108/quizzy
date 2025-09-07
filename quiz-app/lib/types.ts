@@ -25,6 +25,7 @@ export interface Quiz {
   userId: string;
   createdAt: string;
   submitted: boolean;
+  description:string;
 }
 
 export interface QuizWithQuestions {

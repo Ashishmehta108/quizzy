@@ -7,8 +7,8 @@ import {
 import { checkAuth } from "../utils/checkAuth";
 const resultRouter = Router();
 
-resultRouter.post("/", checkAuth, PostResult);
-resultRouter.get("/", checkAuth, GetResults);
+  resultRouter.post("/", checkAuth, PostResult);
+  resultRouter.get("/", checkAuth, GetResults);
 resultRouter.get("/:id", checkAuth, GetResultById);
 
 export default resultRouter;

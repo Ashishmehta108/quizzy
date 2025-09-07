@@ -11,6 +11,7 @@ import { searchWeb } from "./tools/websearch.tool";
 import { notionRetriever } from "./tools/notion";
 import { DynamicStructuredTool, tool } from "@langchain/core/tools";
 import { RunnableConfig } from "@langchain/core/runnables";
+import z from "zod";
 
 export async function retrieveNode(
   state: typeof QuizState.State,
@@ -30,10 +31,10 @@ export async function retrieveNode(
       .where(eq(documents.id, config.configurable.docId))
       .limit(1);
 
-    // if (!hasDocument?.id) {
-    //   console.warn("[RetrieveNode] Document not found in DB.");
-    //   return { retrievedChunks: [] };
-    // }
+    if (!hasDocument?.id) {
+      console.warn("[RetrieveNode] Document not found in DB.");
+      return { retrievedChunks: [] };
+    }
 
     console.log(
       "[RetrieveNode] Generating embedding for query:",
@@ -186,11 +187,6 @@ export async function quizGeneratorNode(
   }
 }
 
-import z from "zod";
-
-// --------------------
-// Search Web Tool
-// --------------------
 const searchWebSchema = z.object({
   input: z.string(),
 });
@@ -205,9 +201,6 @@ export const searchWebTool = new DynamicStructuredTool({
   },
 });
 
-// --------------------
-// Notion Search Tool
-// --------------------
 const notionSearchSchema = z.object({
   userId: z.string(),
   queries: z.array(z.string()),
@@ -223,9 +216,6 @@ export const notionSearchTool = new DynamicStructuredTool({
   },
 });
 
-// --------------------
-// Echo Tool
-// --------------------
 const echoSchema = z.object({
   text: z.string(),
 });
@@ -240,9 +230,4 @@ export const echoTool = new DynamicStructuredTool({
   },
 });
 
-// --------------------
-// Export tools array
-// --------------------
 export const tools = [searchWebTool, notionSearchTool, echoTool];
-
-console.log("[tools.ts] Exported tools:", tools);

@@ -36,16 +36,39 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "../ui/collapsible";
+import { toast } from "sonner";
+import { Skeleton } from "../ui/skeleton";
+import { BACKEND_URL } from "@/lib/constants";
 
 export default function AppSidebar() {
+  const [chats, setChats] = React.useState([]);
   const { user } = useUser();
   const { signOut } = useAuth();
-
+  const [chatsLoading, setChatsLoading] = React.useState(true);
   const handleLogout = async () => {
     await signOut();
     window.location.href = "/";
   };
-
+  React.useEffect(() => {
+    getQuizChats();
+  }, []);
+  const getQuizChats = async () => {
+    try {
+      const data = await fetch(`${BACKEND_URL}/chats`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      const res = await data.json();
+      setChats(res.chats);
+    } catch (error: any) {
+      toast.error(`Failed to fetch chats ${error.message}`, { duration: 4000 });
+    } finally {
+      setChatsLoading(false);
+    }
+  };
   return (
     <Sidebar className="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
       {/* Header */}
@@ -65,9 +88,7 @@ export default function AppSidebar() {
         </Link>
       </SidebarHeader>
 
-      {/* Content */}
       <SidebarContent className="px-4 flex-1 overflow-y-auto">
-        {/* Main */}
         <SidebarMenu aria-label="Main" className="mb-4 flex flex-col">
           <SidebarMenuItem className="text-xs my-2 font-normal">
             Home
@@ -83,8 +104,6 @@ export default function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-
-        {/* Quizzes */}
         <SidebarMenu aria-label="Quizzes" className="mb-4">
           <SidebarMenuItem className="text-xs my-2 font-medium">
             Quizzes
@@ -154,29 +173,37 @@ export default function AppSidebar() {
 
           <SidebarMenuItem>
             <Collapsible>
-              <CollapsibleTrigger className="w-full flex items-center justify-between text-xs px-2 py-2 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
-                <span className="text-zinc-700 dark:text-zinc-200">Chats</span>
+              <CollapsibleTrigger className="group w-full flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                <span>Chats</span>
                 <ChevronDown className="h-4 w-4 text-zinc-500 dark:text-zinc-400 transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </CollapsibleTrigger>
-              <CollapsibleContent className="ml-2 mt-1 space-y-1">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 px-2 py-2 text-xs"
-                >
-                  Personal Chats
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 px-2 py-2 text-xs"
-                >
-                  Group Chats
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 px-2 py-2 text-xs"
-                >
-                  Archived
-                </Button>
+
+              <CollapsibleContent>
+                {chatsLoading ? (
+                  <div className="ml-2 mt-2 flex flex-col gap-2">
+                    {[...Array(4)].map((_, i) => (
+                      <Skeleton key={i} className="h-7 w-full rounded-md" />
+                    ))}
+                  </div>
+                ) : chats.length > 0 ? (
+                  <div className="ml-2 mt-1 flex flex-col gap-1 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
+                    {chats.map((chat: any) => (
+                      <Link key={chat.id} href={`/dashboard/chat/${chat.id}`}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start rounded-lg px-3 py-2 text-sm font-normal text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                        >
+                          {chat.title}
+                        </Button>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="ml-2 mt-2 text-xs text-zinc-500 dark:text-zinc-400 italic">
+                    No chats yet
+                  </div>
+                )}
               </CollapsibleContent>
             </Collapsible>
           </SidebarMenuItem>

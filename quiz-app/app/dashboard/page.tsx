@@ -55,7 +55,7 @@ import UsageWidget from "@/components/dashboard/UsageWidget";
 import { useActivityData } from "@/hooks/useUtility";
 import ActivityChart from "@/components/dashboard/activityWidget";
 import CreateQuizModal from "@/components/dashboard/createQuizModal";
-
+import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
 const fetchQuizzesAndResults = async () => {
   const [quizzesRes, resultsRes] = await Promise.all([
     api.get<QuizWithQuestions[]>("/quizzes", {
@@ -70,101 +70,6 @@ const fetchQuizzesAndResults = async () => {
     quizzes: quizzesRes.data,
     results: resultsRes.data.data,
   };
-};
-
-const processActivityData = (results: Result[]) => {
-  if (!results || results.length === 0) return [];
-
-  const last30Days = Array.from({ length: 30 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - (29 - i));
-    return date;
-  });
-
-  return last30Days
-    .map((date) => {
-      const dayResults = results.filter((result) => {
-        const resultDate = new Date(result.submittedAt);
-        return resultDate.toDateString() === date.toDateString();
-      });
-
-      const averageScore =
-        dayResults.length > 0
-          ? Math.round(
-              dayResults.reduce((sum, r) => sum + r.score, 0) /
-                dayResults.length
-            )
-          : 0;
-
-      return {
-        date: date.toISOString().split("T")[0],
-        name: date.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-        }),
-        quizzes: dayResults.length,
-        score: averageScore,
-        day: date.toLocaleDateString("en-US", { weekday: "short" }),
-      };
-    })
-    .filter((data) => data.quizzes > 0 || Math.random() < 0.1); // Show some empty days for context
-};
-
-const processScoreDistribution = (results: Result[]) => {
-  if (!results || results.length === 0) return [];
-
-  const ranges = [
-    { range: "0-20%", min: 0, max: 20, count: 0, color: "#ef4444" },
-    { range: "21-40%", min: 21, max: 40, count: 0, color: "#f97316" },
-    { range: "41-60%", min: 41, max: 60, count: 0, color: "#eab308" },
-    { range: "61-80%", min: 61, max: 80, count: 0, color: "#3b82f6" },
-    { range: "81-100%", min: 81, max: 100, count: 0, color: "#22c55e" },
-  ];
-
-  results.forEach((result) => {
-    const range = ranges.find(
-      (r) => result.score >= r.min && result.score <= r.max
-    );
-    if (range) range.count++;
-  });
-
-  return ranges.filter((r) => r.count > 0);
-};
-
-const processQuizPerformance = (results: Result[]) => {
-  if (!results || results.length === 0) return [];
-
-  const quizStats = results.reduce((acc, result) => {
-    if (!acc[result.title]) {
-      acc[result.title] = {
-        title: result.title,
-        attempts: 0,
-        totalScore: 0,
-        bestScore: 0,
-        averageScore: 0,
-      };
-    }
-
-    acc[result.title].attempts++;
-    acc[result.title].totalScore += result.score;
-    acc[result.title].bestScore = Math.max(
-      acc[result.title].bestScore,
-      result.score
-    );
-
-    return acc;
-  }, {} as Record<string, any>);
-
-  return Object.values(quizStats)
-    .map((quiz: any) => ({
-      ...quiz,
-      averageScore: Math.round(quiz.totalScore / quiz.attempts),
-      name:
-        quiz.title.length > 20
-          ? `${quiz.title.substring(0, 20)}...`
-          : quiz.title,
-    }))
-    .slice(0, 10);
 };
 
 interface StatCardProps {
@@ -246,210 +151,6 @@ const StatCard = ({
   );
 };
 
-interface ScoreDistributionChartProps {
-  data: Array<{
-    range: string;
-    count: number;
-    color: string;
-  }>;
-}
-
-const ScoreDistributionChart = ({ data }: ScoreDistributionChartProps) => {
-  const hasData = data && data.length > 0;
-
-  if (!hasData) {
-    return (
-      <Card className="bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-200/60 dark:ring-zinc-800/60 rounded-2xl">
-        <CardHeader className="p-6 pb-4">
-          <CardTitle className="flex items-center gap-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-            <Target size="20" className="text-zinc-600 dark:text-zinc-400" />
-            Score Distribution
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 pt-2">
-          <div className="h-[200px] flex items-center justify-center">
-            <p className="text-zinc-600 dark:text-zinc-400 text-sm">
-              No quiz results available
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-200/60 dark:ring-zinc-800/60 rounded-2xl">
-      <CardHeader className="p-6 pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-          <Target size="20" className="text-zinc-600 dark:text-zinc-400" />
-          Score Distribution
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-6 pt-2">
-        <div className="h-[200px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} layout="horizontal">
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="currentColor"
-                className="opacity-20 text-zinc-400 dark:text-zinc-600"
-              />
-              <XAxis
-                type="number"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 12 }}
-                className="text-zinc-500 dark:text-zinc-400"
-              />
-              <YAxis
-                type="category"
-                dataKey="range"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 12 }}
-                className="text-zinc-500 dark:text-zinc-400"
-                width={60}
-              />
-              <Tooltip
-                content={({ active, payload, label }) => {
-                  if (active && payload && payload.length) {
-                    return (
-                      <Card className="bg-white dark:bg-zinc-800 shadow-lg ring-1 ring-zinc-200/60 dark:ring-zinc-700/60 rounded-xl">
-                        <CardContent className="p-3">
-                          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 mb-1">
-                            Score Range: {label}
-                          </p>
-                          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                            Attempts: {payload[0].value}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    );
-                  }
-                  return null;
-                }}
-              />
-              <Bar dataKey="count" radius={[0, 4, 4, 0]}>
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-interface QuizPerformanceChartProps {
-  data: Array<{
-    name: string;
-    title: string;
-    attempts: number;
-    averageScore: number;
-    bestScore: number;
-  }>;
-}
-
-const QuizPerformanceChart = ({ data }: QuizPerformanceChartProps) => {
-  const hasData = data && data.length > 0;
-
-  if (!hasData) {
-    return (
-      <Card className="bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-200/60 dark:ring-zinc-800/60 rounded-2xl">
-        <CardHeader className="p-6 pb-4">
-          <CardTitle className="flex items-center gap-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-            <Trophy size="20" className="text-zinc-600 dark:text-zinc-400" />
-            Quiz Performance
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 pt-2">
-          <div className="h-[200px] flex items-center justify-center">
-            <p className="text-zinc-600 dark:text-zinc-400 text-sm">
-              No quiz performance data available
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-200/60 dark:ring-zinc-800/60 rounded-2xl">
-      <CardHeader className="p-6 pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-          <Trophy size="20" className="text-zinc-600 dark:text-zinc-400" />
-          Quiz Performance
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-6 pt-2">
-        <div className="h-[200px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="currentColor"
-                className="opacity-20 text-zinc-400 dark:text-zinc-600"
-              />
-              <XAxis
-                dataKey="name"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 11 }}
-                className="text-zinc-500 dark:text-zinc-400"
-                angle={-45}
-                textAnchor="end"
-                height={60}
-              />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 12 }}
-                className="text-zinc-500 dark:text-zinc-400"
-              />
-              <Tooltip
-                content={({ active, payload, label }) => {
-                  if (active && payload && payload.length) {
-                    const data = payload[0].payload;
-                    return (
-                      <Card className="bg-white dark:bg-zinc-800 shadow-lg ring-1 ring-zinc-200/60 dark:ring-zinc-700/60 rounded-xl">
-                        <CardContent className="p-3">
-                          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 mb-1">
-                            {data.title}
-                          </p>
-                          <div className="space-y-1">
-                            <p className="text-sm text-blue-600 dark:text-blue-400">
-                              Average: {data.averageScore}%
-                            </p>
-                            <p className="text-sm text-emerald-600 dark:text-emerald-400">
-                              Best: {data.bestScore}%
-                            </p>
-                            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                              Attempts: {data.attempts}
-                            </p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  }
-                  return null;
-                }}
-              />
-              <Bar
-                dataKey="averageScore"
-                fill="#3b82f6"
-                radius={[4, 4, 0, 0]}
-              />
-              <Bar dataKey="bestScore" fill="#22c55e" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
 export default function DashboardPage() {
   const router = useRouter();
   const { data: activityData } = useActivityData();
@@ -497,7 +198,7 @@ export default function DashboardPage() {
     };
   }, [data]);
 
-  if (isLoading) return <Loader />;
+  if (isLoading) return <DashboardSkeleton />;
   if (isError) return <p>Something went wrong</p>;
   if (!isMounted) return null;
 
@@ -516,12 +217,6 @@ export default function DashboardPage() {
               </p>
             </div>
             <CreateQuizModal />
-            {/* <Link href="/dashboard/quizzes/create">
-              <Button className="bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 shadow-sm ring-1 ring-zinc-900/10 dark:ring-zinc-100/10 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100">
-                <Add size="18" className="mr-2" />
-                Create Quiz
-              </Button>
-            </Link> */}
           </div>
         </div>
 
@@ -584,16 +279,12 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* {stats.totalResults > 0 && ( */}
         <div className="mb-8">
           <ActivityChart data={activityData!} />
         </div>
         <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
-          {/* <ActivityWidget data={activityData || []} /> */}
           <UsageWidget />
         </div>
-        {/* )} */}
-
         <Tabs defaultValue="quizzes" className="space-y-8 mt-5">
           <TabsList className="grid w-full max-w-md grid-cols-2 mx-auto h-12 bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-200/60 dark:ring-zinc-800/60 rounded-2xl p-1">
             <TabsTrigger

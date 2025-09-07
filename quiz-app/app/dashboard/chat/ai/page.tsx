@@ -51,7 +51,7 @@ export default function ChatAIPage() {
                     >
                       <h3 className="font-medium">{quiz.title}</h3>
                       <p className="text-sm text-zinc-500">
-                        {"No description"}
+                        {quiz.description || "No description"}
                       </p>
                     </Link>
                   </li>

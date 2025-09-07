@@ -14,6 +14,7 @@ import {
   renderSkeletons, // ✅ import the new skeleton
 } from "@/components/loader/Skeleton";
 import EmptyState from "@/components/Empty";
+import { Notepad2 } from "iconsax-reactjs";
 
 export default function ResultsPage() {
   const [results, setResults] = useState<Result[]>([]);
@@ -33,15 +34,11 @@ export default function ResultsPage() {
   const fetchResults = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const response = await api.get<{ data: Result[] }>("/results", {
         withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
       });
-
+      console.log(response.data.data);
       setResults(response.data.data);
     } catch (err) {
       console.error("Error fetching results:", err);
@@ -68,7 +65,7 @@ export default function ResultsPage() {
 
       {!loading && !error && results.length === 0 && (
         <EmptyState
-          icon={Trophy}
+          icon={Notepad2}
           title="No results yet"
           description="Take some quizzes to see your results here."
           action={null}
