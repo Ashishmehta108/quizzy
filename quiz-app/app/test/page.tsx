@@ -1,7 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-
 // // import api from "@/lib/api";
 // // import { Quiz } from "@/lib/types";
 // // import { Marquee } from "@/components/magicui/marquee";
@@ -108,20 +106,36 @@ import { Button } from "@/components/ui/button";
 
 // export default QuizPage;
 
+("use client");
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@clerk/nextjs";
+
 export default function Test() {
+  const { getToken } = useAuth();
+
+  const handleCheckSession = async () => {
+    try {
+      const token = await getToken({ template: "default" });
+      console.log("Clerk token:", token);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACK_URL}/health`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include", 
+        }
+      );
+
+      const data = await response.json();
+      console.log("Health response:", data);
+    } catch (err) {
+      console.error("Session check failed:", err);
+    }
+  };
+
   return (
-    <Button
-      onClick={async () => {
-        const session = await fetch(
-          `${process.env.NEXT_PUBLIC_BACK_URL}/health`,
-          {
-            credentials: "include",
-          }
-        );
-        console.log(await session.json());
-      }}
-    >
-      Click me for session check
-    </Button>
+    <Button onClick={handleCheckSession}>Click me for session check</Button>
   );
 }

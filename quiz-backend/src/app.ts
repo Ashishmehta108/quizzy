@@ -6,8 +6,9 @@ import helmet from "helmet";
 import express, { NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import { clerkMiddleware, requireAuth } from "@clerk/express";
-import { clerkClient } from "./config/clerk/clerk";
+import { clerkClient, clerkMiddleware, requireAuth } from "@clerk/express";
+// import { clerkClient } from "./config/clerk/clerk";
+import { ClerkClient } from "@clerk/express";
 import notionRouter from "./routes/notion.route";
 import authRouter from "./routes/auth.routes";
 import quizRouter from "./routes/quiz.routes";
@@ -21,18 +22,19 @@ import {
   rateLimitByIP,
   rateLimitByKey,
 } from "./middlewares/ratelimit.middleware";
+
 const app = express();
+app.use(clerkMiddleware({ clerkClient }));
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-User-Id"],
   })
 );
 app.use(helmet());
 
-app.use(clerkMiddleware());
 app.use(cookieParser("superSecret"));
 app.use(express.json({ limit: "1mb" }));
 app.use(compression());
@@ -50,6 +52,38 @@ app.post(
   }
 );
 
+app.use((req, _res, next) => {
+  console.log("ALL HEADERS", req.headers);
+  next();
+});
+
+app.get("/api/user", async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith("Bearer ")) {
+      return res.status(401).json({ error: "No token provided" });
+    }
+    const token = authHeader.split(" ")[1];
+
+    const session = await clerkClient.sessions.getSession(token);
+
+    if (!session || !session.userId) {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+
+    console.log("Verified session:", session);
+
+    res.status(200).json({
+      status: "OK",
+      userId: session.userId,
+      sessionId: session.id,
+    });
+  } catch (err) {
+    console.error("Token verification failed:", err);
+    res.status(401).json({ error: "Unauthorized" });
+  }
+});
+
 app.use("/api/auth", authRouter);
 app.use("/api/quizzes", quizRouter);
 app.use("/api/results", resultRouter);
@@ -59,10 +93,33 @@ app.use("/api", dummyRouter);
 app.use("/api/utility", utilityRouter);
 app.use("/api", chatRouter);
 
-app.get("/health", requireAuth(), (req: Request, res: Response) => {
-  console.log(req.auth?.userId);
-  res.status(200).json({ status: "OK" });
+app.get("/health", async (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith("Bearer ")) {
+      return res.status(401).json({ error: "No token provided" });
+    }
+    const token = authHeader.split(" ")[1];
+
+    const session = await clerkClient.sessions.getSession(token);
+
+    if (!session || !session.userId) {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+
+    console.log("Verified session:", session);
+
+    res.status(200).json({
+      status: "OK",
+      userId: session.userId,
+      sessionId: session.id,
+    });
+  } catch (err) {
+    console.error("Token verification failed:", err);
+    res.status(401).json({ error: "Unauthorized" });
+  }
 });
+
 app.use(errorHandler);
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {

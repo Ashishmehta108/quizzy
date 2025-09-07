@@ -76,7 +76,6 @@ export const createQuiz = asyncHandler(
       const websearch = req.body.webSearch === "true";
       const socketId = req.body.socketId;
       const description = req.body.description || "No description provided";
-
       const userId = req.auth?.userId;
       if (!userId) throw new ApiError(401, "Unauthorized: userId missing");
 

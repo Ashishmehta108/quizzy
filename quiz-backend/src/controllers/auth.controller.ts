@@ -8,6 +8,7 @@ import { ApiError } from "../utils/apiError";
 
 const syncUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log(req.auth?.userId);
     const userId = req.auth?.userId || req.body.auth?.userId;
     if (!userId) throw new ApiError(401, "Unauthorized: User ID not provided");
 
