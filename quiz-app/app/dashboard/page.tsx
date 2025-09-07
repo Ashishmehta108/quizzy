@@ -206,7 +206,6 @@ export default function DashboardPage() {
               Track your learning progress and quiz performance
             </p>
           </div>
-          <CreateQuizModal />
         </div>
 
         {/* Stats */}
@@ -267,11 +266,10 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* Activity Chart */}
         {activityData && <ActivityChart data={activityData} />}
 
         {/* Usage Widget */}
-        <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+        <div className="grid gap-6 mt-2 grid-cols-1 lg:grid-cols-2">
           <UsageWidget />
         </div>
 

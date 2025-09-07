@@ -27,7 +27,7 @@ export default function AiraIntro() {
         <Image
           src={aira}
           alt="Aira agent"
-          className="rounded-2xl shadow-2xl w-full max-w-[450px] h-[520px] object-cover transition-transform hover:scale-[1.01]"
+          className="rounded-2xl shadow-2xl w-full max-w-[450px] mt-2 h-[480px] object-cover transition-transform hover:scale-[1.01]"
           priority
         />
       </div>
