@@ -229,6 +229,22 @@ export const createQuiz = asyncHandler(
       res
         .status(err.statusCode || 500)
         .json({ error: err.message || "Internal Server Error" });
+    } finally {
+      const deleteUploadedFiles = async (files: Express.Multer.File[]) => {
+        for (const file of files) {
+          try {
+            await fs.unlink(file.path);
+            console.log("Deleted file:", file.path);
+          } catch (err: any) {
+            console.error("Failed to delete file:", file.path, err);
+          }
+        }
+      };
+      deleteUploadedFiles(
+        Array.isArray(req.files)
+          ? req.files
+          : (Object.values(req.files || {}).flat() as Express.Multer.File[])
+      );
     }
   }
 );
