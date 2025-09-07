@@ -32,7 +32,7 @@ app.use(
 );
 app.use(helmet());
 
-app.use(clerkMiddleware({ clerkClient }));
+app.use(clerkMiddleware());
 app.use(cookieParser("superSecret"));
 app.use(express.json({ limit: "1mb" }));
 app.use(compression());

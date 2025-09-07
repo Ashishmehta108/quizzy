@@ -1,7 +1,8 @@
+import { useAuth } from "@clerk/nextjs";
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACK_URL!+"/api",
+  baseURL: process.env.NEXT_PUBLIC_BACK_URL! + "/api",
   withCredentials: true,
 });
 export const getToken = async () => {
@@ -25,9 +26,11 @@ export const setToken = async (token: string) => {
 
 api.interceptors.request.use(async (config) => {
   const token = await getToken();
+  const { userId } = useAuth();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  config.headers["X-User-Id"] = userId;
   return config;
 });
 
