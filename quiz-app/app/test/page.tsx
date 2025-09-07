@@ -112,9 +112,12 @@ export default function Test() {
   return (
     <Button
       onClick={async () => {
-        const session = await fetch("http://localhost:5000/health", {
-          credentials: "include",
-        });
+        const session = await fetch(
+          `${process.env.NEXT_PUBLIC_BACK_URL}/health`,
+          {
+            credentials: "include",
+          }
+        );
         console.log(await session.json());
       }}
     >
