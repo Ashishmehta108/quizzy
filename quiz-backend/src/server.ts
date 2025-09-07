@@ -15,7 +15,10 @@ const io = new Server(server, {
     credentials: true,
   },
 });
-
+app.get("/", (req, res) => {
+  console.log(req.auth?.userId);
+  res.send("Quizzy Backend is running");
+});
 const userSocketMap = new Map<string, string>();
 
 io.on("connection", (socket) => {
