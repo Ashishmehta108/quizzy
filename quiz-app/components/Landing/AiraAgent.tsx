@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function AiraIntro() {
   return (
-    <div className="max-w-5xl mx-auto flex flex-col-reverse lg:flex-row items-center justify-between gap-8 lg:gap-16 h-[600px] px-4 rounded-2xl overflow-hidden">
+    <div className="max-w-5xl mx-auto flex flex-col-reverse lg:flex-row items-center justify-between gap-8  lg:gap-16 h-[700px] py-5 px-4 rounded-2xl overflow-hidden">
       {/* Text Content */}
       <div className="flex-1 text-center lg:text-left  text-zinc-900 dark:text-zinc-100">
         <h2 className="text-4xl sm:text-5xl font-extrabold mb-4 drop-shadow-lg">
