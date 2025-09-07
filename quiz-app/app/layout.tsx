@@ -2,7 +2,7 @@ import type React from "react";
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import logo from "../public/quizzy_metadata_logo.png";
+import logo from "../public/quizzy_logo.png";
 import TanstackQuery from "../components/Tanstackquery";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Arimo } from "next/font/google";
