@@ -7,7 +7,7 @@ import { InteractiveHoverButton } from "../magicui/interactive-hover-button";
 
 export default function AiraIntro() {
   return (
-    <section className="max-w-5xl mx-auto flex flex-col-reverse lg:flex-row items-center justify-between gap-8 lg:gap-16 h-[800px] py-5 px-4 rounded-2xl overflow-hidden">
+    <section className="max-w-5xl mx-auto flex flex-col-reverse lg:flex-row items-center justify-between gap-8 lg:gap-16 h-[900px] py-5 px-4 rounded-2xl overflow-hidden">
 
       <div className="flex-1 text-center lg:text-left text-zinc-900 dark:text-zinc-100">
         <h2 className="text-4xl sm:text-5xl font-extrabold mb-4 drop-shadow-lg">

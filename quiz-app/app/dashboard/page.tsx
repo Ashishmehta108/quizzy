@@ -25,8 +25,6 @@ import type { QuizWithQuestions, Result } from "@/lib/types";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import "../globals.css";
-import Loader from "@/components/loader/loader";
-import { mockActivityData } from "@/components/mockdata";
 import EmptyState from "@/components/Empty";
 import UsageWidget from "@/components/dashboard/UsageWidget";
 import { useActivityData } from "@/hooks/useUtility";
@@ -53,57 +51,46 @@ const StatCard = ({
   color = "default",
   progress,
 }: StatCardProps) => {
-  const iconColorClasses = {
-    default: "text-zinc-600 dark:text-zinc-400",
-    success: "text-emerald-600 dark:text-emerald-500",
-    warning: "text-amber-600 dark:text-amber-500",
-    info: "text-blue-600 dark:text-blue-500",
-  };
-
-  const iconBgClasses = {
-    default: "bg-zinc-100 dark:bg-zinc-800",
-    success: "bg-emerald-50 dark:bg-emerald-950/50",
-    warning: "bg-amber-50 dark:bg-amber-950/50",
-    info: "bg-blue-50 dark:bg-blue-950/50",
-  };
-
   return (
     <Card className="bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-200/60 dark:ring-zinc-800/60 rounded-2xl shadow-inner">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div className="space-y-3 flex-1">
-            <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex-1 space-y-1 sm:space-y-3">
+            <p className="text-xs sm:text-sm font-medium text-zinc-600 dark:text-zinc-400">
               {title}
             </p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <p className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-zinc-100">
                 {value}
               </p>
               {trend && (
                 <Badge
                   variant="secondary"
-                  className="text-[10px] sm:text-xs sm:px-2 px-[4.5px] py-1"
+                  className="text-[10px] sm:text-xs sm:px-2 px-2 py-1"
                 >
                   {trend}
                 </Badge>
               )}
             </div>
             {subtitle && (
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
                 {subtitle}
               </p>
             )}
             {progress !== undefined && (
-              <div className="space-y-2 pt-1">
+              <div className="space-y-1 sm:space-y-2 pt-1">
                 <Progress value={progress} className="h-2" />
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                <p className="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400">
                   {progress}% completion rate
                 </p>
               </div>
             )}
           </div>
-          <div className="w-12 h-12 rounded-lg bg-zinc-50 dark:bg-zinc-800 shadow-inner ring-1 ring-zinc-200/40 dark:ring-zinc-700/40 flex items-center justify-center mb-6">
-            <Icon size="18" className="text-zinc-600 dark:text-zinc-400" />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-zinc-50 dark:bg-zinc-800 shadow-inner ring-1 ring-zinc-200/40 dark:ring-zinc-700/40 flex items-center justify-center">
+            <Icon
+              size="16"
+              className="sm:text-zinc-600 text-zinc-500 dark:text-zinc-400"
+            />
           </div>
         </div>
       </CardContent>
@@ -124,7 +111,7 @@ const fetchQuizzesAndResults = async () => {
     };
   } catch (err) {
     console.error("Error fetching quizzes or results:", err);
-    return { quizzes: [], results: [] }; // fallback empty arrays
+    return { quizzes: [], results: [] };
   }
 };
 
@@ -138,7 +125,7 @@ export default function DashboardPage() {
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["quizzes-and-results"],
     queryFn: fetchQuizzesAndResults,
-    retry: false, // optional: avoid automatic retries
+    retry: false,
   });
 
   const stats = useMemo(() => {
@@ -223,7 +210,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid gap-6 grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4 mb-8">
           <StatCard
             title="Total Quizzes"
             value={stats.totalQuizzes}
