@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import crypto from "crypto";
 import fetch from "node-fetch";
 import { TokenResponse } from "../types/notion";
-import { NotionIntegration } from "@/config/db/schema";
-import { db } from "@/config/db";
+import { NotionIntegration } from "../config/db/schema";
+import { db } from "../config/db/index";
 import { eq } from "drizzle-orm";
-import { encryptToken, decryptToken } from "@/utils/encryptionHelper";
+import { encryptToken, decryptToken } from "../utils/encryptionHelper";
 import { OauthTokenResponse } from "@notionhq/client";
 const { NOTION_CLIENT_ID, NOTION_CLIENT_SECRET, NOTION_REDIRECT_URI } =
   process.env;

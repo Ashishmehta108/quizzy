@@ -2,7 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { db } from "../config/db";
 import { chatMessages, chatSessions } from "../config/db/schema";
 import { eq, and, desc } from "drizzle-orm";
-
+import { questions } from "../config/db/schema";
 const client = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI || "" });
 
 export type Message = {
@@ -29,7 +29,6 @@ export async function ensureSession(quizId: string, userId: string) {
 
   return inserted[0].id;
 }
-import { questions } from "@/config/db/schema";
 
 export async function quizAI(
   type: "chat" | "hint" | "explain" | "summary",

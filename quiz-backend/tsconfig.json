@@ -14,17 +14,14 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/types"
-    ],
+    "typeRoots": ["./node_modules/@types", "./src/types"],
     "types": ["node"]
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.d.ts"
-, "src/controllers/result.controller.ts"  ],
-  "exclude": [
-    "node_modules"
-  ]
+    "src/**/*.d.ts",
+    "src/controllers/result.controller.ts"
+  ],
+  "exclude": ["node_modules"],
+  "plugins": [{ "transform": "@zerollup/ts-transform-paths" }]
 }

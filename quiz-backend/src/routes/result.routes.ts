@@ -3,7 +3,7 @@ import {
   PostResult,
   GetResultById,
   GetResults,
-} from "@/controllers/result.controller";
+} from "../controllers/result.controller";
 import { checkAuth } from "../utils/checkAuth";
 const resultRouter = Router();
 

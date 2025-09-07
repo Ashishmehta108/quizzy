@@ -12,6 +12,9 @@ import { NavbarDemo } from "@/components/Landing/LandingNavbar";
 import Info from "@/components/Landing/Info";
 import { IphonePopup } from "@/components/Landing/Notification";
 import { PricingPage } from "@/components/pricing/pricing";
+import FramerDiscWithCubes from "@/components/Landing/Parallaxeffect";
+import { GradientCTA } from "@/components/Landing/NewCta";
+import AiraIntro from "@/components/Landing/AiraAgent";
 
 interface AnimatedElementProps {
   children: React.ReactNode;
@@ -83,13 +86,10 @@ const QuizAppLanding = () => {
     <div className="min-h-screen pb-8 relative  dark:bg-zinc-950 transition-colors duration-300">
       <NavbarDemo />
       <Hero />
-      {/* <Features /> */}
-      <IphonePopup />
-      <Info />
+      <AiraIntro />
       <div id="pricing">
         <PricingPage />
       </div>
-
       <TestimonialsSection />
       <CTA />
       <Footer />

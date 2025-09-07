@@ -69,11 +69,19 @@ utilityRouter.route("/activityData").post(
         return res.json({ success: false, data: [] });
       }
 
-      const resultData: Result[] = dbResults.map((r) => ({
-        ...r,
-        quizId: r.quizId ?? "",
-        userId: r.userId ?? "",
-      }));
+      const resultData: Result[] = dbResults.map((r) => {
+        const totalQuestions = r.optionsReview
+          ? JSON.parse(r.optionsReview).length
+          : 1;
+        const percentageScore = Math.round((r.score / totalQuestions) * 100);
+
+        return {
+          ...r,
+          score: percentageScore,
+          quizId: r.quizId ?? "",
+          userId: r.userId ?? "",
+        };
+      });
 
       const data = processActivityData(resultData);
       console.log("[ActivityData] Processed data:");

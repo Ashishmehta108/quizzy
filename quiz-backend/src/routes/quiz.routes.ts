@@ -13,7 +13,7 @@ const quizRouter = Router();
 quizRouter.post("/check", checkAuth, quizChecks, (req, res) => {
   res.json({ ok: true });
 });
-quizRouter.post("/", checkAuth, upload.array("files", 5), createQuiz);
+quizRouter.post("/", upload.array("files", 5), createQuiz);
 
 quizRouter.get("/", checkAuth, getQuizzes);
 

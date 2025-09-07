@@ -12,27 +12,28 @@ import { notionRetriever } from "./tools/notion";
 import { DynamicStructuredTool, tool } from "@langchain/core/tools";
 import { RunnableConfig } from "@langchain/core/runnables";
 import z from "zod";
+import { inArray } from "drizzle-orm";
 
 export async function retrieveNode(
   state: typeof QuizState.State,
   config?: RunnableConfig
 ) {
   try {
-    console.log("[RetrieveNode] State received:", state, config);
+    console.log("[RetrieveNode] State received:");
 
-    if (!config?.configurable?.docId) {
+    const docIds = config?.configurable?.docId || [];
+    if (docIds.length === 0) {
       console.warn("[RetrieveNode] No docId provided.");
       return { retrievedChunks: [] };
     }
 
-    const [hasDocument] = await db
+    const documentsInDb = await db
       .select()
       .from(documents)
-      .where(eq(documents.id, config.configurable.docId))
-      .limit(1);
+      .where(inArray(documents.id, docIds));
 
-    if (!hasDocument?.id) {
-      console.warn("[RetrieveNode] Document not found in DB.");
+    if (!documentsInDb.length) {
+      console.warn("[RetrieveNode] No documents found in DB.");
       return { retrievedChunks: [] };
     }
 
@@ -42,12 +43,13 @@ export async function retrieveNode(
     );
     const queryEmbedding = await generateEmbedding(state.input.query);
     console.log("embedding generated", queryEmbedding);
+
     console.log("[RetrieveNode] Querying Pinecone...");
     const namespace = index.namespace("quiz-data");
     const results = await namespace.query({
       vector: queryEmbedding as number[],
       topK: 5,
-      filter: { docId: { $eq: config.configurable.docId } },
+      filter: { docId: { $in: docIds } }, // use $in for multiple IDs
       includeMetadata: true,
     });
 

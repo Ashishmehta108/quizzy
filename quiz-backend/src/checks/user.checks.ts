@@ -1,8 +1,8 @@
-import { db } from "@/config/db";
-import { users } from "@/config/db/schema";
-import { asyncHandler } from "@/utils/asyncHandler";
+import { db } from "../config/db";
+import { users } from "../config/db/schema";
+import { asyncHandler } from "../utils/asyncHandler";
 import { eq } from "drizzle-orm";
-import { ApiError } from "@/utils/apiError";
+import { ApiError } from "../utils/apiError";
 
 export const userChecks = asyncHandler(async (req, res, next) => {
   const userId = req.auth?.userId;

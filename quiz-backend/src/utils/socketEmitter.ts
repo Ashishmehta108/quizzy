@@ -1,5 +1,4 @@
-import { io } from "@/server";
-
+import { io } from "../server";
 export const emitSocketEvent = (
   event: string,
   message: string,

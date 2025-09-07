@@ -27,7 +27,7 @@ interface LoginForm {
 
 export default function LoginPage() {
   const { isLoaded, signIn, setActive } = useSignIn();
-  const { getToken } = useAuth();
+  const { getToken, userId } = useAuth();
   const router = useRouter();
   const [error, setError] = useState<string>("");
 
@@ -87,6 +87,10 @@ export default function LoginPage() {
       setError("OAuth login failed");
     }
   };
+
+  if (userId) {
+    router.push("/dashboard");
+  }
 
   return (
     <div className="flex pt-20 justify-center bg-white dark:bg-zinc-900 px-4">

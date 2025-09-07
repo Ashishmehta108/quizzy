@@ -4,7 +4,7 @@ import app from "./app";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { quizAI, ensureSession } from "./services/aiservice";
-
+import "./loadPath";
 const PORT = process.env.PORT || 5000;
 const server = createServer(app);
 

@@ -73,6 +73,8 @@ const ActivityChart = ({ data }: ActivityChartProps) => {
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 12 }}
+                domain={[0, 100]} 
+                tickFormatter={(value) => `${value}%`} 
                 className="text-zinc-500 dark:text-zinc-400"
                 interval="preserveStartEnd"
               />

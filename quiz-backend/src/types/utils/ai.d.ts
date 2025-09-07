@@ -1,4 +1,4 @@
-import { QuizState } from "@/ai/agent/Graph";
+import { QuizState } from "../ai/agent/Graph";
 import { Tool } from "@langchain/core/tools";
 
 export interface GenerateQuizQuestionsParams {

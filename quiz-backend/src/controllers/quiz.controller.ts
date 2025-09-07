@@ -5,6 +5,7 @@ import {
   users,
   usage,
   billings,
+  documents,
 } from "../config/db/schema";
 import { and, eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
@@ -16,11 +17,11 @@ import { Response, Request } from "express";
 import type { InferSelectModel } from "drizzle-orm";
 import { Readable } from "stream";
 import { QuizRequest, QuizResponse } from "../types/routes/quiz";
-import extractTextFromImage from "@/utils/ocr";
-import { io } from "@/server";
+import extractTextFromImage from "../utils/ocr";
+import { io } from "../server";
 import { asyncHandler } from "../utils/asyncHandler";
 import { ApiError } from "../utils/apiError";
-import { airaAgent } from "@/ai/agent/airaAgent";
+import { airaAgent } from "../ai/agent/airaAgent";
 
 export interface QuizFile {
   fieldname: string;
@@ -40,7 +41,7 @@ export interface FileRequest extends Request {
   body: {
     title?: string;
     query?: string;
-    websearch?: string;
+    webSearch?: string;
     socketId?: string;
     description?: string;
   };
@@ -69,146 +70,166 @@ const emitUpdate = (
 
 export const createQuiz = asyncHandler(
   async (req: FileRequest, res: Response) => {
-    console.log("[CreateQuiz] Request received");
-    console.log(req.body);
-    const socketId = req.body.socketId;
-    const description = req.body.description || "No description provided";
+    try {
+      console.log("[CreateQuiz] Request received:", req.body);
 
-    const userId = req.auth?.userId;
-    if (!userId) {
-      throw new ApiError(401, "Unauthorized: userId missing");
-    }
+      const websearch = req.body.webSearch === "true";
+      const socketId = req.body.socketId;
+      const description = req.body.description || "No description provided";
 
-    emitUpdate(socketId, "status", "Authenticating user…");
+      const userId = req.auth?.userId;
+      if (!userId) throw new ApiError(401, "Unauthorized: userId missing");
 
-    const [getUserId] = await db
-      .select()
-      .from(users)
-      .where(eq(users.clerkId, userId));
-    if (!getUserId?.id) {
-      throw new ApiError(401, "User not found");
-    }
+      emitUpdate(socketId, "status", "Creating quiz request recieved ");
 
-    emitUpdate(socketId, "status", "Checking for existing quiz…");
+      const [getUser] = await db
+        .select()
+        .from(users)
+        .where(eq(users.clerkId, userId));
 
-    const { title, query } = req.body;
-    if (!title) {
-      throw new ApiError(400, "Title is required");
-    }
+      if (!getUser?.id) throw new ApiError(401, "User not found");
 
-    const existingQuiz = await db
-      .select()
-      .from(quizzes)
-      .where(and(eq(quizzes.title, title), eq(quizzes.userId, getUserId.id)));
+      const { title, query } = req.body;
+      if (!title) throw new ApiError(400, "Title is required");
 
-    if (existingQuiz.length > 0) {
-      throw new ApiError(400, "Quiz with this title already exists");
-    }
+      const existingQuiz = await db
+        .select()
+        .from(quizzes)
+        .where(and(eq(quizzes.title, title), eq(quizzes.userId, getUser.id)));
 
-    let docId = null;
-    let fullDoc = "";
+      if (existingQuiz.length > 0) {
+        emitUpdate(socketId, "status", "Quiz with this title already exists");
+        throw new ApiError(400, "Quiz with this title already exists");
+      }
 
-    if (req.files?.length !== 0) {
-      emitUpdate(socketId, "status", "Processing uploaded files…");
+      let docIds: string[] = [];
+      let fullDoc = "";
 
-      let allFiles: Express.Multer.File[] = [];
-      docId = randomUUID();
+      if (req.files && Object.keys(req.files).length > 0) {
+        emitUpdate(socketId, "status", "Processing uploaded files…");
 
-      if (Array.isArray(req.files)) {
-        allFiles = req.files;
-      } else if (typeof req.files === "object") {
-        for (const key of Object.keys(req.files)) {
-          const val = req.files[key];
-          if (Array.isArray(val)) {
-            allFiles = allFiles.concat(val);
+        const allFiles: Express.Multer.File[] = Array.isArray(req.files)
+          ? req.files
+          : (Object.values(req.files).flat() as Express.Multer.File[]);
+
+        for (const file of allFiles) {
+          const filePath = file.path;
+          const fileType = file.mimetype;
+          const documentId = randomUUID();
+          docIds.push(documentId);
+
+          if (fileType === "application/pdf") {
+            fullDoc += await processPdf(filePath, getUser.id, documentId, file);
+          } else if (fileType === "text/plain") {
+            const buffer = await fs.readFile(filePath);
+            const chunks = chunkText(buffer.toString(), 1000, 100);
+            await upsertChunks(getUser.id, documentId, chunks);
+            await db.insert(documents).values({
+              id: documentId,
+              title,
+              userId: getUser.id,
+              content: chunks.map((c) => c.text).join(" "),
+              uploadUrl: "",
+              createdAt: new Date(),
+            });
+            fullDoc += chunks.map((c) => c.text).join(" ");
+          } else if (
+            ["image/png", "image/jpg", "image/jpeg"].includes(fileType)
+          ) {
+            const data = await extractTextFromImage(filePath);
+            const chunks = chunkText(data, 1000, 100);
+            await upsertChunks(getUser.id, documentId, chunks);
+            await db.insert(documents).values({
+              id: documentId,
+              title,
+              userId: getUser.id,
+              content: chunks.map((c) => c.text).join(" "),
+              uploadUrl: "",
+              createdAt: new Date(),
+            });
+            fullDoc += chunks.map((c) => c.text).join(" ");
+          } else {
+            throw new ApiError(400, `Unsupported file type: ${fileType}`);
           }
         }
       }
 
-      for (const file of allFiles) {
-        const filePath = file.path;
-        const fileType = file.mimetype;
+      emitUpdate(socketId, "status", "Generating quiz with AiraAgent…");
 
-        if (fileType === "application/pdf") {
-          fullDoc += await processPdf(filePath, getUserId.id, docId, file);
-        } else if (fileType === "text/plain") {
-          const buffer = await fs.readFile(filePath);
-          const chunktext = chunkText(buffer.toString(), 1000, 100);
-          await upsertChunks(getUserId.id, docId, chunktext);
-          fullDoc += chunktext.map((c) => c.text).join(" ");
-        } else if (
-          ["image/png", "image/jpg", "image/jpeg"].includes(fileType)
-        ) {
-          const data = await extractTextFromImage(filePath);
-          const chunktext = chunkText(data, 1000, 100);
-          await upsertChunks(getUserId.id, docId, chunktext);
-          fullDoc += chunktext.map((c) => c.text).join(" ");
-        } else {
-          throw new ApiError(400, `Unsupported file type: ${fileType}`);
+      if (!query) throw new ApiError(400, "Query not found");
+
+      const aira = await airaAgent.invoke(
+        { input: { title, query }, usage: { webSearchesDone: 0 } },
+        {
+          configurable: {
+            userId: getUser.id,
+            docIds,
+            websearchOn: websearch,
+          },
         }
-      }
+      );
+
+      const { quiz: quizQuestions } = aira;
+      if (!Array.isArray(quizQuestions) || quizQuestions.length === 0)
+        throw new ApiError(500, "Failed to generate quiz questions");
+
+      emitUpdate(socketId, "status", "Saving quiz to database…");
+
+      const [billing] = await db
+        .select()
+        .from(billings)
+        .where(eq(billings.userId, getUser.id))
+        .limit(1);
+
+      const [currentUsage] = await db
+        .select()
+        .from(usage)
+        .where(eq(usage.billingId, billing.id));
+
+      await db
+        .update(usage)
+        .set({
+          quizzesGeneratedUsed: (currentUsage?.quizzesGeneratedUsed ?? 0) + 1,
+          websearchesUsed:
+            (currentUsage?.websearchesUsed ?? 0) +
+            (aira.usage?.webSearchesDone ?? 0),
+          updatedAt: new Date(),
+        })
+        .where(eq(usage.billingId, billing.id));
+
+      const quizId = randomUUID();
+      await db.insert(quizzes).values({
+        id: quizId,
+        title,
+        userId: getUser.id,
+        createdAt: new Date(),
+        submitted: false,
+        description,
+      });
+
+      const questionsData = quizQuestions.map((q) => ({
+        id: randomUUID(),
+        quizId,
+        question: q.question,
+        options: JSON.stringify(q.options),
+        answer: q.answer,
+        explanation: q.explanation ?? "",
+        createdAt: new Date(),
+        submittedAt: new Date(),
+      }));
+
+      await db.insert(questions).values(questionsData);
+
+      emitUpdate(socketId, "status", "Quiz created successfully ✅");
+
+      res.status(201).json({ quizId, questions: quizQuestions });
+    } catch (err: any) {
+      console.error("[CreateQuiz] Error:", err);
+
+      res
+        .status(err.statusCode || 500)
+        .json({ error: err.message || "Internal Server Error" });
     }
-
-    emitUpdate(socketId, "status", "Generating quiz with AiraAgent…");
-    if (!query) throw new ApiError(500, "query not found ");
-    const aira = await airaAgent.invoke(
-      { input: { title, query }, usage: { webSearchesDone: 0 } },
-      { configurable: { userId: getUserId.id, docId: docId || null } }
-    );
-
-    const { quiz: quizQuestions } = aira;
-    if (!Array.isArray(quizQuestions) || quizQuestions.length === 0) {
-      throw new ApiError(500, "Failed to generate quiz questions");
-    }
-
-    emitUpdate(socketId, "status", "Saving quiz to database…");
-    const billing = await db
-      .select()
-      .from(billings)
-      .where(eq(billings.userId, getUserId.id))
-      .limit(1);
-
-    const [currentUsage] = await db
-      .select()
-      .from(usage)
-      .where(eq(usage.billingId, billing[0].id));
-
-    await db
-      .update(usage)
-      .set({
-        quizzesGeneratedUsed: (currentUsage?.quizzesGeneratedUsed ?? 0) + 1,
-        websearchesUsed:
-          (currentUsage?.websearchesUsed ?? 0) +
-          (aira.usage?.webSearchesDone ?? 0),
-        updatedAt: new Date(),
-      })
-      .where(eq(usage.billingId, billing[0].id));
-    const quizId = randomUUID();
-    await db.insert(quizzes).values({
-      id: quizId,
-      title,
-      userId: getUserId.id,
-      createdAt: new Date(),
-      submitted: false,
-      description: description,
-    });
-
-    const questionsData = quizQuestions.map((q) => ({
-      id: randomUUID(),
-      quizId,
-      question: q.question,
-      options: JSON.stringify(q.options),
-      answer: q.answer,
-      explanation: q.explanation ?? "",
-      createdAt: new Date(),
-      submittedAt: new Date(),
-    }));
-
-    await db.insert(questions).values(questionsData);
-
-    emitUpdate(socketId, "status", "Quiz created successfully ✅");
-
-    res.status(201).json({ quizId, questions: quizQuestions });
   }
 );
 
@@ -225,14 +246,12 @@ export const getQuizzes = async (req: QuizRequest, res: QuizResponse) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Get all quizzes for user
     const userQuizzes = await db
       .select()
       .from(quizzes)
       .where(eq(quizzes.userId, user.id))
       .execute();
 
-    // Attach questions properly
     const quizzesWithQuestions = await Promise.all(
       userQuizzes.map(async (quiz) => {
         const questionsList = await db

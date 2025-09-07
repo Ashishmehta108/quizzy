@@ -1,10 +1,9 @@
-import { db } from "@/config/db";
-import { quizzes, users, billings, plans, usage } from "@/config/db/schema";
-import { ApiError } from "@/utils/apiError";
-import { asyncHandler } from "@/utils/asyncHandler";
+import { db } from "../config/db";
+import { quizzes, users, billings, plans, usage } from "../config/db/schema";
+import { ApiError } from "../utils/apiError";
+import { asyncHandler } from "../utils/asyncHandler";
 import { and, eq } from "drizzle-orm";
 
-// Middleware to check if user can create a quiz
 export const quizChecks = asyncHandler(async (req, res, next) => {
   const { title, query } = req.body;
   const userId = req.auth?.userId;
@@ -13,7 +12,6 @@ export const quizChecks = asyncHandler(async (req, res, next) => {
   if (!title) throw new ApiError(400, "Quiz title is required");
   if (!query) throw new ApiError(400, "Quiz query/description is required");
 
-  // Check if quiz with same title already exists
   const [existingQuiz] = await db
     .select({ title: quizzes.title })
     .from(quizzes)
@@ -23,7 +21,6 @@ export const quizChecks = asyncHandler(async (req, res, next) => {
     throw new ApiError(409, "Quiz with this title already exists");
   }
 
-  // Optionally: check active subscription & usage
   const [activeBilling] = await db
     .select()
     .from(billings)
@@ -51,6 +48,5 @@ export const quizChecks = asyncHandler(async (req, res, next) => {
     throw new ApiError(403, "Monthly quiz generation limit reached");
   }
 
-  // Everything is OK — move to next middleware
   next();
 });

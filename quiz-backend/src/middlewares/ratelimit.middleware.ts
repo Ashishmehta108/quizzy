@@ -1,6 +1,4 @@
-// middleware/rateLimit.ts
 import { Request, Response, NextFunction } from "express";
-// import { redisclient } from "@/utils/redis";
 import { redisclient } from "../utils/redis";
 
 interface LimiterOptions {
@@ -17,12 +15,6 @@ interface ConsumeResult {
   currentCount?: number;
 }
 
-/**
- * Create a sliding-window counter:
- * - windowSec: time window in seconds (e.g., 60)
- * - max: max requests allowed in window
- * - burst: optional burst cushion (extra tokens)
- */
 function makeLimiter({ prefix, windowSec, max, burst = 0 }: LimiterOptions) {
   return async function consume(id: string): Promise<ConsumeResult> {
     const now = Math.floor(Date.now() / 1000);

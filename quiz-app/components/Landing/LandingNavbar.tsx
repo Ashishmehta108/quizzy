@@ -14,8 +14,10 @@ import {
 import { useState } from "react";
 import { ModeToggle } from "../Modetoggle";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 
 export function NavbarDemo() {
+  const { user } = useUser();
   const navItems = [
     {
       name: "Features",
@@ -36,7 +38,6 @@ export function NavbarDemo() {
   return (
     <div className="relative sticky top-0 z-50">
       <Navbar>
-        {/* Desktop Navigation */}
         <NavBody>
           <NavbarLogo logo={logo.src} />
           <NavItems items={navItems} />
@@ -48,9 +49,11 @@ export function NavbarDemo() {
               {" "}
               <ModeToggle />
             </NavbarButton>
-            <Link href={"/login"}>
-              <NavbarButton variant="primary"> Login</NavbarButton>
-            </Link>
+            {!user?.emailAddresses[0].emailAddress && (
+              <Link href={"/login"}>
+                <NavbarButton variant="primary"> Login</NavbarButton>
+              </Link>
+            )}
           </div>
         </NavBody>
         <MobileNav>
@@ -79,15 +82,17 @@ export function NavbarDemo() {
             ))}
             <div className="flex w-full   flex-col gap-4">
               <ModeToggle />
-              <Link href={"/login"}>
-                <NavbarButton
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  variant="primary"
-                  className="max-w-[100px]"
-                >
-                  Login
-                </NavbarButton>
-              </Link>
+              {!user?.emailAddresses[0].emailAddress && (
+                <Link href={"/login"}>
+                  <NavbarButton
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    variant="primary"
+                    className="max-w-[100px]"
+                  >
+                    Login
+                  </NavbarButton>
+                </Link>
+              )}
             </div>
           </MobileNavMenu>
         </MobileNav>

@@ -65,7 +65,7 @@ const fetchQuizzesAndResults = async () => {
       withCredentials: true,
     }),
   ]);
-  console.log(quizzesRes.data);
+  console.log(resultsRes.data.data);
   return {
     quizzes: quizzesRes.data,
     results: resultsRes.data.data,
@@ -140,10 +140,8 @@ const StatCard = ({
               </div>
             )}
           </div>
-          <div
-            className={`p-3 rounded-xl ${iconBgClasses[color]} shadow-inner ring-1 ring-white/20 dark:ring-zinc-800/40`}
-          >
-            <Icon size="18" className={iconColorClasses[color]} />
+          <div className="w-12 h-12 rounded-lg bg-zinc-50 dark:bg-zinc-800 shadow-inner ring-1 ring-zinc-200/40 dark:ring-zinc-700/40 flex items-center justify-center mb-6">
+            <Icon size="18" className="text-zinc-600 dark:text-zinc-400" />
           </div>
         </div>
       </CardContent>
@@ -169,12 +167,21 @@ export default function DashboardPage() {
   const stats = useMemo(() => {
     const totalQuizzes = data?.quizzes.length || 0;
     const totalResults = data?.results.length || 0;
-    const averageScore = data?.results.length
+
+    // Calculate percentage score for each result
+    const percentageScores =
+      data?.results.map((result) => {
+        const totalQuestions = JSON.parse(result.optionsReview).length || 1; // avoid division by 0
+        return Math.round((result.score / totalQuestions) * 100);
+      }) || [];
+
+    const averageScore = percentageScores.length
       ? Math.round(
-          data.results.reduce((acc, result) => acc + result.score, 0) /
-            data.results.length
+          percentageScores.reduce((acc, score) => acc + score, 0) /
+            percentageScores.length
         )
       : 0;
+
     const recentQuizzes =
       data?.quizzes.filter(
         (quiz) =>
@@ -184,8 +191,9 @@ export default function DashboardPage() {
 
     const completionRate =
       totalQuizzes > 0 ? Math.round((totalResults / totalQuizzes) * 100) : 0;
-    const bestScore = data?.results.length
-      ? Math.max(...data.results.map((r) => r.score))
+
+    const bestScore = percentageScores.length
+      ? Math.max(...percentageScores)
       : 0;
 
     return {
@@ -205,7 +213,6 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
       <main className="max-w-7xl container mx-auto px-4 sm:px-6 lg:px-8 pb-12 pt-8">
-        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
@@ -220,7 +227,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Stats Grid */}
         <div className="grid gap-6 grid-cols-2 lg:grid-cols-4 mb-8">
           <StatCard
             title="Total Quizzes"

@@ -13,21 +13,27 @@ import { tools } from "./tools/tool";
 import { tool } from "@langchain/core/tools";
 import { searchWeb } from "./tools/websearch.tool";
 import { notionRetriever } from "./tools/notion";
-import { callModel } from "@/utils/callModel";
+import { callModel } from "../../utils/callModel";
+import { RunnableConfig } from "@langchain/core/runnables";
 type State = typeof QuizState.State;
 
-function routeModelOutput(state: typeof QuizState.State): string {
+function routeModelOutput(
+  state: typeof QuizState.State,
+  config: RunnableConfig
+): string {
   const messages = state.messages;
   const lastMessage = messages[messages.length - 1];
 
   if ((lastMessage as AIMessage)?.tool_calls?.length || 0 > 0) {
     console.log("tool call found");
     state.usage.webSearchesDone = state.usage.webSearchesDone + 1;
-    console.log("hi");
-    return "tools";
+    if (config.configurable?.websearchOn) {
+      return "tools";
+    }
   } else {
     return "generateQuiz";
   }
+  return "generateQuiz";
 }
 
 export const searchWebTool = tool(

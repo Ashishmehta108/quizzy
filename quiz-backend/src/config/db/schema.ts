@@ -213,7 +213,7 @@ export const chatMessages = pgTable(
       .references(() => chatSessions.id, { onDelete: "cascade" }),
     quizId: text("quiz_id").notNull(),
     role: messageRoleEnum("role").notNull(),
-    status: messageStatusEnum("status").notNull(), // "sent" (user) | "received" (assistant) | "error"
+    status: messageStatusEnum("status").notNull(),
     content: text("content").notNull(),
     tokensIn: integer("tokens_in").default(0).notNull(),
     tokensOut: integer("tokens_out").default(0).notNull(),

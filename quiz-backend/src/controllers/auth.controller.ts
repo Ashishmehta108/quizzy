@@ -11,16 +11,13 @@ const syncUser = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.auth?.userId || req.body.auth?.userId;
     if (!userId) throw new ApiError(401, "Unauthorized: User ID not provided");
 
-    // Fetch user from DB
     let [user] = await db.select().from(users).where(eq(users.clerkId, userId));
 
     if (!user) {
-      // Fetch Clerk user safely
       let clerkUser;
       try {
         clerkUser = await clerkClient.users.getUser(userId);
       } catch {
-        // If Clerk fails, just create anonymous user
         clerkUser = null;
       }
 

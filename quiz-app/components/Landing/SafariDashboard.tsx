@@ -18,7 +18,7 @@ export function SafariDashboard() {
   const imageSrc = resolvedTheme === "dark" ? DarkDashboard.src : Dashboard.src;
 
   return (
-    <div className="relative container max-w-7xl mx-auto">
+    <div className="relative container max-w-5xl mx-auto">
       <Safari
         url="quizzy.vercel.app"
         width={1200}
