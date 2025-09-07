@@ -7,13 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import {
-  ArchiveBook,
-  TableDocument,
-  Add,
-  Notepad2,
-  Activity,
-} from "iconsax-reactjs";
+import { ArchiveBook, TableDocument, Add, Notepad2 } from "iconsax-reactjs";
 import {
   Trophy,
   CheckCircle2 as CheckCircle,
@@ -30,47 +24,15 @@ import api from "@/lib/api";
 import type { QuizWithQuestions, Result } from "@/lib/types";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  Cell,
-} from "recharts";
 import "../globals.css";
 import Loader from "@/components/loader/loader";
-import {
-  mockActivityData,
-  mockScoreDistributionData,
-} from "@/components/mockdata";
+import { mockActivityData } from "@/components/mockdata";
 import EmptyState from "@/components/Empty";
 import UsageWidget from "@/components/dashboard/UsageWidget";
 import { useActivityData } from "@/hooks/useUtility";
 import ActivityChart from "@/components/dashboard/activityWidget";
 import CreateQuizModal from "@/components/dashboard/createQuizModal";
 import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
-const fetchQuizzesAndResults = async () => {
-  const [quizzesRes, resultsRes] = await Promise.all([
-    api.get<QuizWithQuestions[]>("/quizzes", {
-      withCredentials: true,
-    }),
-    api.get<{ data: Result[] }>("/results", {
-      withCredentials: true,
-    }),
-  ]);
-  console.log(resultsRes.data.data);
-  return {
-    quizzes: quizzesRes.data,
-    results: resultsRes.data.data,
-  };
-};
 
 interface StatCardProps {
   title: string;
@@ -149,31 +111,58 @@ const StatCard = ({
   );
 };
 
+const fetchQuizzesAndResults = async () => {
+  try {
+    const [quizzesRes, resultsRes] = await Promise.all([
+      api.get<QuizWithQuestions[]>("/quizzes", { withCredentials: true }),
+      api.get<{ data: Result[] }>("/results", { withCredentials: true }),
+    ]);
+
+    return {
+      quizzes: quizzesRes.data || [],
+      results: resultsRes.data?.data || [],
+    };
+  } catch (err) {
+    console.error("Error fetching quizzes or results:", err);
+    return { quizzes: [], results: [] }; // fallback empty arrays
+  }
+};
+
 export default function DashboardPage() {
   const router = useRouter();
   const { data: activityData } = useActivityData();
-  console.log(activityData);
 
   const [isMounted, setIsMounted] = useState(false);
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  useEffect(() => setIsMounted(true), []);
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["quizzes-and-results"],
-    queryFn: () => fetchQuizzesAndResults(),
+    queryFn: fetchQuizzesAndResults,
+    retry: false, // optional: avoid automatic retries
   });
 
   const stats = useMemo(() => {
-    const totalQuizzes = data?.quizzes.length || 0;
-    const totalResults = data?.results.length || 0;
+    if (!data)
+      return {
+        totalQuizzes: 0,
+        totalResults: 0,
+        averageScore: 0,
+        recentQuizzes: 0,
+        completionRate: 0,
+        bestScore: 0,
+      };
 
-    // Calculate percentage score for each result
-    const percentageScores =
-      data?.results.map((result) => {
-        const totalQuestions = JSON.parse(result.optionsReview).length || 1; // avoid division by 0
+    const totalQuizzes = data.quizzes.length;
+    const totalResults = data.results.length;
+
+    const percentageScores = data.results.map((result) => {
+      try {
+        const totalQuestions = JSON.parse(result.optionsReview)?.length || 1;
         return Math.round((result.score / totalQuestions) * 100);
-      }) || [];
+      } catch {
+        return 0;
+      }
+    });
 
     const averageScore = percentageScores.length
       ? Math.round(
@@ -182,16 +171,14 @@ export default function DashboardPage() {
         )
       : 0;
 
-    const recentQuizzes =
-      data?.quizzes.filter(
-        (quiz) =>
-          new Date(quiz.createdAt).getTime() >
-          Date.now() - 7 * 24 * 60 * 60 * 1000
-      ).length || 0;
+    const recentQuizzes = data.quizzes.filter(
+      (quiz) =>
+        new Date(quiz.createdAt).getTime() >
+        Date.now() - 7 * 24 * 60 * 60 * 1000
+    ).length;
 
     const completionRate =
       totalQuizzes > 0 ? Math.round((totalResults / totalQuizzes) * 100) : 0;
-
     const bestScore = percentageScores.length
       ? Math.max(...percentageScores)
       : 0;
@@ -206,27 +193,36 @@ export default function DashboardPage() {
     };
   }, [data]);
 
-  if (isLoading) return <DashboardSkeleton />;
-  if (isError) return <p>Something went wrong</p>;
   if (!isMounted) return null;
+  if (isLoading) return <DashboardSkeleton />;
+
+  if (isError)
+    return (
+      <div className="min-h-screen flex items-center justify-center flex-col">
+        <p className="text-zinc-700 dark:text-zinc-300 mb-4">
+          Something went wrong while loading your dashboard.
+        </p>
+        <Button onClick={() => refetch()}>Retry</Button>
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
       <main className="max-w-7xl container mx-auto px-4 sm:px-6 lg:px-8 pb-12 pt-8">
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
-                Dashboard
-              </h1>
-              <p className="text-zinc-600 dark:text-zinc-400">
-                Track your learning progress and quiz performance
-              </p>
-            </div>
-            <CreateQuizModal />
+        {/* Header */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+              Dashboard
+            </h1>
+            <p className="text-zinc-600 dark:text-zinc-400">
+              Track your learning progress and quiz performance
+            </p>
           </div>
+          <CreateQuizModal />
         </div>
 
+        {/* Stats */}
         <div className="grid gap-6 grid-cols-2 lg:grid-cols-4 mb-8">
           <StatCard
             title="Total Quizzes"
@@ -240,7 +236,6 @@ export default function DashboardPage() {
                 : undefined
             }
           />
-
           <StatCard
             title="Quizzes Taken"
             value={stats.totalResults}
@@ -285,20 +280,22 @@ export default function DashboardPage() {
           />
         </div>
 
-        <div className="mb-8">
-          <ActivityChart data={activityData!} />
-        </div>
+        {/* Activity Chart */}
+        {activityData && <ActivityChart data={activityData} />}
+
+        {/* Usage Widget */}
         <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
           <UsageWidget />
         </div>
+
+        {/* Tabs */}
         <Tabs defaultValue="quizzes" className="space-y-8 mt-5">
           <TabsList className="grid w-full max-w-md grid-cols-2 mx-auto h-12 bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-200/60 dark:ring-zinc-800/60 rounded-2xl p-1">
             <TabsTrigger
               value="quizzes"
               className="flex items-center gap-2 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 dark:data-[state=active]:bg-zinc-800 dark:data-[state=active]:text-zinc-300 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-zinc-900/10 dark:data-[state=active]:ring-zinc-100/10 rounded-xl focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100"
             >
-              <ArchiveBook size="18" />
-              My Quizzes
+              <ArchiveBook size="18" /> My Quizzes
               {stats.totalQuizzes > 0 && (
                 <Badge variant="secondary" className="ml-1 text-xs">
                   {stats.totalQuizzes}
@@ -309,8 +306,7 @@ export default function DashboardPage() {
               value="results"
               className="flex items-center gap-2 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-zinc-800 dark:data-[state=active]:text-zinc-300 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-zinc-900/10 dark:data-[state=active]:ring-zinc-100/10 rounded-xl focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100"
             >
-              <TableDocument size="18" />
-              Results
+              <TableDocument size="18" /> Results
               {stats.totalResults > 0 && (
                 <Badge variant="secondary" className="ml-1 text-xs">
                   {stats.totalResults}
@@ -319,35 +315,20 @@ export default function DashboardPage() {
             </TabsTrigger>
           </TabsList>
 
+          {/* Quizzes Tab */}
           <TabsContent value="quizzes" className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
-                Your Quizzes
-              </h2>
-              <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-                Create, manage, and share your educational quizzes with others
-              </p>
-            </div>
-
-            {isLoading ? (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <QuizCardSkeleton key={i} />
-                ))}
-              </div>
-            ) : stats.totalQuizzes === 0 ? (
+            {stats.totalQuizzes === 0 ? (
               <EmptyState
                 icon={ArchiveBook}
                 title="No quizzes yet"
-                description="Start creating engaging quizzes to test knowledge and track learning progress. Your first quiz is just a click away!"
+                description="Start creating engaging quizzes to test knowledge and track learning progress."
                 action={
                   <Link href="/dashboard/quizzes/create">
                     <Button
                       size="lg"
                       className="bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 shadow-sm ring-1 ring-zinc-900/10 dark:ring-zinc-100/10 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100"
                     >
-                      <Add size="18" className="mr-2" />
-                      Create Your First Quiz
+                      <Add size="18" className="mr-2" /> Create Your First Quiz
                     </Button>
                   </Link>
                 }
@@ -359,28 +340,13 @@ export default function DashboardPage() {
             )}
           </TabsContent>
 
+          {/* Results Tab */}
           <TabsContent value="results" className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
-                Quiz Results
-              </h2>
-              <p className="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-                Track your performance, identify strengths, and monitor your
-                learning journey
-              </p>
-            </div>
-
-            {isLoading ? (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <ResultCardSkeleton key={i} />
-                ))}
-              </div>
-            ) : stats.totalResults === 0 ? (
+            {stats.totalResults === 0 ? (
               <EmptyState
                 icon={Notepad2}
                 title="No results yet"
-                description="Take some quizzes to see your performance analytics and track your learning progress over time."
+                description="Take some quizzes to see your performance analytics and track your learning progress."
                 action={
                   <Button
                     variant="outline"
@@ -388,8 +354,8 @@ export default function DashboardPage() {
                     onClick={() => router.push("/quizzes")}
                     className="ring-1 ring-zinc-200 dark:ring-zinc-800 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800"
                   >
-                    <BookOpen size="18" className="mr-2" />
-                    Browse Available Quizzes
+                    <BookOpen size="18" className="mr-2" /> Browse Available
+                    Quizzes
                   </Button>
                 }
               />

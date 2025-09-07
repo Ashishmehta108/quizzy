@@ -1,140 +1,57 @@
 "use client";
 
-// // import api from "@/lib/api";
-// // import { Quiz } from "@/lib/types";
-// // import { Marquee } from "@/components/magicui/marquee";
-
-// // export default function Test() {
-
-// //   return (
-// //     <Marquee>
-// //       <span>Next.js</span>
-// //       <span>React</span>
-// //       <span>TypeScript</span>
-// //       <span>Tailwind CSS</span>
-// //     </Marquee>
-// //   );
-// // }
-
-// "use client";
-
-// import axios from "axios";
-// import { useAuth } from "@clerk/nextjs";
-// import { Button } from "@/components/ui/button";
-// export default function Test() {
-//   const { getToken } = useAuth();
-//   const sendbackend = async () => {
-//     const token = await getToken();
-//     console.log(token);
-//     const res = await axios.get("http://localhost:5000/user", {
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${token}`,
-//       },
-//       withCredentials: true,
-//     });
-//     console.log(res.data);
-//   };
-
-//   return (
-//     <div>
-//       <Button onClick={sendbackend}>Test</Button>
-//     </div>
-//   );
-// }'
-
-// "use client";
-
-// import { useState } from "react";
-// import Timer from "@/components/timer/timer";
-// import { useSocket } from "@/app/context/socket.context";
-
-// const QuizPage = () => {
-//   const { startQuiz, endQuiz, socket } = useSocket();
-//   const [quizStarted, setQuizStarted] = useState(false);
-//   const quizId = "quiz_001";
-//   const duration = 3 * 60; // 3 minutes in seconds
-
-//   const handleStart = () => {
-//     startQuiz(quizId, duration);
-//     setQuizStarted(true);
-//   };
-
-//   const handleEnd = () => {
-//     endQuiz(quizId);
-//     setQuizStarted(false);
-//   };
-
-//   const handleTimeUp = () => {
-//     alert("Time is up! Quiz ended.");
-//     setQuizStarted(false);
-//   };
-
-//   return (
-//     <div className="p-4">
-//       <h1 className="text-2xl font-bold mb-4">3-Minute Quiz Simulation</h1>
-
-//       {!quizStarted && (
-//         <button
-//           onClick={handleStart}
-//           className="px-4 py-2 bg-blue-500 text-white rounded"
-//         >
-//           Start Quiz
-//         </button>
-//       )}
-
-//       {quizStarted && (
-//         <>
-//           <Timer
-//             quizId={quizId}
-//             duration={duration}
-//             onTimeUp={handleTimeUp}
-//           />
-//           <button
-//             onClick={handleEnd}
-//             className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-//           >
-//             End Quiz
-//           </button>
-//         </>
-//       )}
-
-//       <p className="mt-4">Socket connected: {socket?.connected ? "Yes" : "No"}</p>
-//     </div>
-//   );
-// };
-
-// export default QuizPage;
-
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 
-export default function Test() {
+export default function TestPage() {
   const { getToken } = useAuth();
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleCheckSession = async () => {
-    try {
-      const token = await getToken({ template: "default" });
-      console.log("Clerk token:", token);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACK_URL}/health`,
-        {
-          method: "GET",
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const token = await getToken();
+        console.log("Frontend Clerk token:", token);
+
+        if (!token) {
+          setError("No Clerk token found. Are you signed in?");
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch(`http://localhost:5000/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          credentials: "include", 
-        }
-      );
+        });
 
-      const data = await response.json();
-      console.log("Health response:", data);
-    } catch (err) {
-      console.error("Session check failed:", err);
+        if (!res.ok) {
+          throw new Error(`Request failed: ${res.status}`);
+        }
+
+        const json = await res.json();
+        setData(json);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     }
-  };
+
+    fetchUser();
+  }, [getToken]);
+
+  if (loading) return <p className="p-6">Loading...</p>;
+  if (error) return <p className="p-6 text-red-500">Error: {error}</p>;
 
   return (
-    <Button onClick={handleCheckSession}>Click me for session check</Button>
+    <div className="p-6">
+      <h1 className="text-xl font-bold">Auth Test Page</h1>
+      <pre className="mt-4 rounded bg-gray-100 p-4 text-sm">
+        {JSON.stringify(data, null, 2)}
+      </pre>
+    </div>
   );
 }

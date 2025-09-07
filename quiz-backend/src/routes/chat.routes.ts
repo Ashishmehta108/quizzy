@@ -17,7 +17,8 @@ chatRouter.get(
   "/chats",
   asyncHandler(async (req, res) => {
     const userId = req.auth?.userId;
-    if (!userId) return res.status(400).json({ error: "Missing userId" });
+    console.log(userId);
+    if (!userId) return res.status(200).json({ chats: [] });
     const quizzesWithChats = await db
       .select({
         id: chatSessions.id,

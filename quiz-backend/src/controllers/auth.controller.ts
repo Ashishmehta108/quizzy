@@ -39,8 +39,11 @@ const syncUser = async (req: Request, res: Response, next: NextFunction) => {
             apiKeyLastRotatedAt: new Date(),
           })
           .returning();
-      } catch {
-        throw new ApiError(500, "Failed to create user");
+      } catch (error: any) {
+        throw new ApiError(
+          500,
+          `Failed to create user record: ${error.message}`
+        );
       }
     }
 

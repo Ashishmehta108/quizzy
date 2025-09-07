@@ -6,9 +6,8 @@ import helmet from "helmet";
 import express, { NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import { clerkClient, clerkMiddleware, requireAuth } from "@clerk/express";
-// import { clerkClient } from "./config/clerk/clerk";
-import { ClerkClient } from "@clerk/express";
+import { clerkMiddleware, requireAuth, verifyToken } from "@clerk/express";
+import { clerkClient } from "./config/clerk/clerk";
 import notionRouter from "./routes/notion.route";
 import authRouter from "./routes/auth.routes";
 import quizRouter from "./routes/quiz.routes";
@@ -93,32 +92,9 @@ app.use("/api", dummyRouter);
 app.use("/api/utility", utilityRouter);
 app.use("/api", chatRouter);
 
-app.get("/health", async (req: Request, res: Response) => {
-  try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith("Bearer ")) {
-      return res.status(401).json({ error: "No token provided" });
-    }
-    const token = authHeader.split(" ")[1];
 
-    const session = await clerkClient.sessions.getSession(token);
 
-    if (!session || !session.userId) {
-      return res.status(401).json({ error: "Invalid token" });
-    }
 
-    console.log("Verified session:", session);
-
-    res.status(200).json({
-      status: "OK",
-      userId: session.userId,
-      sessionId: session.id,
-    });
-  } catch (err) {
-    console.error("Token verification failed:", err);
-    res.status(401).json({ error: "Unauthorized" });
-  }
-});
 
 app.use(errorHandler);
 
