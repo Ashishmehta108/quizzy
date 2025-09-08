@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthenticateWithRedirectCallback } from "@clerk/nextjs";
 import { useEffect } from "react";
+import Loader from "@/components/loader/loader";
 
 async function SsoCallback() {
   const router = useRouter();
@@ -23,5 +24,10 @@ async function SsoCallback() {
 }
 
 export default function SsoCallbackPage() {
-  return <AuthenticateWithRedirectCallback />;
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center bg-white dark:bg-zinc-950 p-4">
+      <Loader />
+      <AuthenticateWithRedirectCallback />
+    </div>
+  );
 }
