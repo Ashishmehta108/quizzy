@@ -112,19 +112,6 @@ export default function ResultViewPage(): React.JSX.Element | null {
 
     const rawAnswers: RawAnswer[] = raw.selectedAnswers ?? [];
 
-    const flattenedSelected = rawAnswers.flatMap((a) =>
-      Array.isArray(a.selected)
-        ? a.selected
-        : a.selected !== undefined
-        ? [a.selected]
-        : []
-    );
-    const hasZero = flattenedSelected.some((v) => v === 0);
-    const hasPositiveOnly =
-      flattenedSelected.length > 0 && flattenedSelected.every((v) => v >= 1);
-
-    const needsIndexShift = !hasZero && hasPositiveOnly;
-
     const transformed: QuizAnswer[] = rawAnswers.map((a, idx) => {
       const selArrRaw = Array.isArray(a.selected)
         ? a.selected
@@ -132,18 +119,13 @@ export default function ResultViewPage(): React.JSX.Element | null {
         ? [a.selected]
         : [];
 
-      const selectedOptions = selArrRaw.map((s) =>
-        typeof s === "number" ? (needsIndexShift ? s - 1 : s) : Number(s)
-      );
-
-      const correctRaw = a.correct ?? -1;
-      const correctOption =
-        typeof correctRaw === "number"
-          ? needsIndexShift
-            ? correctRaw - 1
-            : correctRaw
-          : Number(correctRaw);
-
+      const selectedOptions = selArrRaw.map((s) => {
+        const num = Number(s);
+        return num;
+      });
+      console.log(selectedOptions);
+      const correctOption = a.correct ?? -1;
+      // Clean option strings
       const cleanOptions = (a.options ?? []).map((opt) =>
         typeof opt === "string" ? opt.replace(/`/g, "").trim() : String(opt)
       );
@@ -173,7 +155,7 @@ export default function ResultViewPage(): React.JSX.Element | null {
       raw.percentage !== undefined
         ? raw.percentage
         : ((score / Math.max(1, totalQuestions)) * 100).toFixed(2);
-
+    console.log(transformed);
     return {
       score,
       percentage: String(percentage),

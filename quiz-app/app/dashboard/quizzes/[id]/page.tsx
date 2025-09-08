@@ -375,25 +375,27 @@ export default function TakeQuizPage({
 
   return (
     <div className="relative min-h-screen dark:bg-zinc-900 bg-white mt-2">
-      <div className=" max-w-2xl container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col  md:gap-8 gap-2">
-        <div className="xl:absolute top-20 gap-y-2 gap-2 flex items-center   md:text-2xl  text-base  left-10">
-          <span className="font-medium max-w-md mx-auto flex flex-wrap">
-            Quiz - {quiz.quiz.title}
-          </span>
-          <span className="flex items-center text-xs gap-2">
-            <FileText className="h-4 w-4" />
-            {quiz.questions.length} questions
-          </span>
-          <span className="flex text-xs items-center gap-2">
-            <Clock className="h-4 w-4" />
-            No time limit
-          </span>
+      <div className="max-w-2xl container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:gap-8 gap-4">
+        <div className="flex flex-col md:flex-col gap-2 md:text-2xl text-base">
+          <span className="font-medium">{`Quiz - ${quiz.quiz.title}`}</span>
+          <div className="flex flex-wrap items-center gap-4 text-xs">
+            <span className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              {quiz.questions.length} questions
+            </span>
+            <span className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              No time limit
+            </span>
+          </div>
         </div>
+
         {error && (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
+
         <QuestionCard
           question={currentQuestion}
           questionIndex={currentQuestionIndex}
