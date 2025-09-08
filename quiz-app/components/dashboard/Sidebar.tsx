@@ -54,7 +54,7 @@ export default function AppSidebar() {
   }, []);
   const getQuizChats = async () => {
     try {
-      const token = getToken();
+      const token = await getToken();
 
       const data = await fetch(`${BACKEND_URL}/chats`, {
         method: "GET",
