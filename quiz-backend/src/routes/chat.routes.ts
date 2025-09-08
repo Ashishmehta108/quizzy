@@ -18,18 +18,23 @@ chatRouter.get(
   "/chats",
   asyncHandler(async (req, res) => {
     const userId = req.auth?.userId;
-    console.log(userId);
+    console.log("UserId:", userId);
+
     if (!userId) return res.status(200).json({ chats: [] });
+
     const quizzesWithChats = await db
       .select({
         id: chatSessions.id,
         title: quizzes.title,
         quizId: quizzes.id,
       })
-      .from(chatSessions) 
-      .where(eq(chatSessions.userId, userId))
-      .innerJoin(quizzes, eq(chatSessions.quizId, quizzes.id));
-    if (!quizzesWithChats[0].id) return res.json({ chats: [] });
+      .from(chatSessions)
+      .innerJoin(quizzes, eq(chatSessions.quizId, quizzes.id))
+      .where(eq(chatSessions.userId, userId));
+
+    console.log("Quizzes with chats:", quizzesWithChats);
+
+    if (!quizzesWithChats.length) return res.json({ chats: [] });
 
     res.json({ chats: quizzesWithChats });
   })
