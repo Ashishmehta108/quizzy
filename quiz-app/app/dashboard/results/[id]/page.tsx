@@ -71,7 +71,7 @@ export default function ResultViewPage(): React.JSX.Element | null {
 
   useEffect(() => {
     const initializePage = async () => {
-      if (!isLoaded) {
+      if (isLoaded) {
         await fetchResult();
       }
     };

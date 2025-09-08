@@ -376,7 +376,7 @@ export default function TakeQuizPage({
   return (
     <div className="relative min-h-screen dark:bg-zinc-900 bg-white mt-2">
       <div className=" max-w-2xl container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col  md:gap-8 gap-2">
-        <div className="xl:absolute top-20 gap-y-2 gap-2 flex items-center    md:flex-col md:text-2xl  text-base  left-10">
+        <div className="xl:absolute top-20 gap-y-2 gap-2 flex items-center   md:text-2xl  text-base  left-10">
           <span className="font-medium max-w-md mx-auto flex flex-wrap">
             Quiz - {quiz.quiz.title}
           </span>
@@ -389,13 +389,11 @@ export default function TakeQuizPage({
             No time limit
           </span>
         </div>
-
         {error && (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-
         <QuestionCard
           question={currentQuestion}
           questionIndex={currentQuestionIndex}
