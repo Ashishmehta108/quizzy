@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { SafariDashboard } from "./SafariDashboard";
 import Link from "next/link";
 import "./components.css";
+import { DashboardVideo } from "./DashboardVideo";
 export default function Hero() {
   const router = useRouter();
 
@@ -71,7 +72,7 @@ export default function Hero() {
             type="scale"
             className="container mx-auto max-w-7xl "
           >
-            <SafariDashboard />
+            <DashboardVideo />
           </AnimatedElement>
         </div>
       </div>
