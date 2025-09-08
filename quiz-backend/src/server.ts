@@ -39,8 +39,7 @@ io.on("connection", (socket) => {
 
   socket.on("quiz_chat", async ({ quizId, sessionId, userId, query }) => {
     const room = `quiz_${quizId}_${sessionId}`;
-    io.to(room).emit("user_message", { userId, content: query });
-
+    console.log("chats sent", query);
     try {
       const { reply } = await quizAI("chat", {
         quizId,

@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { calculateResult } from "../utils/calculateresult";
 import { Request, Response } from "express";
+import { ApiError } from "../utils/apiError";
 
 export const PostResult = async (req: Request, res: Response) => {
   try {
@@ -57,6 +58,7 @@ export const GetResults = async (req: Request, res: Response) => {
       .select({ id: users.id })
       .from(users)
       .where(eq(users.clerkId, userId));
+    console.log(user);
     if (!user) return res.status(404).json({ error: "User not found" });
 
     const data = await db
@@ -100,19 +102,21 @@ export const GetResultById = async (req: Request, res: Response) => {
       .select()
       .from(results)
       .where(and(eq(results.userId, user.id), eq(results.id, id!)));
-    if (!data || data.length === 0)
-      return res.status(404).json({ error: "Result not found" });
+    if (!data || data.length === 0) throw new ApiError(404, "Result not found");
 
     const resultData = data[0];
     const result = await calculateResult(
       resultData.id,
-      userId,
+      user.id,
       resultData.quizId!
     );
-    if (!result) return res.status(404).json({ error: "Result not found" });
+    if (!result) throw new ApiError(404, "Result calculation failed");
 
     res.json({ result });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || "Failed to fetch result" });
+    if (error instanceof ApiError) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
+    // res.status(500).json({ error: error.message || "Failed to fetch result" });
   }
 };

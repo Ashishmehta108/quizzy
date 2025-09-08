@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import aira from "@/public/aira.jpg";
 import { MessageSquare, Send2 } from "iconsax-reactjs";
 import { AutoResizeTextarea } from "@/components/followups/AutoResize";
+import { v4 as uuidv4 } from "uuid";
 
 type Role = "user" | "assistant";
 
@@ -101,7 +102,6 @@ export default function QuizChatPage() {
   const { id: quizId } = useParams();
   const search = useSearchParams();
   const questionFollowupParam = search?.get("followup") ?? null;
-  console.log(questionFollowupParam);
 
   const { socket } = useSocket();
   const [sessionId, setSessionId] = useState<string>("");
@@ -136,7 +136,21 @@ export default function QuizChatPage() {
           `${BACKEND_URL}/chat/${quizId}?userId=${userId}`
         );
         const data = await res.json();
-        setMessages(data.messages || []);
+        setMessages((prev) => {
+          const existing = new Set(
+            prev.map((m) => `${m.role}-${m.content}-${m.createdAt}`)
+          );
+          const merged: Message[] = [...prev];
+
+          for (const msg of data.messages || []) {
+            const key = `${msg.role}-${msg.content}-${msg.createdAt}`;
+            if (!existing.has(key)) {
+              merged.push(msg);
+            }
+          }
+
+          return merged;
+        });
       } catch (err) {
         console.error("Failed to load history", err);
       } finally {
@@ -173,7 +187,6 @@ export default function QuizChatPage() {
           const found = foundById || foundByNum;
           if (found) {
             setInput(`Explain question ${found.number ?? ""}: ${found.text}`);
-
             setTimeout(() => inputRef.current?.focus(), 50);
           }
         }
@@ -189,6 +202,7 @@ export default function QuizChatPage() {
     if (!socket) return;
     const handler = (msg: { content: string }) => {
       const assistant: Message = {
+        id: uuidv4(),
         role: "assistant",
         content: msg.content,
         status: "received",
@@ -209,7 +223,10 @@ export default function QuizChatPage() {
     if (!input.trim() || !socket || !userId || !sessionId) return;
 
     const msgText = input.trim();
+    const tempId = uuidv4();
+
     const userMsg: Message = {
+      id: tempId,
       role: "user",
       content: msgText,
       status: "sent",
@@ -217,12 +234,6 @@ export default function QuizChatPage() {
     };
 
     setMessages((prev) => [...prev, userMsg]);
-
-    fetch(`${BACKEND_URL}/chat/${quizId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...userMsg, sessionId, userId }),
-    }).catch(console.error);
 
     socket.emit("quiz_chat", {
       quizId,
@@ -254,7 +265,6 @@ export default function QuizChatPage() {
     });
   };
 
-  // when user picks a question
   const handlePickQuestion = (q: QuizQuestion) => {
     setInput(`Explain question ${q.number ?? ""}: ${q.text}`);
     setShowQuestions(false);
@@ -277,21 +287,6 @@ export default function QuizChatPage() {
               <div className="flex flex-col gap-2 max-w-2xl">
                 <Skeleton className="h-4 w-52 rounded-lg bg-zinc-200 dark:bg-zinc-700" />
                 <Skeleton className="h-4 w-72 rounded-lg bg-zinc-200 dark:bg-zinc-700" />
-              </div>
-            </div>
-
-            <div className="flex items-end gap-2 justify-end">
-              <div className="flex flex-col gap-2 max-w-[250px]">
-                <Skeleton className="h-4 w-28 rounded-lg bg-zinc-200 dark:bg-zinc-700" />
-              </div>
-              <Skeleton className="h-8 w-8 rounded-full bg-zinc-200 dark:bg-zinc-700" />
-            </div>
-
-            <div className="flex items-end gap-2 justify-start">
-              <Skeleton className="h-8 w-8 rounded-full bg-zinc-200 dark:bg-zinc-700" />
-              <div className="flex flex-col gap-2 max-w-2xl">
-                <Skeleton className="h-4 w-60 rounded-lg bg-zinc-200 dark:bg-zinc-700" />
-                <Skeleton className="h-4 w-40 rounded-lg bg-zinc-200 dark:bg-zinc-700" />
               </div>
             </div>
           </div>
@@ -345,9 +340,10 @@ export default function QuizChatPage() {
         )}
         <div ref={messagesEndRef} />
       </main>
+
+      {/* Footer */}
       <footer className="sticky bottom-0 z-10 bg-card px-4 pt-6 pb-4">
         <div className="max-w-3xl mx-auto flex items-center gap-3 relative">
-          {/* Questions picker */}
           <div className="relative">
             <Button
               onClick={() => setShowQuestions((s) => !s)}
@@ -434,7 +430,6 @@ export default function QuizChatPage() {
             />
           </div>
 
-          {/* Send button */}
           <Button
             onClick={sendMessage}
             disabled={loading || !input.trim()}

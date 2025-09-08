@@ -23,10 +23,11 @@ chatRouter.get(
       .select({
         id: chatSessions.id,
         title: quizzes.title,
+        quizId: quizzes.id,
       })
       .from(chatSessions)
       .where(eq(chatSessions.userId, userId))
-      .leftJoin(quizzes, eq(chatSessions.quizId, quizzes.id));
+      .innerJoin(quizzes, eq(chatSessions.quizId, quizzes.id));
     if (!quizzesWithChats) return res.json({ chats: [] });
 
     res.json({ chats: quizzesWithChats });

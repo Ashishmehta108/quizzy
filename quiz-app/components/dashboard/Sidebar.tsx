@@ -62,6 +62,7 @@ export default function AppSidebar() {
         credentials: "include",
       });
       const res = await data.json();
+      console.log(res.chats )
       setChats(res.chats);
     } catch (error: any) {
       toast.error(`Failed to fetch chats ${error.message}`, { duration: 4000 });
@@ -188,7 +189,7 @@ export default function AppSidebar() {
                 ) : chats.length > 0 ? (
                   <div className="ml-2 mt-1 flex flex-col gap-1 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
                     {chats.map((chat: any) => (
-                      <Link key={chat.id} href={`/dashboard/chat/${chat.id}`}>
+                      <Link key={chat.id} href={`/dashboard/chat/ai/${chat.quizId}`}>
                         <Button
                           variant="ghost"
                           size="sm"

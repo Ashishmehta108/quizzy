@@ -111,7 +111,7 @@ export default function CreateQuizPage() {
     }
   };
 
-  if (success) {
+  if (success?.id) {
     return (
       <div className="bg-white dark:bg-zinc-900 py-8">
         <div className="max-w-2xl container mx-auto px-4 sm:px-6 lg:px-8">

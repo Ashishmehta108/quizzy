@@ -6,7 +6,7 @@ import helmet from "helmet";
 import express, { NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import { clerkMiddleware, requireAuth, verifyToken } from "@clerk/express";
+import { clerkMiddleware } from "@clerk/express";
 import { clerkClient } from "./config/clerk/clerk";
 import notionRouter from "./routes/notion.route";
 import authRouter from "./routes/auth.routes";
@@ -51,10 +51,6 @@ app.post(
   }
 );
 
-app.use((req, _res, next) => {
-  console.log("ALL HEADERS", req.headers);
-  next();
-});
 
 app.get("/api/user", async (req, res) => {
   try {
