@@ -23,9 +23,5 @@ async function SsoCallback() {
 }
 
 export default function SsoCallbackPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SsoCallback />
-    </Suspense>
-  );
+  return <AuthenticateWithRedirectCallback />;
 }

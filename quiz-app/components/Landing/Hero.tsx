@@ -35,7 +35,7 @@ export default function Hero() {
               </span>
             </div>
           </AnimatedElement>
-
+ 
           <AnimatedElement delay={0}>
             <h1 className="text-5xl gzap-y-2 sm:text-6xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-8 leading-tight tracking-tight ">
               Create Smart Quizzes
