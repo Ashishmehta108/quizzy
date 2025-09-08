@@ -76,14 +76,14 @@ export function QuestionCard({
                   className={`group w-full px-4 py-3 text-left rounded-2xl border transition-all duration-200 flex items-center gap-4 ${
                     isSelected
                       ? "bg-blue-200/30 border-blue-400 dark:bg-blue-700/30 dark:border-blue-500 scale-[1.02]"
-                      : "bg-white/10 dark:bg-zinc-900/30 border-white/20 dark:border-white/10 hover:bg-white/20 dark:hover:bg-white/10"
+                      : "bg-zinc-50 dark:bg-zinc-900/30 border-zinc-200 dark:border-white/10 hover:bg-zinc-100 dark:hover:bg-white/10"
                   }`}
                 >
                   <div
                     className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-semibold text-xs transition-all duration-200 ${
                       isSelected
                         ? "bg-blue-500 text-white border-blue-500"
-                        : "bg-white/20 dark:bg-zinc-800/40 text-gray-600 dark:text-zinc-300 border-white/20 dark:border-white/10"
+                        : "bg-zinc-50 dark:bg-zinc-800/40 text-gray-600 dark:text-zinc-300 border-zinc-200 dark:border-white/10"
                     }`}
                   >
                     {optionLabel}
@@ -375,7 +375,7 @@ export default function TakeQuizPage({
 
   return (
     <div className="relative min-h-screen dark:bg-zinc-900 bg-white mt-2">
-      <div className=" max-w-2xl container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:gap-8 gap-2">
+      <div className=" max-w-2xl container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col  md:gap-8 gap-2">
         <div className="xl:absolute top-20 gap-y-2 gap-2 flex items-center    md:flex-col md:text-2xl  text-base  left-10">
           <span className="font-medium max-w-md mx-auto flex flex-wrap">
             Quiz - {quiz.quiz.title}
