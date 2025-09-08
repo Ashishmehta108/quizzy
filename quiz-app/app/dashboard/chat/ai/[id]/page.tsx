@@ -102,7 +102,6 @@ export default function QuizChatPage() {
   const { id: quizId } = useParams();
   const search = useSearchParams();
   const questionFollowupParam = search?.get("followup") ?? null;
-
   const { socket } = useSocket();
   const [sessionId, setSessionId] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -341,14 +340,13 @@ export default function QuizChatPage() {
         <div ref={messagesEndRef} />
       </main>
 
-      {/* Footer */}
       <footer className="sticky bottom-0 z-10 bg-card px-4 pt-6 pb-4">
         <div className="max-w-3xl mx-auto flex items-center gap-3 relative">
           <div className="relative">
             <Button
               onClick={() => setShowQuestions((s) => !s)}
               variant="ghost"
-              className="h-9 w-9 rounded-full flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-sm hover:shadow-md transition"
+              className="h-9 w-9 rounded-full flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-sm hover:shadow-md transition hover:text-zinc-100 "
               aria-expanded={showQuestions}
               title="Pick a quiz question"
             >

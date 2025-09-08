@@ -25,9 +25,7 @@ export default function UsageWidget() {
         <CardTitle>Usage</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {/* Both metrics in the same row */}
         <div className="grid grid-cols-2 gap-6">
-          {/* Web Searches */}
           <div className="flex items-center gap-3">
             <span className="text-md font-medium shrink-0">
               Web {usage.websearchesUsed}/{plan.monthlyLimit.websearches}
@@ -35,7 +33,6 @@ export default function UsageWidget() {
             <Progress value={webSearchPct} className="flex-1 h-2" />
           </div>
 
-          {/* Quizzes */}
           <div className="flex items-center gap-3">
             <span className="text-md font-medium shrink-0">
               Quizzes {usage.quizzesGeneratedUsed}/

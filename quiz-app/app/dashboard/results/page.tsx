@@ -3,15 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
-import { Trophy } from "lucide-react";
-
-import { Card, CardContent } from "@/components/ui/card";
 import ResultTable from "@/components/ui/result-card";
 import api from "@/lib/api";
 import type { Result } from "@/lib/types";
 import {
   renderErrorState,
-  renderSkeletons, // ✅ import the new skeleton
+  renderSkeletons,
 } from "@/components/loader/Skeleton";
 import EmptyState from "@/components/Empty";
 import { Notepad2 } from "iconsax-reactjs";
@@ -23,7 +20,6 @@ export default function ResultsPage() {
 
   const { isLoaded } = useAuth();
   const { user } = useUser();
-  const router = useRouter();
 
   useEffect(() => {
     if (isLoaded && user) {
@@ -38,7 +34,6 @@ export default function ResultsPage() {
       const response = await api.get<{ data: Result[] }>("/results", {
         withCredentials: true,
       });
-      console.log(response.data.data);
       setResults(response.data.data);
     } catch (err) {
       console.error("Error fetching results:", err);

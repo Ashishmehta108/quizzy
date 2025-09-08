@@ -11,10 +11,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Fetch user details
     const user = await (await clerkClient()).users.getUser(userId);
 
-    // Return user + token if needed
     return NextResponse.json({ user, token: sessionToken }, { status: 200 });
   } catch (err) {
     console.error(err);

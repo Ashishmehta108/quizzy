@@ -35,7 +35,6 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [followUps, setFollowUps] = useState<FollowUpMessage[]>([]);
   const [timeLeft, setTimeLeft] = useState<Record<string, number>>({});
 
-  // --- Quiz actions ---
   const startQuiz = useCallback(
     (quizId: string, duration: number) => {
       if (!socket) return;
@@ -54,10 +53,9 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     [socket]
   );
 
-  // --- Socket setup ---
   useEffect(() => {
     const socketIo = io(`${process.env.NEXT_PUBLIC_BACK_URL}`, {
-      transports: ["websocket"], // force pure WS, avoid handshake issues
+      transports: ["websocket"],
     });
 
     setSocket(socketIo);

@@ -92,8 +92,8 @@ export default function ResultViewPage(): React.JSX.Element | null {
       console.error("Error fetching result:", err);
       setError(
         err?.response?.data?.message ??
-        err?.message ??
-        "Something went wrong while fetching the result"
+          err?.message ??
+          "Something went wrong while fetching the result"
       );
     } finally {
       setLoading(false);
@@ -116,8 +116,8 @@ export default function ResultViewPage(): React.JSX.Element | null {
       Array.isArray(a.selected)
         ? a.selected
         : a.selected !== undefined
-          ? [a.selected]
-          : []
+        ? [a.selected]
+        : []
     );
     const hasZero = flattenedSelected.some((v) => v === 0);
     const hasPositiveOnly =
@@ -129,8 +129,8 @@ export default function ResultViewPage(): React.JSX.Element | null {
       const selArrRaw = Array.isArray(a.selected)
         ? a.selected
         : a.selected !== undefined
-          ? [a.selected]
-          : [];
+        ? [a.selected]
+        : [];
 
       const selectedOptions = selArrRaw.map((s) =>
         typeof s === "number" ? (needsIndexShift ? s - 1 : s) : Number(s)
@@ -164,7 +164,7 @@ export default function ResultViewPage(): React.JSX.Element | null {
       typeof raw.score === "number"
         ? raw.score
         : transformed.filter((t) => t.selectedOptions.includes(t.correctOption))
-          .length;
+            .length;
     const totalQuestions =
       typeof raw.totalQuestions === "number"
         ? raw.totalQuestions
@@ -180,28 +180,6 @@ export default function ResultViewPage(): React.JSX.Element | null {
       totalQuestions,
       selectedAnswers: transformed,
     };
-  };
-
-  const calculateTimeTaken = (answers: QuizAnswer[] | undefined) => {
-    if (!answers || answers.length === 0) return null;
-    const createds = answers
-      .map((a) => a.createdAt)
-      .filter(Boolean) as string[];
-    const submitteds = answers
-      .map((a) => a.submittedAt)
-      .filter(Boolean) as string[];
-    if (createds.length === 0 || submitteds.length === 0) return null;
-
-    const start = new Date(
-      Math.min(...createds.map((d) => new Date(d).getTime()))
-    );
-    const end = new Date(
-      Math.max(...submitteds.map((d) => new Date(d).getTime()))
-    );
-    const diffMs = Math.max(0, end.getTime() - start.getTime());
-    const mins = Math.floor(diffMs / 60000);
-    const secs = Math.floor((diffMs % 60000) / 1000);
-    return `${mins}m ${secs}s`;
   };
 
   const isAnswerCorrect = (selectedOptions: number[], correctOption: number) =>
@@ -238,7 +216,6 @@ export default function ResultViewPage(): React.JSX.Element | null {
   }
 
   const scorePercentage = Number.parseFloat(String(result.percentage));
-  //   const timeTaken = calculateTimeTaken(result.selectedAnswers);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 relative overflow-hidden">

@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Image from "next/image";
 import Logo from "@/public/quizzy_logo.png";
-import { Loader, Github, Mail, Chrome } from "lucide-react";
+import { Loader, Github, Mail } from "lucide-react";
 import google from "@/public/google.svg";
 
 interface LoginForm {

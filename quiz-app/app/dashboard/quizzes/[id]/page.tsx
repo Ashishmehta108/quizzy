@@ -40,7 +40,6 @@ export function QuestionCard({
   isSubmitting,
   isLastQuestion,
 }: QuestionCardProps) {
-  console.log(question);
   const q = JSON.parse(question.options);
 
   return (
@@ -189,7 +188,6 @@ export default function TakeQuizPage({
       const response = await api.get<QuizResponse[]>(`/quizzes/${id}`, {
         withCredentials: true,
       });
-      console.log();
       //@ts-ignore
       setQuiz(response.data);
       setLoading(false);

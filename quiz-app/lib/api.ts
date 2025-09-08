@@ -28,11 +28,9 @@ export const setToken = async (token: string) => {
 api.interceptors.request.use(async (config) => {
   const token = await fetchMe();
   
-  console.log("Interceptor Clerk token:", token);
   if (token) {
     config.headers.Authorization = `Bearer ${token.token}`;
   }
-  // config.headers["X-User-Id"] = userId;
   return config;
 });
 

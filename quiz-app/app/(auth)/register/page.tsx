@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import {
@@ -80,8 +80,6 @@ export default function RegisterPage() {
         await setActive({ session: result.createdSessionId });
         await syncUser();
         router.push("/dashboard");
-      } else {
-        console.log(result);
       }
     } catch (err: any) {
       console.error(err);
