@@ -20,7 +20,7 @@ export default function DashboardPage() {
   const [quizzes, setQuizzes] = useState<QuizWithQuestions[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [resultIds, setResultIds] = useState<string[]>([]);
   const { isLoaded } = useAuth();
   const { user } = useUser();
   const router = useRouter();

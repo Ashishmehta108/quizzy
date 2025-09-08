@@ -41,7 +41,7 @@ export function QuizTable({ quizzes }: QuizTableProps) {
   const [search, setSearch] = useState("");
   const [minQuestions, setMinQuestions] = useState("0");
   const [sortDesc, setSortDesc] = useState(true);
-  console.log(quizzes)
+  console.log(quizzes);
   const filteredQuizzes = useMemo(() => {
     return quizzes
       .filter((quiz) => {
@@ -52,13 +52,8 @@ export function QuizTable({ quizzes }: QuizTableProps) {
         return matchesTitle && hasMinQuestions;
       })
       .sort((a, b) => {
-
-        const dateA = a?.createdAt
-          ? new Date(a.createdAt).getTime()
-          : 0;
-        const dateB = b?.createdAt
-          ? new Date(b.createdAt).getTime()
-          : 0;
+        const dateA = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
         return sortDesc ? dateB - dateA : dateA - dateB;
       });
   }, [quizzes, search, minQuestions, sortDesc]);
@@ -86,14 +81,13 @@ export function QuizTable({ quizzes }: QuizTableProps) {
               <SelectTrigger className="focus:ring-0 focus:ring-offset-0  ">
                 <SelectValue placeholder="Min Questions" />
               </SelectTrigger>
-              <SelectContent className="" >
+              <SelectContent className="">
                 <SelectItem value="0">Any</SelectItem>
                 <SelectItem value="5">5+</SelectItem>
                 <SelectItem value="10">10+</SelectItem>
                 <SelectItem value="15">15+</SelectItem>
               </SelectContent>
             </Select>
-
           </div>
         </div>
       </div>
@@ -157,7 +151,7 @@ export function QuizTable({ quizzes }: QuizTableProps) {
                       <Link
                         href={
                           attempted
-                            ? `/dashboard/results/${quiz?.id}` //result id here
+                            ? `/dashboard/results/${quiz.resultId}` //result id here
                             : `/dashboard/quizzes/${quiz.id}`
                         }
                       >

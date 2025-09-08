@@ -6,6 +6,7 @@ import {
   usage,
   billings,
   documents,
+  results,
 } from "../config/db/schema";
 import { and, eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
@@ -251,7 +252,7 @@ export const createQuiz = asyncHandler(
 export const getQuizzes = async (req: QuizRequest, res: QuizResponse) => {
   try {
     const userId = req.auth?.userId!;
-
+    let rslts = [];
     const [user]: User[] = await db
       .select()
       .from(users)
@@ -268,6 +269,13 @@ export const getQuizzes = async (req: QuizRequest, res: QuizResponse) => {
       .execute();
     if (userQuizzes.length === 0) {
       return res.json([]);
+    }
+    const r = await db
+      .select()
+      .from(results)
+      .where(eq(results.userId, user.id));
+    if (!r.length) {
+      rslts = [];
     }
     const quizzesWithQuestions = await Promise.all(
       userQuizzes.map(async (quiz) => {
@@ -295,6 +303,7 @@ export const getQuizzes = async (req: QuizRequest, res: QuizResponse) => {
     submittedAt: Date;
     explanation: string;
 }[] */,
+          resultId: r.find((result) => result.quizId === quiz.id)?.id || "",
         };
       })
     );

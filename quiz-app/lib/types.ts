@@ -25,7 +25,7 @@ export interface Quiz {
   userId: string;
   createdAt: string;
   submitted: boolean;
-  description:string;
+  description: string;
 }
 
 export interface QuizWithQuestions {
@@ -34,6 +34,7 @@ export interface QuizWithQuestions {
   userId: string;
   createdAt: string;
   submitted: boolean;
+  resultId?: string;
   questions: Question[];
 }
 

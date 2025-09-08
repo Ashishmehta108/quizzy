@@ -151,7 +151,7 @@ export const GetResultById = async (req: Request, res: Response) => {
     // 6. Calculate result
     console.log("🧮 Calculating result for:", {
       resultId: resultData.id,
-    
+
       quizId: resultData.quizId,
     });
 
