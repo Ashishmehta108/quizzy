@@ -6,6 +6,7 @@ import {
   chatSessions,
   questions,
   quizzes,
+  users,
 } from "../config/db/schema";
 import { eq, desc, asc, and } from "drizzle-orm";
 import { asyncHandler } from "../utils/asyncHandler";
@@ -19,6 +20,10 @@ chatRouter.get(
     const userId = req.auth?.userId;
     console.log(userId);
     if (!userId) return res.status(200).json({ chats: [] });
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.clerkId, userId));
     const quizzesWithChats = await db
       .select({
         id: chatSessions.id,
@@ -26,7 +31,7 @@ chatRouter.get(
         quizId: quizzes.id,
       })
       .from(chatSessions)
-      .where(eq(chatSessions.userId, userId))
+      .where(eq(chatSessions.userId, user.id))
       .innerJoin(quizzes, eq(chatSessions.quizId, quizzes.id));
     if (!quizzesWithChats) return res.json({ chats: [] });
 
