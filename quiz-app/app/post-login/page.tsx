@@ -17,7 +17,7 @@ export default function PostLogin() {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("req sent", token);
+      console.log("req sent");
 
       router.push("/dashboard");
     })();
