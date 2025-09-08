@@ -43,7 +43,7 @@ import { BACKEND_URL } from "@/lib/constants";
 export default function AppSidebar() {
   const [chats, setChats] = React.useState([]);
   const { user } = useUser();
-  const { signOut } = useAuth();
+  const { signOut, getToken } = useAuth();
   const [chatsLoading, setChatsLoading] = React.useState(true);
   const handleLogout = async () => {
     await signOut();
@@ -54,10 +54,13 @@ export default function AppSidebar() {
   }, []);
   const getQuizChats = async () => {
     try {
+      const token = getToken();
+
       const data = await fetch(`${BACKEND_URL}/chats`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         credentials: "include",
       });
