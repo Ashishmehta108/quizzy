@@ -24,6 +24,8 @@ import GoogleLogo from "@/public/google.svg";
 
 interface RegisterForm {
   name: string;
+  lastName: string;
+  username: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -67,6 +69,7 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     try {
       if (!isLoaded) return;
+
       setError("");
       setIsLoading(true);
 
@@ -74,16 +77,57 @@ export default function RegisterPage() {
         emailAddress: data.email,
         password: data.password,
         firstName: data.name,
+        lastName: data.lastName,
+        username: data.username,
       });
+      console.log("Signup result:", result);
 
       if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId });
-        await syncUser();
-        router.push("/dashboard");
+        if (result.createdSessionId) {
+          await setActive({ session: result.createdSessionId });
+          await syncUser();
+          router.push("/dashboard");
+        } else {
+          router.push("/login");
+        }
+      } else if (result.status === "abandoned") {
+        setError("Sign-up process was abandoned. Please try again.");
+      } else if (result.status === "missing_requirements") {
+        try {
+          await signUp.prepareEmailAddressVerification({
+            strategy: "email_code",
+          });
+        } catch (verificationErr: any) {
+          console.error("Verification error:", verificationErr);
+        }
+        router.push("/verify-email");
+      } else {
+        setError("Unexpected signup status. Please try again.");
       }
     } catch (err: any) {
-      console.error(err);
-      setError(err.errors?.[0]?.longMessage || err.message || "Signup failed");
+      console.error("Signup error:", err);
+
+      let message = "Signup failed";
+
+      if (err?.errors && Array.isArray(err.errors) && err.errors.length > 0) {
+        message =
+          err.errors[0]?.longMessage || err.errors[0]?.message || message;
+      } else if (err?._status === "missing_requirements") {
+        if (
+          Array.isArray(err.requiredFields) &&
+          err.requiredFields.length > 0
+        ) {
+          message = `Missing required fields: ${err.requiredFields
+            .map((f: any) => f?.fieldId || f)
+            .join(", ")}`;
+        } else {
+          message = "Please complete all required sign-up fields.";
+        }
+      } else if (typeof err?.message === "string") {
+        message = err.message;
+      }
+
+      setError(message);
     } finally {
       setIsLoading(false);
     }
@@ -144,6 +188,7 @@ export default function RegisterPage() {
               <Github className="h-4 w-4" /> Sign up with GitHub
             </Button>
           </div>
+
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-4 text-xs md:text-sm"
@@ -155,23 +200,46 @@ export default function RegisterPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">First Name</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Enter your full name"
-                className="focus-visible:border-zinc-400 placeholder:text-sm text-sm md:text-base md:placeholder:text-base focus-visible:ring-transparent"
-                {...register("name", {
-                  required: "Name is required",
-                  minLength: {
-                    value: 2,
-                    message: "Name must be at least 2 characters",
-                  },
-                })}
+                placeholder="Enter your first name"
+                {...register("name", { required: "First name is required" })}
               />
               {errors.name && (
                 <p className="text-sm text-destructive">
                   {errors.name.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                id="lastName"
+                type="text"
+                placeholder="Enter your last name"
+                {...register("lastName", { required: "Last name is required" })}
+              />
+              {errors.lastName && (
+                <p className="text-sm text-destructive">
+                  {errors.lastName.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="Choose a username"
+                {...register("username", { required: "Username is required" })}
+              />
+              {errors.username && (
+                <p className="text-sm text-destructive">
+                  {errors.username.message}
                 </p>
               )}
             </div>
@@ -182,14 +250,7 @@ export default function RegisterPage() {
                 id="email"
                 type="email"
                 placeholder="Enter your email"
-                className="focus-visible:border-zinc-400 placeholder:text-sm text-sm md:text-base md:placeholder:text-base focus-visible:ring-transparent"
-                {...register("email", {
-                  required: "Email is required",
-                  pattern: {
-                    value: /^\S+@\S+$/i,
-                    message: "Invalid email address",
-                  },
-                })}
+                {...register("email", { required: "Email is required" })}
               />
               {errors.email && (
                 <p className="text-sm text-destructive">
@@ -204,7 +265,6 @@ export default function RegisterPage() {
                 id="password"
                 type="password"
                 placeholder="Enter your password"
-                className="focus-visible:border-zinc-400 placeholder:text-sm text-sm md:text-base md:placeholder:text-base focus-visible:ring-transparent"
                 {...register("password", {
                   required: "Password is required",
                   minLength: {
@@ -226,7 +286,6 @@ export default function RegisterPage() {
                 id="confirmPassword"
                 type="password"
                 placeholder="Confirm your password"
-                className="focus-visible:border-zinc-400 placeholder:text-sm text-sm md:text-base md:placeholder:text-base focus-visible:ring-transparent"
                 {...register("confirmPassword", {
                   required: "Please confirm your password",
                   validate: (value) =>
@@ -258,7 +317,7 @@ export default function RegisterPage() {
 
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
-            <Link href="/register" className="text-accent hover:underline">
+            <Link href="/login" className="text-accent hover:underline">
               Sign in
             </Link>
           </div>

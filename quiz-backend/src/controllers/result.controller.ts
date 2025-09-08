@@ -88,35 +88,96 @@ export const GetResults = async (req: Request, res: Response) => {
 
 export const GetResultById = async (req: Request, res: Response) => {
   try {
-    const userId = req.auth?.userId;
-    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    console.log("➡️ GetResultById called");
 
+    // 1. Check authentication
+    const userId = req.auth?.userId;
+    console.log("🔑 userId from auth:", userId);
+
+    if (!userId) {
+      console.warn("⚠️ Unauthorized request - no userId found");
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // 2. Validate user existence
     const [user] = await db
       .select({ id: users.id })
       .from(users)
       .where(eq(users.clerkId, userId));
-    if (!user) return res.status(404).json({ error: "User not found" });
 
+    console.log("👤 DB user lookup result:", user);
+
+    if (!user) {
+      console.warn("⚠️ User not found for clerkId:");
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // 3. Validate request param
     const { id } = req.params;
-    const data = await db
+    console.log("📦 Request param id:");
+
+    if (!id) {
+      console.warn("⚠️ Invalid result ID:");
+      return res.status(400).json({ error: "Invalid result ID" });
+    }
+
+    // 4. Fetch result entry
+    const resultRows = await db
       .select()
       .from(results)
-      .where(and(eq(results.userId, user.id), eq(results.id, id!)));
-    if (!data || data.length === 0) throw new ApiError(404, "Result not found");
+      .where(and(eq(results.userId, user.id), eq(results.id, id)));
 
-    const resultData = data[0];
+    console.log("📊 Result rows fetched:");
+
+    if (!resultRows || resultRows.length === 0) {
+      console.warn(
+        "⚠️ Result not found for userId:",
+        user.id,
+        " resultId:",
+        id
+      );
+      return res.status(404).json({ error: "Result not found" });
+    }
+
+    const resultData = resultRows[0];
+    console.log("✅ Found resultData:", resultData);
+
+    // 5. Ensure quizId exists
+    if (!resultData.quizId) {
+      console.error("❌ Result has no quizId:");
+      return res.status(400).json({ error: "Result has no associated quizId" });
+    }
+
+    // 6. Calculate result
+    console.log("🧮 Calculating result for:", {
+      resultId: resultData.id,
+    
+      quizId: resultData.quizId,
+    });
+
     const result = await calculateResult(
       resultData.id,
       user.id,
-      resultData.quizId!
+      resultData.quizId
     );
-    if (!result) throw new ApiError(404, "Result calculation failed");
 
-    res.json({ result });
+    if (!result) {
+      console.error("❌ Result calculation failed for:", resultData);
+      return res.status(500).json({ error: "Result calculation failed" });
+    }
+
+    // 7. Success
+    console.log("🎉 Successfully calculated result:", result);
+    return res.json({ result });
   } catch (error: any) {
+    console.error("💥 GetResultById error:", error);
+
     if (error instanceof ApiError) {
       return res.status(error.statusCode).json({ error: error.message });
     }
-    // res.status(500).json({ error: error.message || "Failed to fetch result" });
+
+    return res
+      .status(500)
+      .json({ error: error.message || "Failed to fetch result" });
   }
 };

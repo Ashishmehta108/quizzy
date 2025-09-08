@@ -39,8 +39,22 @@ import {
 import { toast } from "sonner";
 import { Skeleton } from "../ui/skeleton";
 import { BACKEND_URL } from "@/lib/constants";
+import { useSocket } from "@/app/context/socket.context";
 
 export default function AppSidebar() {
+  const { socket } = useSocket();
+  React.useEffect(() => {
+    if (!socket) return;
+
+    const handleChatUpdate = () => {
+      getQuizChats();
+    };
+
+    socket?.on("chat_update", handleChatUpdate);
+    return () => {
+      socket?.off("chat_update", handleChatUpdate);
+    };
+  }, []);
   const [chats, setChats] = React.useState([]);
   const { user } = useUser();
   const { signOut, getToken } = useAuth();

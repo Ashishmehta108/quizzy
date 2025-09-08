@@ -48,6 +48,8 @@ io.on("connection", (socket) => {
         userQuery: query,
       });
       io.to(room).emit("ai_response", { content: reply });
+
+      io.to(room).emit("chat_update", { quizId, sessionId });
     } catch (err) {
       socket.emit("error", { message: "Failed to process message." });
     }
