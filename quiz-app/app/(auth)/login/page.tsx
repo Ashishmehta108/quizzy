@@ -80,7 +80,7 @@ export default function LoginPage() {
     try {
       await signIn.authenticateWithRedirect({
         strategy: provider,
-        redirectUrl: `/sso-callback?redirect=/post-login`,
+        redirectUrl: `/sso-callback`,
         redirectUrlComplete: "/post-login",
       });
     } catch (err) {
