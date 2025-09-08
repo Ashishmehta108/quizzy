@@ -20,10 +20,6 @@ chatRouter.get(
     const userId = req.auth?.userId;
     console.log(userId);
     if (!userId) return res.status(200).json({ chats: [] });
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.clerkId, userId));
     const quizzesWithChats = await db
       .select({
         id: chatSessions.id,
@@ -31,9 +27,9 @@ chatRouter.get(
         quizId: quizzes.id,
       })
       .from(chatSessions)
-      .where(eq(chatSessions.userId, user.id))
+      .where(eq(chatSessions.userId, userId))
       .innerJoin(quizzes, eq(chatSessions.quizId, quizzes.id));
-    if (!quizzesWithChats) return res.json({ chats: [] });
+    if (!quizzesWithChats[0].id) return res.json({ chats: [] });
 
     res.json({ chats: quizzesWithChats });
   })
