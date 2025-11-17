@@ -13,6 +13,7 @@ jobs:
   build_frontend:
     name: Build Quiz App
     runs-on: ubuntu-latest
+    working-directory: quiz-app
 
     env:
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
@@ -35,25 +36,22 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
-          cache-dependency-path: quiz-app/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
-        working-directory: ./quiz-app
         run: pnpm install --frozen-lockfile
 
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
       - name: Pull Vercel environment
-        working-directory: ./quiz-app
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
       - name: Build frontend (Vercel prebuild)
-        working-directory: ./quiz-app
+
         run: vercel build --prod --token=$VERCEL_TOKEN
 
       - name: Debug .vercel folder
-        working-directory: ./quiz-app
         run: |
           echo "Quiz App .vercel:"
           ls -la .vercel || true
@@ -68,7 +66,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: quiz-app-vercel-prebuilt
-          path: quiz-app/.vercel/output
+          path: .vercel/output
           if-no-files-found: error
 
   build_backend:
