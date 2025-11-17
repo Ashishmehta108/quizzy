@@ -13,43 +13,52 @@ jobs:
   build_frontend:
     name: Build Quiz App
     runs-on: ubuntu-latest
+
     env:
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
+      - name: Remove incorrect Vercel config (important)
+        run: rm -rf .vercel
+
       - uses: pnpm/action-setup@v4
         with:
           version: 9
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
           cache-dependency-path: quiz-app/pnpm-lock.yaml
-      
+
       - name: Install dependencies
-        working-directory: quiz-app
-        run: pnpm install --frozen-lockfile
-      
+        run: cd quiz-app && pnpm install --frozen-lockfile
+
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
-      
-      - name: Pull Vercel env (production)
-        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
-      
-      - name: Build using Vercel (prebuilt)
 
-        run: vercel build --prod --token=$VERCEL_TOKEN
-      
-      - name: Check build output exists
+      - name: Pull Vercel env into quiz-app folder
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN --cwd quiz-app
+
+      - name: Build using Vercel (prebuilt)
+        run: vercel build --token=$VERCEL_TOKEN --cwd quiz-app
+
+      - name: Show output directories for debugging
+        run: |
+          echo "Root .vercel:"
+          ls -la .vercel || true
+          echo "Quiz App .vercel:"
+          ls -la quiz-app/.vercel || true
+
+      - name: Confirm build output exists
         run: ls -la quiz-app/.vercel/output
-      
+
       - name: Upload Vercel Prebuilt Artifact
         uses: actions/upload-artifact@v4
         with:
