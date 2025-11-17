@@ -1,0 +1,22 @@
+
+FROM node:20-slim AS base
+WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@9 --activate
+COPY package.json pnpm-lock.yaml ./
+
+
+FROM base AS build
+COPY . .
+RUN pnpm install --frozen-lockfile
+RUN pnpm run build   # Should emit JS into e.g. dist/, adjust if needed
+
+
+FROM node:20-slim AS runner
+ENV NODE_ENV=production
+WORKDIR /app
+COPY --from=build /app/package.json /app/pnpm-lock.yaml ./
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist   # adjust path to compiled output
+COPY --from=build /app/drizzle ./drizzle
+EXPOSE 8080
+CMD ["node","dist/server.js"]        # update entrypoint if different
