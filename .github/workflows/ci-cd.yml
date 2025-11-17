@@ -41,17 +41,22 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
-      - name: Pull Vercel env
-        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+      - name: Pull Vercel env (production)
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN --cwd quiz-app
 
       - name: Build using Vercel (prebuilt)
-        run: vercel build --token=$VERCEL_TOKEN
+        run: vercel build --token=$VERCEL_TOKEN --cwd quiz-app
+
+      - name: Check build output exists
+        run: ls -la quiz-app/.vercel/output
 
       - name: Upload Vercel Prebuilt Artifact
         uses: actions/upload-artifact@v4
         with:
           name: quiz-app-vercel-prebuilt
           path: quiz-app/.vercel/output
+          if-no-files-found: error
+
 
   build_backend:
     name: Build Quiz Backend
@@ -90,7 +95,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: quiz-backend/pnpm-lock.yaml
 
-      - name: Install dependencies
+      - name: Install backend dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Build backend
@@ -104,6 +109,7 @@ jobs:
             quiz-backend/dist
             quiz-backend/package.json
             quiz-backend/pnpm-lock.yaml
+
 
   deploy_frontend:
     needs: build_frontend
@@ -127,7 +133,8 @@ jobs:
           path: .vercel/output
 
       - name: Deploy to Vercel (prebuilt)
-        run: vercel deploy --prebuilt --token=$VERCEL_TOKEN --yes
+        run: vercel deploy --prebuilt --token=$VERCEL_TOKEN --cwd . --yes
+
 
   deploy_backend:
     needs: build_backend
