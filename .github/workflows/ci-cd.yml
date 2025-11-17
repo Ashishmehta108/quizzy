@@ -53,7 +53,7 @@ jobs:
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
       - name: Build frontend (Vercel prebuild)
-        run: vercel build --prod --token=$VERCEL_TOKEN --cwd ./quiz-app
+        run: vercel build --prod --token=$VERCEL_TOKEN --cwd
 
       - name: Debug .vercel folder
         working-directory: ./quiz-app
