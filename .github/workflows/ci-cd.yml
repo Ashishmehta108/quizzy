@@ -149,7 +149,7 @@ jobs:
       # Vercel Deploy
       # ---------------------------
       - name: Vercel Deploy
-        working-directory: quiz-app
+        working-directory: quiz-app/quiz-app
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
 
   deploy_backend:
