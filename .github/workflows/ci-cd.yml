@@ -47,7 +47,7 @@ jobs:
         run: cd quiz-app && vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
       - name: Build frontend using Vercel (correct dir)
-        run: cd quiz-app && vercel build --token=$VERCEL_TOKEN
+        run: vercel build --token=$VERCEL_TOKEN
 
       - name: Debug root vs quiz-app .vercel folder
         run: |
