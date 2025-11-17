@@ -45,12 +45,14 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Vercel CLI
-        run: npm install -g vercel@latest
+        run: pnpm install -g vercel@latest
 
       - name: Pull Vercel environment
+        working-directory: ./quiz-app
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
       - name: Build frontend (Vercel prebuild)
+        working-directory: ./quiz-app
         run: vercel build --token=$VERCEL_TOKEN
 
       - name: Debug .vercel folder
