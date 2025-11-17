@@ -1,0 +1,16 @@
+{
+  "projectId": "prj_OWvOYQIHb1eeKdpiadXU23Pjunc2",
+  "orgId": "team_23u6tc07lOzVMMF5sfHBNVYi",
+  "projectName": "quiz-app",
+  "settings": {
+    "createdAt": 1763405233791,
+    "framework": "nextjs",
+    "devCommand": null,
+    "installCommand": null,
+    "buildCommand": null,
+    "outputDirectory": null,
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "22.x"
+  }
+}
