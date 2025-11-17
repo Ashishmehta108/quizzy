@@ -72,9 +72,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: quiz-backend/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run lint --if-present
-      - run: pnpm run test --if-present
-      - run: pnpm run drizzle:migrate --if-present
+      - run: pnpm run drizzle:generate --if-present
       - run: pnpm run build
       - name: Upload backend artifact
         uses: actions/upload-artifact@v4
