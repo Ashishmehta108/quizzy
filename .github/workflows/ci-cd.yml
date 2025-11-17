@@ -13,43 +13,44 @@ jobs:
   build_frontend:
     name: Build Quiz App
     runs-on: ubuntu-latest
-
     env:
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
+    
     steps:
       - uses: actions/checkout@v4
-
+      
       - uses: pnpm/action-setup@v4
         with:
           version: 9
-
+      
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
           cache-dependency-path: quiz-app/pnpm-lock.yaml
-
+      
       - name: Install dependencies
         working-directory: quiz-app
         run: pnpm install --frozen-lockfile
-
+      
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
-
+      
       - name: Pull Vercel env (production)
-        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN --cwd quiz-app
-
+        working-directory: quiz-app
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+      
       - name: Build using Vercel (prebuilt)
-        run: vercel build --token=$VERCEL_TOKEN --cwd quiz-app
-
+        working-directory: quiz-app
+        run: vercel build --prod --token=$VERCEL_TOKEN
+      
       - name: Check build output exists
         run: ls -la quiz-app/.vercel/output
-
+      
       - name: Upload Vercel Prebuilt Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -57,14 +58,13 @@ jobs:
           path: quiz-app/.vercel/output
           if-no-files-found: error
 
-
   build_backend:
     name: Build Quiz Backend
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: quiz-backend
-
+    
     services:
       postgres:
         image: postgres:15
@@ -78,29 +78,29 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
+    
     env:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/quizai
-
+    
     steps:
       - uses: actions/checkout@v4
-
+      
       - uses: pnpm/action-setup@v4
         with:
           version: 9
-
+      
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
           cache-dependency-path: quiz-backend/pnpm-lock.yaml
-
+      
       - name: Install backend dependencies
         run: pnpm install --frozen-lockfile
-
+      
       - name: Build backend
         run: pnpm run build
-
+      
       - name: Upload backend artifact
         uses: actions/upload-artifact@v4
         with:
@@ -110,36 +110,34 @@ jobs:
             quiz-backend/package.json
             quiz-backend/pnpm-lock.yaml
 
-
   deploy_frontend:
     needs: build_frontend
     runs-on: ubuntu-latest
-
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
+    
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
-
+      
       - name: Download Vercel Prebuilt Artifact
         uses: actions/download-artifact@v4
         with:
           name: quiz-app-vercel-prebuilt
-          path: .vercel/output
-
+          path: quiz-app/.vercel/output
+      
       - name: Deploy to Vercel (prebuilt)
-        run: vercel deploy --prebuilt --token=$VERCEL_TOKEN --cwd . --yes
-
+        working-directory: quiz-app
+        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --yes
 
   deploy_backend:
     needs: build_backend
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Trigger Render Deploy
         run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
