@@ -14,6 +14,10 @@ jobs:
     name: Build Quiz App
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: quiz-app
+
     env:
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
@@ -24,8 +28,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Remove incorrect Vercel config
-        run: rm -rf quiz-app/.vercel
+      - name: Remove incorrect Vercel folder
+        run: rm -rf .vercel
 
       - uses: pnpm/action-setup@v4
         with:
@@ -38,28 +42,26 @@ jobs:
           cache-dependency-path: quiz-app/pnpm-lock.yaml
 
       - name: Install dependencies
-        run: cd quiz-app && pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
-      - name: Pull Vercel env (correct working directory)
-        run: cd quiz-app && vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
-      - name: Build frontend using Vercel (correct dir)
+      - name: Build frontend (Vercel prebuild)
         run: vercel build --token=$VERCEL_TOKEN
 
-      - name: Debug root vs quiz-app .vercel folder
+      - name: Debug .vercel folder
         run: |
-          echo "Root .vercel:"
-          ls -la .vercel || true
           echo "Quiz App .vercel:"
-          ls -la quiz-app/.vercel || true
+          ls -la .vercel || true
           echo "Quiz App .vercel/output:"
-          ls -la quiz-app/.vercel/output || true
+          ls -la .vercel/output || true
 
       - name: Ensure build output exists
-        run: ls -la quiz-app/.vercel/output
+        run: ls -la .vercel/output
 
       - name: Upload Vercel Prebuilt Artifact
         uses: actions/upload-artifact@v4
@@ -123,6 +125,10 @@ jobs:
   deploy_frontend:
     needs: build_frontend
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: quiz-app
+
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -141,7 +147,7 @@ jobs:
           path: quiz-app/.vercel/output
       
       - name: Deploy to Vercel (prebuilt)
-        run: cd quiz-app && vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --yes
+        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --yes
 
   deploy_backend:
     needs: build_backend
