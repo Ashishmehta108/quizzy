@@ -14,7 +14,7 @@ jobs:
     name: Build Quiz App
     runs-on: ubuntu-latest
 
-    env: 
+    env:
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -42,8 +42,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Vercel CLI
-        working-directory: ./quiz-app
-        run: pnpm install -g vercel@latest
+        run: npm install -g vercel@latest
 
       - name: Pull Vercel environment
         working-directory: ./quiz-app
@@ -51,7 +50,7 @@ jobs:
 
       - name: Build frontend (Vercel prebuild)
         working-directory: ./quiz-app
-        run: vercel build --token=$VERCEL_TOKEN
+        run: vercel build --prod --token=$VERCEL_TOKEN
 
       - name: Debug .vercel folder
         working-directory: ./quiz-app
@@ -78,7 +77,7 @@ jobs:
     defaults:
       run:
         working-directory: quiz-backend
-    
+
     services:
       postgres:
         image: postgres:15
@@ -92,29 +91,29 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    
+
     env:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/quizai
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v4
         with:
           version: 9
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
           cache-dependency-path: quiz-backend/pnpm-lock.yaml
-      
+
       - name: Install backend dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Build backend
         run: pnpm run build
-      
+
       - name: Upload backend artifact
         uses: actions/upload-artifact@v4
         with:
@@ -132,19 +131,19 @@ jobs:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
-      
+
       - name: Download Vercel Prebuilt Artifact
         uses: actions/download-artifact@v4
         with:
           name: quiz-app-vercel-prebuilt
           path: quiz-app/.vercel/output
-      
+
       - name: Deploy to Vercel (prebuilt)
         working-directory: ./quiz-app
         run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --yes
@@ -152,7 +151,7 @@ jobs:
   deploy_backend:
     needs: build_backend
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Trigger Render Deploy
         run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
