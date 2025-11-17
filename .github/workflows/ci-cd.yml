@@ -13,9 +13,6 @@ jobs:
   build_frontend:
     name: Build Quiz App
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: quiz-app
 
     env:
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
@@ -38,15 +35,18 @@ jobs:
           cache-dependency-path: quiz-app/pnpm-lock.yaml
 
       - name: Install dependencies
+        working-directory: quiz-app
         run: pnpm install --frozen-lockfile
 
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
       - name: Pull Vercel env
+        working-directory: quiz-app
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
-      - name: Build using Vercel
+      - name: Build using Vercel (prebuilt)
+        working-directory: quiz-app
         run: vercel build --token=$VERCEL_TOKEN
 
       - name: Upload Vercel Prebuilt Artifact
@@ -69,7 +69,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: quizai
-        ports: ['5432:5432']
+        ports: ["5432:5432"]
         options: >-
           --health-cmd "pg_isready -U postgres -d quizai"
           --health-interval 10s
@@ -107,6 +107,9 @@ jobs:
             quiz-backend/package.json
             quiz-backend/pnpm-lock.yaml
 
+  # ---------------------------------------------------
+  # FRONTEND DEPLOY (prebuilt → Vercel)
+  # ---------------------------------------------------
   deploy_frontend:
     needs: build_frontend
     runs-on: ubuntu-latest
@@ -128,7 +131,7 @@ jobs:
           name: quiz-app-vercel-prebuilt
           path: .vercel/output
 
-      - name: Deploy to Vercel (Prebuilt)
+      - name: Deploy to Vercel (prebuilt)
         run: vercel deploy --prebuilt --token=$VERCEL_TOKEN --yes
 
   deploy_backend:
