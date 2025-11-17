@@ -63,7 +63,8 @@ jobs:
           ls -la
 
           # Now run the Vercel build
-          vercel build --prod --token=$VERCEL_TOKEN
+          vercel build --prod --cwd $GITHUB_WORKSPACE/quiz-app --token=$VERCEL_TOKEN
+
 
 
       - name: Debug .vercel folder
