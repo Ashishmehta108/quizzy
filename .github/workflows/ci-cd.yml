@@ -20,18 +20,23 @@ jobs:
     env:
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: pnpm/action-setup@v4
         with:
           version: 9
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
           cache-dependency-path: quiz-app/pnpm-lock.yaml
+
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+
       - name: Upload frontend artifact
         uses: actions/upload-artifact@v4
         with:
@@ -48,6 +53,7 @@ jobs:
     defaults:
       run:
         working-directory: quiz-backend
+
     services:
       postgres:
         image: postgres:15
@@ -61,20 +67,26 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     env:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/quizai
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: pnpm/action-setup@v4
         with:
           version: 9
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
           cache-dependency-path: quiz-backend/pnpm-lock.yaml
+
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
+
       - name: Upload backend artifact
         uses: actions/upload-artifact@v4
         with:
@@ -83,6 +95,7 @@ jobs:
             quiz-backend/dist
             quiz-backend/package.json
             quiz-backend/pnpm-lock.yaml
+
   deploy_frontend:
     needs: build_frontend
     runs-on: ubuntu-latest
@@ -96,17 +109,17 @@ jobs:
 
       # Install Vercel CLI
       - name: Install Vercel CLI
-      - run: npm install --global vercel@latest
+        run: npm install --global vercel@latest
 
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: quiz-app-build
           path: quiz-app
+
       - name: Vercel Pull
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: quiz-app
-
 
       - name: Vercel Build
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
