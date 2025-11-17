@@ -10,7 +10,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
   # ============================
   # FRONTEND BUILD JOB (QUIZ-APP)
   # ============================
@@ -49,15 +48,12 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
-      # IMPORTANT: working-directory FIXED
       - name: Pull Vercel Environment
         working-directory: ./quiz-app
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
-      # IMPORTANT: working-directory FIXED
       - name: Build frontend (Vercel prebuild)
-        working-directory: ./quiz-app
-        run: vercel build --prod --token=$VERCEL_TOKEN
+        run: vercel build --prod --token=$VERCEL_TOKEN --cwd ./quiz-app
 
       - name: Debug .vercel folder
         working-directory: ./quiz-app
@@ -71,12 +67,11 @@ jobs:
         working-directory: ./quiz-app
         run: ls -la .vercel/output
 
-      # IMPORTANT: PATH FIXED (NO DOUBLE quiz-app)
       - name: Upload Vercel Prebuilt Artifact
         uses: actions/upload-artifact@v4
         with:
           name: quiz-app-vercel-prebuilt
-          path: quiz-app/.vercel/output
+          path: ./quiz-app/.vercel/output
           if-no-files-found: error
 
   # ============================
