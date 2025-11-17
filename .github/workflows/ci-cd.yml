@@ -14,10 +14,6 @@ jobs:
     name: Build Quiz App
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: quiz-app
-
     env:
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
@@ -52,6 +48,7 @@ jobs:
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
       - name: Build frontend (Vercel prebuild)
+        working-directory: ./quiz-app
         run: vercel build --token=$VERCEL_TOKEN
 
       - name: Debug .vercel folder
