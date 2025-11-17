@@ -110,7 +110,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/quizzy-frontend:latest ./quiz-app
+          docker build \
+          --build-arg NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }} \
+          --build-arg CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }} \
+          -t ${{ secrets.DOCKERHUB_USERNAME }}/quizzy-frontend:latest ./quiz-app
+
 
       - name: Push Docker image
         run: |
