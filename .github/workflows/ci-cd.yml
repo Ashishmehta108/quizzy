@@ -10,8 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build_and_deploy_frontend:
-    name: Build & Deploy Quiz App
+  build_frontend:
+    name: Build Quiz App
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
@@ -40,13 +40,25 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
       
-      - name: Deploy to Vercel
-        working-directory: quiz-app
-        run: |
-          vercel --token=$VERCEL_TOKEN --prod --yes
+      - name: Pull Vercel env (production)
+        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+      
+      - name: Build using Vercel (prebuilt)
 
-  build_and_deploy_backend:
-    name: Build & Deploy Quiz Backend
+        run: vercel build --prod --token=$VERCEL_TOKEN
+      
+      - name: Check build output exists
+        run: ls -la quiz-app/.vercel/output
+      
+      - name: Upload Vercel Prebuilt Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: quiz-app-vercel-prebuilt
+          path: quiz-app/.vercel/output
+          if-no-files-found: error
+
+  build_backend:
+    name: Build Quiz Backend
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -88,5 +100,42 @@ jobs:
       - name: Build backend
         run: pnpm run build
       
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: quiz-backend-build
+          path: |
+            quiz-backend/dist
+            quiz-backend/package.json
+            quiz-backend/pnpm-lock.yaml
+
+  deploy_frontend:
+    needs: build_frontend
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+      
+      - name: Download Vercel Prebuilt Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: quiz-app-vercel-prebuilt
+          path: quiz-app/.vercel/output
+      
+      - name: Deploy to Vercel (prebuilt)
+        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --yes
+
+  deploy_backend:
+    needs: build_backend
+    runs-on: ubuntu-latest
+    
+    steps:
       - name: Trigger Render Deploy
         run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
