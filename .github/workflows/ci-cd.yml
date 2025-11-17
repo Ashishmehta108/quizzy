@@ -14,7 +14,7 @@ jobs:
     name: Build Quiz App
     runs-on: ubuntu-latest
 
-    env:
+    env: 
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
       CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
