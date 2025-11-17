@@ -54,6 +54,7 @@ jobs:
         run: vercel build --token=$VERCEL_TOKEN
 
       - name: Debug .vercel folder
+        working-directory: ./quiz-app
         run: |
           echo "Quiz App .vercel:"
           ls -la .vercel || true
@@ -61,6 +62,7 @@ jobs:
           ls -la .vercel/output || true
 
       - name: Ensure build output exists
+        working-directory: ./quiz-app
         run: ls -la .vercel/output
 
       - name: Upload Vercel Prebuilt Artifact
@@ -125,9 +127,6 @@ jobs:
   deploy_frontend:
     needs: build_frontend
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: quiz-app
 
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -147,6 +146,7 @@ jobs:
           path: quiz-app/.vercel/output
       
       - name: Deploy to Vercel (prebuilt)
+        working-directory: ./quiz-app
         run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --yes
 
   deploy_backend:
