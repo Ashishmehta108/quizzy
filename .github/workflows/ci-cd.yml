@@ -54,7 +54,11 @@ jobs:
 
       - name: Build frontend (Vercel prebuild)
         working-directory: ./quiz-app
-        run: vercel build --prod --token=$VERCEL_TOKEN
+        run: |
+          cd quiz-app || cd .
+          vercel build --prod --token=$VERCEL_TOKEN
+        # OR use this simpler approach:
+        # run: vercel build --prod --token=$VERCEL_TOKEN --cwd ./quiz-app
 
       - name: Debug .vercel folder
         working-directory: ./quiz-app
@@ -72,7 +76,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: quiz-app-vercel-prebuilt
-          path: ./quiz-app/.vercel/output # FIXED: NO DOUBLE quiz-app
+          path: ./quiz-app/.vercel/output
           if-no-files-found: error
 
   # ============================
