@@ -28,12 +28,10 @@ jobs:
         run: rm -rf .vercel
 
       - uses: pnpm/action-setup@v4
-        working-directory: ./quiz-app
         with:
           version: 9
 
       - uses: actions/setup-node@v4
-        working-directory: ./quiz-app
         with:
           node-version: 20
           cache: pnpm
