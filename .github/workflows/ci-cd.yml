@@ -24,8 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Remove incorrect Vercel config (important)
-        run: rm -rf .vercel
+      - name: Remove incorrect Vercel config
+        run: rm -rf quiz-app/.vercel
 
       - uses: pnpm/action-setup@v4
         with:
@@ -43,20 +43,22 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
-      - name: Pull Vercel env into quiz-app folder
-        run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN 
+      - name: Pull Vercel env (correct working directory)
+        run: cd quiz-app && vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
-      - name: Build using Vercel (prebuilt)
-        run: vercel build --token=$VERCEL_TOKEN
+      - name: Build frontend using Vercel (correct dir)
+        run: cd quiz-app && vercel build --token=$VERCEL_TOKEN
 
-      - name: Show output directories for debugging
+      - name: Debug root vs quiz-app .vercel folder
         run: |
           echo "Root .vercel:"
           ls -la .vercel || true
           echo "Quiz App .vercel:"
           ls -la quiz-app/.vercel || true
+          echo "Quiz App .vercel/output:"
+          ls -la quiz-app/.vercel/output || true
 
-      - name: Confirm build output exists
+      - name: Ensure build output exists
         run: ls -la quiz-app/.vercel/output
 
       - name: Upload Vercel Prebuilt Artifact
@@ -139,7 +141,7 @@ jobs:
           path: quiz-app/.vercel/output
       
       - name: Deploy to Vercel (prebuilt)
-        run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --yes
+        run: cd quiz-app && vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --yes
 
   deploy_backend:
     needs: build_backend
