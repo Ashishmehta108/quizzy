@@ -10,10 +10,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ============================
+  # FRONTEND BUILD JOB (QUIZ-APP)
+  # ============================
+
   build_frontend:
     name: Build Quiz App
     runs-on: ubuntu-latest
-    working-directory: quiz-app
 
     env:
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
@@ -24,8 +27,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Remove incorrect Vercel folder
-        run: rm -rf .vercel
+        run: rm -rf quiz-app/.vercel
 
       - uses: pnpm/action-setup@v4
         with:
@@ -35,26 +39,29 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
+          cache-dependency-path: quiz-app/pnpm-lock.yaml
 
       - name: Install dependencies
+        working-directory: ./quiz-app
         run: pnpm install --frozen-lockfile
 
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
-      - name: Pull Vercel environment
+      - name: Pull Vercel Environment
+        working-directory: ./quiz-app
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
       - name: Build frontend (Vercel prebuild)
-
+        working-directory: ./quiz-app
         run: vercel build --prod --token=$VERCEL_TOKEN
 
       - name: Debug .vercel folder
+        working-directory: ./quiz-app
         run: |
-          echo "Quiz App .vercel:"
+          echo ".vercel:"
           ls -la .vercel || true
-          echo "Quiz App .vercel/output:"
+          echo ".vercel/output:"
           ls -la .vercel/output || true
 
       - name: Ensure build output exists
@@ -65,12 +72,17 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: quiz-app-vercel-prebuilt
-          path: .vercel/output
+          path: ./quiz-app/.vercel/output # FIXED: NO DOUBLE quiz-app
           if-no-files-found: error
+
+  # ============================
+  # BACKEND BUILD JOB
+  # ============================
 
   build_backend:
     name: Build Quiz Backend
     runs-on: ubuntu-latest
+
     defaults:
       run:
         working-directory: quiz-backend
@@ -105,13 +117,13 @@ jobs:
           cache: pnpm
           cache-dependency-path: quiz-backend/pnpm-lock.yaml
 
-      - name: Install backend dependencies
+      - name: Install Backend Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build backend
+      - name: Build Backend
         run: pnpm run build
 
-      - name: Upload backend artifact
+      - name: Upload Backend Artifact
         uses: actions/upload-artifact@v4
         with:
           name: quiz-backend-build
@@ -119,6 +131,10 @@ jobs:
             quiz-backend/dist
             quiz-backend/package.json
             quiz-backend/pnpm-lock.yaml
+
+  # ============================
+  # FRONTEND DEPLOY JOB
+  # ============================
 
   deploy_frontend:
     needs: build_frontend
@@ -144,6 +160,10 @@ jobs:
       - name: Deploy to Vercel (prebuilt)
         working-directory: ./quiz-app
         run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN --yes
+
+  # ============================
+  # BACKEND DEPLOY JOB
+  # ============================
 
   deploy_backend:
     needs: build_backend
