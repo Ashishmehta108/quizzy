@@ -53,6 +53,9 @@ jobs:
         run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
 
       - name: Build frontend (Vercel prebuild)
+        working-directory: ./quiz-app
+
+
         run: |
           echo "Current working directory:"
           pwd
