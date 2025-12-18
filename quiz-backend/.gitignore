@@ -16,7 +16,7 @@ build/
 out/
 tmp/
 temp/
-
+drizzle/
 # Environment files
 .env
 .env.local
