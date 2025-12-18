@@ -42,6 +42,7 @@ export interface UsageData {
       quizzesGenerated: number;
       websearches: number;
     };
+    //
   };
   usage: {
     websearchesUsed: number;
