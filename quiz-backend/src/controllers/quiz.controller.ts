@@ -252,12 +252,13 @@ export const createQuiz = asyncHandler(
 export const getQuizzes = async (req: QuizRequest, res: QuizResponse) => {
   try {
     const userId = req.auth?.userId!;
+    console.log("userid is here",userId)
     let rslts = [];
     const [user]: User[] = await db
       .select()
       .from(users)
       .where(eq(users.clerkId, userId));
-
+console.log(user)
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }

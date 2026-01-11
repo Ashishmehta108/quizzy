@@ -154,14 +154,14 @@ export default function DashboardPage() {
     const averageScore = percentageScores.length
       ? Math.round(
           percentageScores.reduce((acc, score) => acc + score, 0) /
-            percentageScores.length
+            percentageScores.length,
         )
       : 0;
 
     const recentQuizzes = data.quizzes.filter(
       (quiz) =>
         new Date(quiz.createdAt).getTime() >
-        Date.now() - 7 * 24 * 60 * 60 * 1000
+        Date.now() - 7 * 24 * 60 * 60 * 1000,
     ).length;
 
     const completionRate =
@@ -239,15 +239,15 @@ export default function DashboardPage() {
               stats.averageScore >= 80
                 ? "success"
                 : stats.averageScore >= 60
-                ? "warning"
-                : "default"
+                  ? "warning"
+                  : "default"
             }
             trend={
               stats.averageScore >= 80
                 ? "Excellent!"
                 : stats.averageScore >= 60
-                ? "Good progress"
-                : "Keep improving"
+                  ? "Good progress"
+                  : "Keep improving"
             }
           />
           <StatCard
@@ -260,8 +260,8 @@ export default function DashboardPage() {
               stats.bestScore === 100
                 ? "Perfect!"
                 : stats.bestScore >= 90
-                ? "Outstanding"
-                : undefined
+                  ? "Outstanding"
+                  : undefined
             }
           />
         </div>
