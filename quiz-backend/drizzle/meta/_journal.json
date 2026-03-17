@@ -78,6 +78,20 @@
       "when": 1757077752713,
       "tag": "0010_complex_wong",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1773772390262,
+      "tag": "0011_spicy_mauler",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1773774849545,
+      "tag": "0012_living_havok",
+      "breakpoints": true
     }
   ]
 }

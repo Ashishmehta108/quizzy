@@ -16,7 +16,7 @@ export const PostResult = async (req: Request, res: Response) => {
     const [user] = await db
       .select({ id: users.id })
       .from(users)
-      .where(eq(users.clerkId, userId));
+      .where(eq(users.clerkId, userId as string));
     if (!user) return res.status(404).json({ error: "User not found" });
 
     const [quiz] = await db
@@ -57,7 +57,7 @@ export const GetResults = async (req: Request, res: Response) => {
     const [user] = await db
       .select({ id: users.id })
       .from(users)
-      .where(eq(users.clerkId, userId));
+      .where(eq(users.clerkId, userId as string));
     console.log(user);
     if (!user) return res.status(404).json({ error: "User not found" });
 

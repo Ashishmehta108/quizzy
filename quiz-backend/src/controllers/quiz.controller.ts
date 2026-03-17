@@ -23,6 +23,7 @@ import { io } from "../server";
 import { asyncHandler } from "../utils/asyncHandler";
 import { ApiError } from "../utils/apiError";
 import { airaAgent } from "../ai/agent/airaAgent";
+import { checkEntitlement } from "../services/entitlements.service";
 
 export interface QuizFile {
   fieldname: string;
@@ -79,6 +80,14 @@ export const createQuiz = asyncHandler(
       const description = req.body.description || "No description provided";
       const userId = req.auth?.userId;
       if (!userId) throw new ApiError(401, "Unauthorized: userId missing");
+
+      const workspaceId = req.headers["x-workspace-id"] as string;
+      if (!workspaceId) throw new ApiError(400, "Workspace ID is required");
+
+      const entitlement = await checkEntitlement(workspaceId, "ai_generation");
+      if (!entitlement.allowed) {
+        throw new ApiError(403, `You have reached your limit of ${entitlement.limit} AI generations for this plan. Please upgrade.`);
+      }
 
       emitUpdate(socketId, "status", "Creating quiz request recieved ");
 

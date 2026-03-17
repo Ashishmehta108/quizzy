@@ -1,5 +1,5 @@
 import { db } from "../config/db";
-import { users, plans, billings, usage } from "../config/db/schema";
+import { users, plans, billings, usage, workspaces, workspaceMembers } from "../config/db/schema";
 import { eq } from "drizzle-orm";
 import { Request, Response, NextFunction } from "express";
 import { randomUUID } from "node:crypto";
@@ -49,59 +49,68 @@ const syncUser = async (req: Request, res: Response, next: NextFunction) => {
 
     let billingCreated = false;
 
-    try {
-      const [existingBilling] = await db
+    // Ensure at least one workspace exists for the user
+    let userWorkspaces = await db
+      .select()
+      .from(workspaceMembers)
+      .where(eq(workspaceMembers.userId, user.id));
+
+    if (userWorkspaces.length === 0) {
+      // Create a default Personal Workspace
+      const workspaceId = randomUUID();
+      const workspaceName = `${user.name}'s Workspace`;
+      const slug = workspaceName.toLowerCase().replace(/[^a-z0-9]/g, "-") + "-" + randomUUID().substring(0, 5);
+
+      await db.insert(workspaces).values({
+        id: workspaceId,
+        name: workspaceName,
+        slug,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      await db.insert(workspaceMembers).values({
+        id: randomUUID(),
+        workspaceId,
+        userId: user.id,
+        role: "owner",
+        joinedAt: new Date(),
+      });
+
+      // Initialize billing for this new workspace
+      const [freePlan] = await db
         .select()
-        .from(billings)
-        .where(eq(billings.userId, user.id))
+        .from(plans)
+        .where(eq(plans.name, "Free"))
         .limit(1);
 
-      if (!existingBilling) {
-        const [freePlan] = await db
-          .select()
-          .from(plans)
-          .where(eq(plans.name, "Free"))
-          .limit(1);
+      if (freePlan) {
+        const billingId = randomUUID();
+        await db.insert(billings).values({
+          id: billingId,
+          userId: user.id,
+          workspaceId,
+          planId: freePlan.id,
+          startDate: new Date(),
+          endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+          status: "active",
+          createdAt: new Date(),
+        });
 
-        if (!freePlan) throw new ApiError(500, "Free plan not found");
-
-        const [billing] = await db
-          .insert(billings)
-          .values({
-            id: randomUUID(),
-            userId: user.id,
-            planId: freePlan.id,
-            startDate: new Date(),
-            endDate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
-            status: "active",
-            createdAt: new Date(),
-          })
-          .returning();
-
-        const [existingUsage] = await db
-          .select()
-          .from(usage)
-          .where(eq(usage.billingId, billing.id))
-          .limit(1);
-
-        if (!existingUsage) {
-          await db.insert(usage).values({
-            id: randomUUID(),
-            billingId: billing.id,
-            quizzesGeneratedUsed: 0,
-            websearchesUsed: 0,
-            periodStart: new Date(),
-            periodEnd: new Date(new Date().setMonth(new Date().getMonth() + 1)),
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          });
-        }
+        await db.insert(usage).values({
+          id: randomUUID(),
+          workspaceId,
+          billingId,
+          quizzesGeneratedUsed: 0,
+          websearchesUsed: 0,
+          periodStart: new Date(),
+          periodEnd: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
 
         billingCreated = true;
       }
-    } catch {
-      // fail silently on billing/usage issues
-      billingCreated = false;
     }
 
     res.json({

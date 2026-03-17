@@ -130,7 +130,8 @@ utilityRouter.route("/usage").post(
           description: plans.description,
           price: plans.price,
           currency: plans.currency,
-          monthlyLimit: plans.monthlyLimit,
+          maxAiGenerations: plans.maxAiGenerations,
+          maxWebsearches: plans.maxWebsearches,
         })
         .from(plans)
         .where(eq(plans.id, billing.planId));
@@ -157,7 +158,13 @@ utilityRouter.route("/usage").post(
             startDate: billing.startDate,
             endDate: billing.endDate,
           },
-          plan,
+          plan: {
+            ...plan,
+            monthlyLimit: {
+              quizzesGenerated: (plan as any).maxAiGenerations,
+              websearches: (plan as any).maxWebsearches,
+            }
+          },
           usage: billingUsage || {
             websearchesUsed: 0,
             quizzesGeneratedUsed: 0,

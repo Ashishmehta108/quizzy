@@ -61,6 +61,12 @@ export function QuestionCard({
             <p className="text-zinc-600 dark:text-zinc-400 text-sm md:text-base">
               Choose the best answer from the options below
             </p>
+            {question.excerpt && (
+              <div className="mt-4 p-3 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-white/10 italic text-xs text-zinc-600 dark:text-zinc-400">
+                <p>"{question.excerpt}"</p>
+                {question.pageNumber && <p className="mt-1 font-semibold">— Page {question.pageNumber}</p>}
+              </div>
+            )}
           </div>
         </CardHeader>
         <CardContent className="pt-0">

@@ -16,4 +16,6 @@ const pool = postgres(connectionString, {
   prepare: false,
 });
 
-export const db: PostgresJsDatabase = drizzle(pool);
+import * as schema from "./schema";
+
+export const db = drizzle(pool, { schema });

@@ -50,6 +50,9 @@ export interface Question {
   question: string;
   options: string;
   answer: number;
+  sourceId?: string;
+  pageNumber?: number;
+  excerpt?: string;
   submittedAt: string;
 }
 

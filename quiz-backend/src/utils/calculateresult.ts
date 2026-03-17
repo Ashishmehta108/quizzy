@@ -54,7 +54,7 @@ export const calculateResult = async (
         question: q.question,
         selected: selectedAnswers[index] || [],
         correct: q.answer,
-        options: JSON.parse(q.options),
+        options: JSON.parse(q.options as string),
         explanation: q.explanation,
         createdAt: q.createdAt,
         submittedAt: q.submittedAt,

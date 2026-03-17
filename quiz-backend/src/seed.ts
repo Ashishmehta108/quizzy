@@ -6,6 +6,8 @@ import {
   results,
   billings,
   plans,
+  workspaces,
+  workspaceMembers,
 } from "./config/db/schema";
 import { db } from "./config/db";
 import { eq } from "drizzle-orm";
@@ -21,6 +23,7 @@ async function seed() {
   const quizId = randomUUID();
   const questionId = randomUUID();
   const billingId = randomUUID();
+  const workspaceId = randomUUID();
 
   await db.delete(users).where(eq(users.email, "john@example.com"));
 
@@ -30,6 +33,19 @@ async function seed() {
     name: "John Doe",
     email: "john@example.com",
     role: "user",
+  });
+
+  await db.insert(workspaces).values({
+    id: workspaceId,
+    name: "Seed Workspace",
+    slug: "seed-workspace-" + randomUUID().substring(0, 5),
+  });
+
+  await db.insert(workspaceMembers).values({
+    id: randomUUID(),
+    workspaceId,
+    userId,
+    role: "owner",
   });
 
   const freePlan = await db
@@ -43,6 +59,7 @@ async function seed() {
   await db.insert(billings).values({
     id: billingId,
     userId: userId,
+    workspaceId: workspaceId,
     planId: freePlanId,
     status: "active",
   });
@@ -51,6 +68,7 @@ async function seed() {
     id: quizId,
     title: "JavaScript Basics",
     userId: userId,
+    workspaceId: workspaceId,
     submitted: false,
   });
 
@@ -95,6 +113,7 @@ async function seed() {
       id: resultId,
       userId: userId,
       quizId: quizId,
+      workspaceId: workspaceId,
       score,
       optionsReview: JSON.stringify(optionsReview),
       submittedAt,

@@ -17,6 +17,14 @@ import resultRouter from "./routes/result.routes";
 import dummyRouter from "./routes/dummy.routes";
 import { utilityRouter } from "./routes/utility.routes";
 import chatRouter from "./routes/chat.routes";
+import workspaceRouter from "./routes/workspace.routes";
+import libraryRouter from "./routes/library.routes";
+import assignmentRouter from "./routes/assignment.routes";
+import courseRouter from "./routes/course.routes";
+import analyticsRoutes from "./routes/analytics.routes";
+import exportRoutes from "./routes/export.routes";
+import gradingRoutes from "./routes/grading.routes";
+import pricingRoutes from "./routes/pricing.routes";
 import {
   rateLimitByIP,
   rateLimitByKey,
@@ -86,7 +94,15 @@ app.use("/api/resetusage", updateUsageRouter);
 app.use("/api/notion", notionRouter);
 app.use("/api", dummyRouter);
 app.use("/api/utility", utilityRouter);
+app.use("/api/workspaces", workspaceRouter);
+app.use("/api/library", libraryRouter);
+app.use("/api/assignments", assignmentRouter);
+app.use("/api/courses", courseRouter);
 app.use("/api", chatRouter);
+app.use("/api", analyticsRoutes);
+app.use("/api", exportRoutes);
+app.use("/api", gradingRoutes);
+app.use("/api", pricingRoutes);
 
 
 

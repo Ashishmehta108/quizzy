@@ -1,0 +1,10 @@
+{
+  "agentId": 2,
+  "status": "blocked",
+  "currentTask": "Waiting for Agent 1 to complete. Exploring codebase in the meantime.",
+  "filesOpen": [],
+  "percentComplete": 0,
+  "lastUpdated": "2026-03-17T23:50:00+05:30",
+  "blockedOn": "agent-1",
+  "errors": []
+}

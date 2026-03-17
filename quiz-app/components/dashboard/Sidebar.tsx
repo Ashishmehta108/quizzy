@@ -122,48 +122,68 @@ export default function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <SidebarMenu aria-label="Quizzes" className="mb-4">
+        <SidebarMenu aria-label="Library" className="mb-4">
           <SidebarMenuItem className="text-xs my-2 font-medium">
-            Quizzes
+            Library
           </SidebarMenuItem>
-
           <SidebarMenuItem>
-            <SidebarMenuButton
-              className="hover:bg-zinc-100 py-0 rounded-xl dark:hover:bg-zinc-800"
-              asChild
-            >
-              <Link href="/dashboard/quizzes/create">
+            <SidebarMenuButton className="hover:bg-zinc-100 py-0 rounded-xl dark:hover:bg-zinc-800" asChild>
+              <Link href="/dashboard/library">
                 <span className="flex items-center gap-2">
                   <Note className="w-5 h-5" />
-                  Create new Quiz
+                  My Content
                 </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+        </SidebarMenu>
 
+        <SidebarMenu aria-label="Classroom" className="mb-4">
+          <SidebarMenuItem className="text-xs my-2 font-medium">
+            Classroom
+          </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              className="hover:bg-zinc-100 py-0 rounded-xl dark:hover:bg-zinc-800"
-              asChild
-            >
-              <Link href="/dashboard/quizzes">
+            <SidebarMenuButton className="hover:bg-zinc-100 py-0 rounded-xl dark:hover:bg-zinc-800" asChild>
+              <Link href="/dashboard/courses">
+                <span className="flex items-center gap-2">
+                  <User className="w-5 h-5" />
+                  Courses & Cohorts
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton className="hover:bg-zinc-100 py-0 rounded-xl dark:hover:bg-zinc-800" asChild>
+              <Link href="/dashboard/assignments">
                 <span className="flex items-center gap-2">
                   <Notepad2 className="w-5 h-5" />
-                  All Quizzes
+                  Assignments
                 </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+        </SidebarMenu>
 
+        <SidebarMenu aria-label="Workspace" className="mb-4">
+          <SidebarMenuItem className="text-xs my-2 font-medium">
+            Workspace
+          </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              className="hover:bg-zinc-100 py-0 rounded-xl dark:hover:bg-zinc-800"
-              asChild
-            >
-              <Link href="/dashboard/results">
+            <SidebarMenuButton className="hover:bg-zinc-100 py-0 rounded-xl dark:hover:bg-zinc-800" asChild>
+              <Link href="/dashboard/analytics">
                 <span className="flex items-center gap-2">
                   <FavoriteChart className="w-5 h-5" />
-                  Results
+                  Analytics
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton className="hover:bg-zinc-100 py-0 rounded-xl dark:hover:bg-zinc-800" asChild>
+              <Link href="/dashboard/pricing">
+                <span className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" />
+                  Billing & Plans
                 </span>
               </Link>
             </SidebarMenuButton>
