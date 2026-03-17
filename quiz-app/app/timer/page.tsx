@@ -8,7 +8,7 @@ const QuizPage = () => {
     return (
         <div>
             <h1>Quiz</h1>
-            <Timer initialTime={300} onTimeUp={handleTimeUp} autoStart />
+            <Timer quizId="test-quiz" duration={300} onTimeUp={handleTimeUp} />
         </div>
     );
 };
