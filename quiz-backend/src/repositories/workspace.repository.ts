@@ -4,7 +4,7 @@
  * @tables workspaces, workspace_members, plans, billings, usage, usage_ledger
  */
 import { db } from "../config/db";
-import { workspaces, workspaceMembers } from "../config/db/schema";
+import { workspaces, workspaceMembers, users } from "../config/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export class WorkspaceRepository {
@@ -63,6 +63,14 @@ export class WorkspaceRepository {
       .select()
       .from(workspaceMembers)
       .where(and(eq(workspaceMembers.workspaceId, workspaceId), eq(workspaceMembers.userId, userId)));
+    return result[0];
+  }
+
+  async getMemberById(memberId: string) {
+    const result = await db
+      .select()
+      .from(workspaceMembers)
+      .where(eq(workspaceMembers.id, memberId));
     return result[0];
   }
 

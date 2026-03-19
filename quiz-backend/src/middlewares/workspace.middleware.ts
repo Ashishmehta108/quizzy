@@ -1,9 +1,12 @@
 /**
  * @layer middleware
  * @owner agent-1
+ * @description Middleware to resolve workspace from request and validate membership
  */
 import { Request, Response, NextFunction } from "express";
 import { WorkspaceService } from "../services/workspace.service";
+import { ApiResponse } from "../utils/apiResponse";
+import { ApiError } from "../utils/apiError";
 
 const workspaceService = new WorkspaceService();
 
@@ -12,22 +15,22 @@ export async function resolveWorkspace(req: any, res: Response, next: NextFuncti
   const dbUserId = req.user?.id;
 
   if (!dbUserId) {
-    return res.status(401).json({ success: false, error: "Unauthorized: DB User not resolved" });
+    return res.status(401).json(new ApiResponse(false, "Unauthorized: DB User not resolved"));
   }
 
   if (!workspaceId) {
-    return res.status(400).json({ success: false, error: "Workspace ID is required" });
+    return res.status(400).json(new ApiResponse(false, "Workspace ID is required"));
   }
 
   try {
     const membership = await workspaceService.checkMembership(workspaceId as string, dbUserId);
-    
+
     if (!membership) {
-      return res.status(403).json({ success: false, error: "Not a member of this workspace" });
+      return res.status(403).json(new ApiResponse(false, "Not a member of this workspace"));
     }
 
     const workspace = await workspaceService.getWorkspaceDetail(workspaceId as string);
-    
+
     req.workspace = {
       id: workspace.id,
       name: workspace.name,
@@ -37,6 +40,9 @@ export async function resolveWorkspace(req: any, res: Response, next: NextFuncti
     next();
   } catch (error) {
     console.error("Workspace resolution error:", error);
-    res.status(500).json({ success: false, error: "Internal server error" });
+    if (error instanceof ApiError) {
+      return next(error);
+    }
+    res.status(500).json(new ApiResponse(false, "Internal server error"));
   }
 }

@@ -1,14 +1,19 @@
 import { db } from "../config/db/index";
-import { quizzes, results, users } from "../config/db/schema";
+import { quizzes, results, users, quizAttempts } from "../config/db/schema";
 import { and, eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { calculateResult } from "../utils/calculateresult";
 import { Request, Response } from "express";
 import { ApiError } from "../utils/apiError";
+import { AttemptRepository } from "../repositories/attempt.repository";
 
+/**
+ * PostResult - Creates a result and links it to an attempt if provided
+ * Ensures attempt/result consistency
+ */
 export const PostResult = async (req: Request, res: Response) => {
   try {
-    const { totalScore, optionsFilled, quizId } = req.body;
+    const { totalScore, optionsFilled, quizId, attemptId, workspaceId, assignmentId } = req.body;
 
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
@@ -27,6 +32,8 @@ export const PostResult = async (req: Request, res: Response) => {
     if (!quiz) return res.status(404).json({ error: "Quiz not found" });
 
     const resultId = randomUUID();
+    
+    // Create result with attempt linkage if attemptId is provided
     const [result] = await db
       .insert(results)
       .values({
@@ -36,8 +43,16 @@ export const PostResult = async (req: Request, res: Response) => {
         quizId,
         userId: user.id,
         submittedAt: new Date(),
+        workspaceId,
+        assignmentId,
+        attemptId: attemptId || null, // Link to attempt if provided
       })
       .returning();
+
+    // If attemptId was provided, link it and update attempt status
+    if (attemptId) {
+      await AttemptRepository.linkResultToAttempt(attemptId, resultId);
+    }
 
     await db
       .update(quizzes)
@@ -60,7 +75,6 @@ export const GetResults = async (req: Request, res: Response) => {
       .from(users)
       .where(eq(users.id, userId))
       .limit(1);
-    console.log(user);
     if (!user || user.length === 0) return res.status(404).json({ error: "User not found" });
 
     const data = await db
@@ -182,5 +196,84 @@ export const GetResultById = async (req: Request, res: Response) => {
     return res
       .status(500)
       .json({ error: error.message || "Failed to fetch result" });
+  }
+};
+
+/**
+ * SubmitQuizAttempt - Atomic submission of a quiz attempt with result
+ * This ensures attempt and result are created/linked consistently
+ */
+export const SubmitQuizAttempt = async (req: Request, res: Response) => {
+  try {
+    const { quizId, answers, workspaceId, assignmentId, score, timeTakenSeconds } = req.body;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // Validate quiz exists
+    const [quiz] = await db
+      .select()
+      .from(quizzes)
+      .where(eq(quizzes.id, quizId));
+
+    if (!quiz) {
+      return res.status(404).json({ error: "Quiz not found" });
+    }
+
+    // Create attempt
+    const attemptId = randomUUID();
+    const [attempt] = await db
+      .insert(quizAttempts)
+      .values({
+        id: attemptId,
+        userId,
+        quizId,
+        workspaceId,
+        assignmentId,
+        answers,
+        score,
+        timeTakenSeconds,
+        status: 'submitted',
+        startedAt: new Date(),
+        submittedAt: new Date(),
+        completedAt: new Date(),
+      })
+      .returning();
+
+    // Create result linked to attempt
+    const resultId = randomUUID();
+    const [result] = await db
+      .insert(results)
+      .values({
+        id: resultId,
+        userId,
+        quizId,
+        workspaceId,
+        assignmentId,
+        attemptId,
+        score,
+        optionsReview: JSON.stringify(answers),
+        submittedAt: new Date(),
+      })
+      .returning();
+
+    // Mark quiz as submitted
+    await db
+      .update(quizzes)
+      .set({ submitted: true })
+      .where(eq(quizzes.id, quizId));
+
+    return res.status(201).json({
+      success: true,
+      data: {
+        attempt,
+        result,
+      },
+    });
+  } catch (error: any) {
+    console.error("SubmitQuizAttempt error:", error);
+    return res.status(500).json({ error: error.message || "Failed to submit quiz attempt" });
   }
 };

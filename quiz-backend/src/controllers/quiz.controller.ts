@@ -82,8 +82,9 @@ export const createQuiz = asyncHandler(async (req: FileRequest, res: Response) =
     const userId = req.user?.id;
     if (!userId) throw new ApiError(401, "Unauthorized: userId missing");
 
-    const workspaceId = req.headers["x-workspace-id"] as string;
-    if (!workspaceId) throw new ApiError(400, "Workspace ID is required");
+    // Use workspace from middleware (already validated membership)
+    const workspaceId = req.workspace?.id;
+    if (!workspaceId) throw new ApiError(400, "Workspace context missing. Please ensure resolveWorkspace middleware is applied.");
 
     const entitlement = await checkEntitlement(workspaceId, "ai_generation");
     if (!entitlement.allowed) {
@@ -103,14 +104,17 @@ export const createQuiz = asyncHandler(async (req: FileRequest, res: Response) =
     if (!title) throw new ApiError(400, "Title is required");
     if (!query) throw new ApiError(400, "Query is required");
 
-    // Check for existing quiz with same title
+    // Check for existing quiz with same title in this workspace
     const existingQuiz = await db
       .select()
       .from(quizzes)
-      .where(and(eq(quizzes.title, title), eq(quizzes.userId, user.id)));
+      .where(and(
+        eq(quizzes.title, title),
+        eq(quizzes.workspaceId, workspaceId)
+      ));
 
     if (existingQuiz.length > 0) {
-      throw new ApiError(400, "Quiz with this title already exists");
+      throw new ApiError(400, "Quiz with this title already exists in this workspace");
     }
 
     // Prepare files for job
@@ -186,6 +190,14 @@ export const createQuiz = asyncHandler(async (req: FileRequest, res: Response) =
 export const getQuizzes = async (req: QuizRequest, res: QuizResponse) => {
   try {
     const userId = req.user?.id!;
+    const workspaceId = req.workspace?.id;
+
+    if (!workspaceId) {
+      return res.status(400).json({ 
+        success: false,
+        error: "Workspace context missing" 
+      });
+    }
 
     const userResult = await db
       .select()
@@ -195,18 +207,21 @@ export const getQuizzes = async (req: QuizRequest, res: QuizResponse) => {
 
     const user = userResult[0];
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ 
+        success: false,
+        error: "User not found" 
+      });
     }
 
-    // Get all user quizzes
-    const userQuizzes = await db
+    // Get all quizzes for the workspace (not just user's quizzes)
+    const workspaceQuizzes = await db
       .select()
       .from(quizzes)
-      .where(eq(quizzes.userId, user.id))
+      .where(eq(quizzes.workspaceId, workspaceId))
       .execute();
 
-    if (userQuizzes.length === 0) {
-      return res.json([]);
+    if (workspaceQuizzes.length === 0) {
+      return res.json({ success: true, data: [] });
     }
 
     // Get all results in a single query
@@ -219,7 +234,7 @@ export const getQuizzes = async (req: QuizRequest, res: QuizResponse) => {
     const allQuestions = await db
       .select()
       .from(questions)
-      .where(inArray(questions.quizId, userQuizzes.map(q => q.id)));
+      .where(inArray(questions.quizId, workspaceQuizzes.map(q => q.id)));
 
     // Group questions by quizId for efficient lookup
     const questionsByQuiz = new Map<string, typeof allQuestions>();
@@ -238,16 +253,19 @@ export const getQuizzes = async (req: QuizRequest, res: QuizResponse) => {
     }
 
     // Build response without additional queries
-    const quizzesWithQuestions = userQuizzes.map((quiz) => ({
+    const quizzesWithQuestions = workspaceQuizzes.map((quiz) => ({
       ...quiz,
       questions: questionsByQuiz.get(quiz.id) || [],
       resultId: resultsByQuiz.get(quiz.id) || "",
     }));
 
-    res.json(quizzesWithQuestions);
+    res.json({ success: true, data: quizzesWithQuestions });
   } catch (error) {
     console.error("Error fetching quizzes:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ 
+      success: false,
+      error: "Internal server error" 
+    });
   }
 };
 
@@ -255,10 +273,75 @@ export const getJobStatus = asyncHandler(async (req: Request, res: Response) => 
   const { jobId } = req.params;
 
   const job = await import("../queues/quiz.queue").then(m => m.getJobStatus(jobId));
-  
+
   if (!job) {
     throw new ApiError(404, "Job not found");
   }
 
   res.json(job);
+});
+
+/**
+ * Get quiz by ID with workspace validation
+ * - Validates that the quiz belongs to the requesting user's workspace
+ * - Returns 404 if quiz doesn't exist or doesn't belong to workspace
+ */
+export const getQuizById = asyncHandler(async (req: QuizRequest, res: QuizResponse) => {
+  const { id } = req.params;
+  const userId = req.user?.id;
+  const workspaceId = req.workspace?.id;
+
+  if (!id) {
+    return res.status(400).json({ 
+      success: false,
+      error: "Quiz ID is required" 
+    });
+  }
+  
+  if (!userId) {
+    return res.status(401).json({ 
+      success: false,
+      error: "Unauthorized: User not authenticated" 
+    });
+  }
+
+  if (!workspaceId) {
+    return res.status(400).json({ 
+      success: false,
+      error: "Workspace context missing" 
+    });
+  }
+
+  // Fetch quiz with workspace validation
+  const [quizRecord] = await db
+    .select()
+    .from(quizzes)
+    .where(
+      and(
+        eq(quizzes.id, id),
+        eq(quizzes.workspaceId, workspaceId)
+      )
+    );
+
+  if (!quizRecord) {
+    // Return 404 instead of 201 for non-existent quizzes
+    return res.status(404).json({
+      success: false,
+      error: "Quiz not found or access denied"
+    });
+  }
+
+  // Fetch questions for this quiz
+  const questionsList = await db
+    .select()
+    .from(questions)
+    .where(eq(questions.quizId, id));
+
+  return res.json({ 
+    success: true,
+    data: { 
+      quiz: quizRecord, 
+      questions: questionsList 
+    } 
+  });
 });

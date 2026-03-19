@@ -1,0 +1,196 @@
+{
+  "version": 1,
+  "updatedAt": "2026-03-20T00:00:00Z",
+  "protocol": {
+    "steps": [
+      "read-locks",
+      "acquire-lock",
+      "edit-owned-files",
+      "release-lock",
+      "update-agent-state"
+    ],
+    "rules": [
+      "Never edit a file with status=locked unless owner matches your agent id.",
+      "If lock is held by another agent, skip to another unblocked task.",
+      "Only lock files needed for the current step, not the full backlog.",
+      "Release locks immediately after each atomic change set.",
+      "If an agent crashes, stale locks older than 45 minutes can be reclaimed with notes."
+    ],
+    "staleLockMinutes": 45
+  },
+  "agents": {
+    "agent-1": {
+      "state": "done",
+      "currentTask": "",
+      "primaryArea": "backend-rbac-and-quiz-guards"
+    },
+    "agent-2": {
+      "state": "completed",
+      "currentTask": "Contest domain implementation complete: schema, repository, service, controller, routes mounted",
+      "primaryArea": "backend-contests-domain"
+    },
+    "agent-3": {
+      "state": "done",
+      "currentTask": "Backend leaderboards and attempt consistency - completed",
+      "primaryArea": "backend-leaderboards-and-attempts"
+    },
+    "agent-4": {
+      "state": "done",
+      "currentTask": "Completed: Contest/leaderboard UI and API client unification",
+      "primaryArea": "frontend-contests-leaderboards-and-api-client",
+      "handoffNote": "Created contests and leaderboards pages with typed API interfaces. Sidebar updated with navigation entries. API client extended with contestApi helper. Pages ready for backend integration with agent-2 and agent-3 endpoints."
+    }
+  },
+  "locks": [
+    {
+      "path": "quiz-backend/src/config/db/schema.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Shared by agent-1 and agent-2. Lock per migration-sized edit."
+    },
+    {
+      "path": "quiz-backend/src/middlewares/role.middleware.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-1. Enhanced with RBAC helpers."
+    },
+    {
+      "path": "quiz-backend/src/routes/quiz.routes.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-1. Updated with RBAC guards."
+    },
+    {
+      "path": "quiz-backend/src/controllers/quiz.controller.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-1. Updated with workspace validation."
+    },
+    {
+      "path": "quiz-backend/src/routes/workspace.routes.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-1. Added role-management endpoints."
+    },
+    {
+      "path": "quiz-backend/src/repositories/workspace.repository.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-1. Added getMemberById method."
+    },
+    {
+      "path": "quiz-backend/src/services/workspace.service.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-1. Enhanced with member management."
+    },
+    {
+      "path": "quiz-backend/src/routes/contest.routes.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-2 (new file)."
+    },
+    {
+      "path": "quiz-backend/src/controllers/contest.controller.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-2 (new file)."
+    },
+    {
+      "path": "quiz-backend/src/services/contest.service.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-2 (new file)."
+    },
+    {
+      "path": "quiz-backend/src/repositories/contest.repository.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-2 (new file)."
+    },
+    {
+      "path": "quiz-backend/src/app.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Shared mount point. Lock only while adding router import/use."
+    },
+    {
+      "path": "quiz-backend/src/repositories/analytics.repository.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-3. Leaderboard queries added."
+    },
+    {
+      "path": "quiz-backend/src/services/analytics.service.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-3. Leaderboard services added, mocks removed."
+    },
+    {
+      "path": "quiz-backend/src/controllers/analytics.controller.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-3. Leaderboard endpoints added."
+    },
+    {
+      "path": "quiz-backend/src/routes/analytics.routes.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-3. Leaderboard routes registered."
+    },
+    {
+      "path": "quiz-backend/src/controllers/result.controller.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-3. Attempt/result consistency fixed."
+    },
+    {
+      "path": "quiz-backend/src/repositories/attempt.repository.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-3. Attempt CRUD and linking added."
+    },
+    {
+      "path": "quiz-app/lib/api.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-4."
+    },
+    {
+      "path": "quiz-app/lib/types.ts",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-4."
+    },
+    {
+      "path": "quiz-app/components/dashboard/Sidebar.tsx",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-4."
+    },
+    {
+      "path": "quiz-app/app/dashboard/contests/page.tsx",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-4 (new file)."
+    },
+    {
+      "path": "quiz-app/app/dashboard/contests/[id]/page.tsx",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-4 (new file)."
+    },
+    {
+      "path": "quiz-app/app/dashboard/leaderboards/page.tsx",
+      "status": "free",
+      "owner": null,
+      "notes": "Owned by agent-4 (new file)."
+    },
+    {
+      "path": "quiz-app/app/dashboard/analytics/page.tsx",
+      "status": "free",
+      "owner": null,
+      "notes": "Shared read/write with agent-3 API contract. Lock for final wiring."
+    }
+  ]
+}

@@ -26,6 +26,7 @@ import analyticsRoutes from "./routes/analytics.routes";
 import exportRoutes from "./routes/export.routes";
 import gradingRoutes from "./routes/grading.routes";
 import pricingRoutes from "./routes/pricing.routes";
+import contestRoutes from "./routes/contest.routes";
 import {
   rateLimitByIP,
   rateLimitByKey,
@@ -126,6 +127,7 @@ app.use("/api", analyticsRoutes);
 app.use("/api", exportRoutes);
 app.use("/api", gradingRoutes);
 app.use("/api", pricingRoutes);
+app.use("/api/contests", contestRoutes);
 
 
 

@@ -94,3 +94,43 @@ export interface EmptyStateProps {
   description: string;
   action?: React.ReactNode;
 }
+
+export interface Contest {
+  id: string;
+  title: string;
+  description: string;
+  startTime: string;
+  endTime: string;
+  status: "upcoming" | "active" | "ended";
+  participantCount: number;
+  quizId: string;
+  createdAt: string;
+}
+
+export interface ContestResponse {
+  contests: Contest[];
+}
+
+export interface ContestDetail extends Contest {
+  quiz?: Quiz;
+  topParticipants?: LeaderboardEntry[];
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  rank: number;
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  score: number;
+  accuracy: number;
+  timeTaken?: number;
+  completedAt: string;
+}
+
+export interface LeaderboardResponse {
+  contestId: string;
+  contestTitle: string;
+  entries: LeaderboardEntry[];
+  totalParticipants: number;
+}

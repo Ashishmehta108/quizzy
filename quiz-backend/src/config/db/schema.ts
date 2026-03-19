@@ -833,3 +833,110 @@ export const assignmentMembersRelations = relations(assignmentMembers, ({ one })
     references: [users.id],
   }),
 }));
+
+// ==================== CONTEST DOMAIN ====================
+
+export const contestStatusEnum = pgEnum("contest_status", [
+  "scheduled",
+  "active",
+  "ended",
+  "cancelled",
+]);
+
+export const contestParticipationStatusEnum = pgEnum("contest_participation_status", [
+  "registered",
+  "participated",
+  "completed",
+  "disqualified",
+]);
+
+/**
+ * Contests table - represents time-bound quiz competitions
+ * @owner agent-2
+ */
+export const contests = pgTable(
+  "contests",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id").notNull(),
+    quizId: varchar("quiz_id", { length: 36 }).notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
+    status: contestStatusEnum("status").default("scheduled").notNull(),
+    startTime: timestamp("start_time").notNull(),
+    endTime: timestamp("end_time").notNull(),
+    maxParticipants: integer("max_participants"),
+    registrationDeadline: timestamp("registration_deadline"),
+    isPublic: boolean("is_public").default(false).notNull(),
+    shareToken: varchar("share_token", { length: 100 }).unique(),
+    prizeInfo: text("prize_info"),
+    rules: text("rules"),
+    createdBy: varchar("created_by", { length: 36 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
+  },
+  (t) => ({
+    workspaceIdx: index("idx_contests_workspace").on(t.workspaceId),
+    quizIdx: index("idx_contests_quiz").on(t.quizId),
+    statusIdx: index("idx_contests_status").on(t.status),
+    startTimeIdx: index("idx_contests_start_time").on(t.startTime),
+    createdByIdx: index("idx_contests_created_by").on(t.createdBy),
+  })
+);
+
+/**
+ * Contest participants table - tracks user registration and participation in contests
+ * @owner agent-2
+ */
+export const contestParticipants = pgTable(
+  "contest_participants",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    contestId: uuid("contest_id").notNull().references(() => contests.id, { onDelete: "cascade" }),
+    userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id, { onDelete: "cascade" }),
+    status: contestParticipationStatusEnum("status").default("registered").notNull(),
+    registeredAt: timestamp("registered_at").defaultNow().notNull(),
+    startedAt: timestamp("started_at"),
+    completedAt: timestamp("completed_at"),
+    score: integer("score"),
+    attemptId: varchar("attempt_id", { length: 36 }),
+    rank: integer("rank"),
+    disqualifiedReason: text("disqualified_reason"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    contestIdx: index("idx_contest_participants_contest").on(t.contestId),
+    userIdx: index("idx_contest_participants_user").on(t.userId),
+    uniqueParticipant: index("idx_contest_participants_unique").on(t.contestId, t.userId),
+    statusIdx: index("idx_contest_participants_status").on(t.status),
+  })
+);
+
+// ==================== CONTEST RELATIONS ====================
+
+export const contestsRelations = relations(contests, ({ one, many }) => ({
+  workspace: one(workspaces, {
+    fields: [contests.workspaceId],
+    references: [workspaces.id],
+  }),
+  quiz: one(quizzes, {
+    fields: [contests.quizId],
+    references: [quizzes.id],
+  }),
+  creator: one(users, {
+    fields: [contests.createdBy],
+    references: [users.id],
+  }),
+  participants: many(contestParticipants),
+}));
+
+export const contestParticipantsRelations = relations(contestParticipants, ({ one }) => ({
+  contest: one(contests, {
+    fields: [contestParticipants.contestId],
+    references: [contests.id],
+  }),
+  user: one(users, {
+    fields: [contestParticipants.userId],
+    references: [users.id],
+  }),
+}));

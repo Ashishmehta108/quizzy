@@ -29,6 +29,8 @@ import {
   Home,
   Note,
   Notepad2,
+  Trophy,
+  Ranking,
 } from "iconsax-reactjs";
 import { useSession, signOut } from "@/lib/auth/auth-client";
 import {
@@ -170,6 +172,26 @@ export default function AppSidebar() {
                 <span className="flex items-center gap-2">
                   <FavoriteChart className="w-5 h-5" />
                   Analytics
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton className="hover:bg-zinc-100 py-0 rounded-xl dark:hover:bg-zinc-800" asChild>
+              <Link href="/dashboard/contests">
+                <span className="flex items-center gap-2">
+                  <Trophy className="w-5 h-5" />
+                  Contests
+                </span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton className="hover:bg-zinc-100 py-0 rounded-xl dark:hover:bg-zinc-800" asChild>
+              <Link href="/dashboard/leaderboards">
+                <span className="flex items-center gap-2">
+                  <Ranking className="w-5 h-5" />
+                  Leaderboards
                 </span>
               </Link>
             </SidebarMenuButton>
