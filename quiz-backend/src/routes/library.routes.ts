@@ -1,28 +1,40 @@
-/**
- * @layer route
- * @owner agent-2
- */
 import { Router } from "express";
-import { LibraryController } from "../controllers/library.controller";
-import { IngestionController } from "../controllers/ingestion.controller";
-import { resolveWorkspace } from "../middlewares/workspace.middleware";
-import { requireRole } from "../middlewares/role.middleware";
-import multer from "multer";
+import {
+  uploadMaterial,
+  listMaterials,
+  getMaterial,
+  deleteMaterial,
+  linkMaterialToCourse,
+  reorderMaterials,
+} from "../controllers/library.controller";
+import { checkAuth } from "../utils/checkAuth";
+import { upload } from "../middlewares/upload.middleware";
 
-import { resolveUser } from "../middlewares/auth.middleware";
+const libraryRouter = Router();
 
-const router = Router();
-const libraryController = new LibraryController();
-const ingestionController = new IngestionController();
-const upload = multer({ dest: "uploads/" });
+// All routes require authentication
+libraryRouter.use(checkAuth);
 
-router.use(resolveUser);
-router.use(resolveWorkspace);
+// Upload material (with file)
+libraryRouter.post(
+  "/",
+  upload.array("files", 5),
+  uploadMaterial
+);
 
-router.get("/", libraryController.listDocuments);
-router.get("/courses", libraryController.listCourses);
-router.post("/upload", upload.single("file"), ingestionController.uploadAndProcess);
-router.get("/:id", libraryController.getDocument);
-router.delete("/:id", requireRole("owner", "admin"), libraryController.deleteDocument);
+// List all materials
+libraryRouter.get("/", listMaterials);
 
-export default router;
+// Get material by ID
+libraryRouter.get("/:id", getMaterial);
+
+// Delete material
+libraryRouter.delete("/:id", deleteMaterial);
+
+// Link material to course
+libraryRouter.post("/:id/link", linkMaterialToCourse);
+
+// Reorder course materials
+libraryRouter.put("/reorder", reorderMaterials);
+
+export default libraryRouter;

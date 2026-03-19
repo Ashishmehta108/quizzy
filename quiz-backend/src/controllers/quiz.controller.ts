@@ -8,7 +8,7 @@ import {
   documents,
   results,
 } from "../config/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { processPdf } from "../ai/parsedoc/doc";
 import { upsertChunks } from "../ai/pinecone";
@@ -24,6 +24,8 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { ApiError } from "../utils/apiError";
 import { airaAgent } from "../ai/agent/airaAgent";
 import { checkEntitlement } from "../services/entitlements.service";
+import { quizGenerationQueue } from "../queues/quiz.queue";
+import type { QuizGenerationJob } from "../queues/quiz.queue";
 
 export interface QuizFile {
   fieldname: string;
@@ -70,180 +72,99 @@ const emitUpdate = (
   }
 };
 
-export const createQuiz = asyncHandler(
-  async (req: FileRequest, res: Response) => {
-    try {
-      console.log("[CreateQuiz] Request received:", req.body);
+export const createQuiz = asyncHandler(async (req: FileRequest, res: Response) => {
+  try {
+    console.log("[CreateQuiz] Request received:", req.body);
 
-      const websearch = req.body.webSearch === "true";
-      const socketId = req.body.socketId;
-      const description = req.body.description || "No description provided";
-      const userId = req.auth?.userId;
-      if (!userId) throw new ApiError(401, "Unauthorized: userId missing");
+    const websearch = req.body.webSearch === "true";
+    const socketId = req.body.socketId;
+    const description = req.body.description || "No description provided";
+    const userId = req.user?.id;
+    if (!userId) throw new ApiError(401, "Unauthorized: userId missing");
 
-      const workspaceId = req.headers["x-workspace-id"] as string;
-      if (!workspaceId) throw new ApiError(400, "Workspace ID is required");
+    const workspaceId = req.headers["x-workspace-id"] as string;
+    if (!workspaceId) throw new ApiError(400, "Workspace ID is required");
 
-      const entitlement = await checkEntitlement(workspaceId, "ai_generation");
-      if (!entitlement.allowed) {
-        throw new ApiError(403, `You have reached your limit of ${entitlement.limit} AI generations for this plan. Please upgrade.`);
+    const entitlement = await checkEntitlement(workspaceId, "ai_generation");
+    if (!entitlement.allowed) {
+      throw new ApiError(403, `You have reached your limit of ${entitlement.limit} AI generations for this plan. Please upgrade.`);
+    }
+
+    const getUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    const user = getUser[0];
+    if (!user?.id) throw new ApiError(401, "User not found");
+
+    const { title, query } = req.body;
+    if (!title) throw new ApiError(400, "Title is required");
+    if (!query) throw new ApiError(400, "Query is required");
+
+    // Check for existing quiz with same title
+    const existingQuiz = await db
+      .select()
+      .from(quizzes)
+      .where(and(eq(quizzes.title, title), eq(quizzes.userId, user.id)));
+
+    if (existingQuiz.length > 0) {
+      throw new ApiError(400, "Quiz with this title already exists");
+    }
+
+    // Prepare files for job
+    const filesForJob: QuizGenerationJob["files"] = [];
+    if (req.files && Object.keys(req.files).length > 0) {
+      const allFiles: Express.Multer.File[] = Array.isArray(req.files)
+        ? req.files
+        : (Object.values(req.files).flat() as Express.Multer.File[]);
+
+      for (const file of allFiles) {
+        filesForJob.push({
+          path: file.path,
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+          buffer: file.buffer,
+        });
       }
+    }
 
-      emitUpdate(socketId, "status", "Creating quiz request recieved ");
-
-      const [getUser] = await db
-        .select()
-        .from(users)
-        .where(eq(users.clerkId, userId));
-
-      if (!getUser?.id) throw new ApiError(401, "User not found");
-
-      const { title, query } = req.body;
-      if (!title) throw new ApiError(400, "Title is required");
-
-      const existingQuiz = await db
-        .select()
-        .from(quizzes)
-        .where(and(eq(quizzes.title, title), eq(quizzes.userId, getUser.id)));
-
-      if (existingQuiz.length > 0) {
-        emitUpdate(socketId, "status", "Quiz with this title already exists");
-        throw new ApiError(400, "Quiz with this title already exists");
-      }
-
-      let docIds: string[] = [];
-      let fullDoc = "";
-
-      if (req.files && Object.keys(req.files).length > 0) {
-        emitUpdate(socketId, "status", "Processing uploaded files…");
-
-        const allFiles: Express.Multer.File[] = Array.isArray(req.files)
-          ? req.files
-          : (Object.values(req.files).flat() as Express.Multer.File[]);
-
-        for (const file of allFiles) {
-          const filePath = file.path;
-          const fileType = file.mimetype;
-          const documentId = randomUUID();
-          docIds.push(documentId);
-
-          if (fileType === "application/pdf") {
-            fullDoc += await processPdf(filePath, getUser.id, documentId, file);
-          } else if (fileType === "text/plain") {
-            const buffer = await fs.readFile(filePath);
-            const chunks = chunkText(buffer.toString(), 1000, 100);
-            await upsertChunks(getUser.id, documentId, chunks);
-            await db.insert(documents).values({
-              id: documentId,
-              title,
-              userId: getUser.id,
-              content: chunks.map((c) => c.text).join(" "),
-              uploadUrl: "",
-              createdAt: new Date(),
-            });
-            fullDoc += chunks.map((c) => c.text).join(" ");
-          } else if (
-            ["image/png", "image/jpg", "image/jpeg"].includes(fileType)
-          ) {
-            const data = await extractTextFromImage(filePath);
-            const chunks = chunkText(data, 1000, 100);
-            await upsertChunks(getUser.id, documentId, chunks);
-            await db.insert(documents).values({
-              id: documentId,
-              title,
-              userId: getUser.id,
-              content: chunks.map((c) => c.text).join(" "),
-              uploadUrl: "",
-              createdAt: new Date(),
-            });
-            fullDoc += chunks.map((c) => c.text).join(" ");
-          } else {
-            throw new ApiError(400, `Unsupported file type: ${fileType}`);
-          }
-        }
-      }
-
-      emitUpdate(socketId, "status", "Generating quiz with AiraAgent…");
-
-      if (!query) throw new ApiError(400, "Query not found");
-
-      const aira = await airaAgent.invoke(
-        { input: { title, query }, usage: { webSearchesDone: 0 } },
-        {
-          configurable: {
-            userId: getUser.id,
-            docIds,
-            websearchOn: websearch,
-          },
-        }
-      );
-
-      const { quiz: quizQuestions } = aira;
-      if (!Array.isArray(quizQuestions) || quizQuestions.length === 0)
-        throw new ApiError(500, "Failed to generate quiz questions");
-
-      emitUpdate(socketId, "status", "Saving quiz to database…");
-
-      const [billing] = await db
-        .select()
-        .from(billings)
-        .where(eq(billings.userId, getUser.id))
-        .limit(1);
-
-      const [currentUsage] = await db
-        .select()
-        .from(usage)
-        .where(eq(usage.billingId, billing.id));
-
-      await db
-        .update(usage)
-        .set({
-          quizzesGeneratedUsed: (currentUsage?.quizzesGeneratedUsed ?? 0) + 1,
-          websearchesUsed:
-            (currentUsage?.websearchesUsed ?? 0) +
-            (aira.usage?.webSearchesDone ?? 0),
-          updatedAt: new Date(),
-        })
-        .where(eq(usage.billingId, billing.id));
-
-      const quizId = randomUUID();
-      await db.insert(quizzes).values({
-        id: quizId,
+    // Add job to queue
+    const job = await quizGenerationQueue.add(
+      "generate-quiz",
+      {
+        userId: user.id,
+        clerkId: userId,
         title,
-        userId: getUser.id,
-        createdAt: new Date(),
-        submitted: false,
+        query,
         description,
-      });
+        webSearch: websearch,
+        socketId,
+        files: filesForJob,
+        workspaceId,
+      } as QuizGenerationJob,
+      {
+        jobId: randomUUID(),
+      }
+    );
 
-      const questionsData = quizQuestions.map((q) => ({
-        id: randomUUID(),
-        quizId,
-        question: q.question,
-        options: JSON.stringify(q.options),
-        answer: q.answer,
-        explanation: q.explanation ?? "",
-        createdAt: new Date(),
-        submittedAt: new Date(),
-      }));
+    // Return immediately with job ID
+    res.status(202).json({
+      jobId: job.id,
+      status: "processing",
+      message: "Quiz generation started. Listen to WebSocket for updates.",
+    });
+  } catch (err: any) {
+    console.error("[CreateQuiz] Error:", err);
 
-      await db.insert(questions).values(questionsData);
-
-      emitUpdate(socketId, "status", "Quiz created successfully ✅");
-
-      res.status(201).json({ quizId, questions: quizQuestions });
-    } catch (err: any) {
-      console.error("[CreateQuiz] Error:", err);
-
-      res
-        .status(err.statusCode || 500)
-        .json({ error: err.message || "Internal Server Error" });
-    } finally {
+    // Clean up uploaded files on error
+    if (req.files) {
       const deleteUploadedFiles = async (files: Express.Multer.File[]) => {
         for (const file of files) {
           try {
             await fs.unlink(file.path);
-            console.log("Deleted file:", file.path);
           } catch (err: any) {
             console.error("Failed to delete file:", file.path, err);
           }
@@ -255,68 +176,73 @@ export const createQuiz = asyncHandler(
           : (Object.values(req.files || {}).flat() as Express.Multer.File[])
       );
     }
+
+    res
+      .status(err.statusCode || 500)
+      .json({ error: err.message || "Internal Server Error" });
   }
-);
+});
 
 export const getQuizzes = async (req: QuizRequest, res: QuizResponse) => {
   try {
-    const userId = req.auth?.userId!;
-    console.log("userid is here",userId)
-    let rslts = [];
-    const [user]: User[] = await db
+    const userId = req.user?.id!;
+
+    const userResult = await db
       .select()
       .from(users)
-      .where(eq(users.clerkId, userId));
-console.log(user)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    const user = userResult[0];
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
+    // Get all user quizzes
     const userQuizzes = await db
       .select()
       .from(quizzes)
       .where(eq(quizzes.userId, user.id))
       .execute();
+
     if (userQuizzes.length === 0) {
       return res.json([]);
     }
-    const r = await db
+
+    // Get all results in a single query
+    const allResults = await db
       .select()
       .from(results)
       .where(eq(results.userId, user.id));
-    if (!r.length) {
-      rslts = [];
-    }
-    const quizzesWithQuestions = await Promise.all(
-      userQuizzes.map(async (quiz) => {
-        const questionsList = await db
-          .select()
-          .from(questions)
-          .where(eq(questions.quizId, quiz.id));
 
-        return {
-          ...quiz,
-          /*parameter) quiz: {
-    id: string;
-    title: string;
-    userId: string | null;
-    createdAt: Date;
-    submitted: boolean;
-}*/
-          questions: questionsList /*const questionsList: {
-    id: string;
-    quizId: string | null;
-    question: string;
-    options: string;
-    answer: number;
-    createdAt: Date;
-    submittedAt: Date;
-    explanation: string;
-}[] */,
-          resultId: r.find((result) => result.quizId === quiz.id)?.id || "",
-        };
-      })
-    );
+    // FIXED: Batch load all questions in a single query instead of N+1
+    const allQuestions = await db
+      .select()
+      .from(questions)
+      .where(inArray(questions.quizId, userQuizzes.map(q => q.id)));
+
+    // Group questions by quizId for efficient lookup
+    const questionsByQuiz = new Map<string, typeof allQuestions>();
+    for (const question of allQuestions) {
+      const existing = questionsByQuiz.get(question.quizId!) || [];
+      existing.push(question);
+      questionsByQuiz.set(question.quizId!, existing);
+    }
+
+    // Map results by quizId for quick lookup
+    const resultsByQuiz = new Map<string, string>();
+    for (const result of allResults) {
+      if (result.quizId) {
+        resultsByQuiz.set(result.quizId, result.id);
+      }
+    }
+
+    // Build response without additional queries
+    const quizzesWithQuestions = userQuizzes.map((quiz) => ({
+      ...quiz,
+      questions: questionsByQuiz.get(quiz.id) || [],
+      resultId: resultsByQuiz.get(quiz.id) || "",
+    }));
 
     res.json(quizzesWithQuestions);
   } catch (error) {
@@ -324,3 +250,15 @@ console.log(user)
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const getJobStatus = asyncHandler(async (req: Request, res: Response) => {
+  const { jobId } = req.params;
+
+  const job = await import("../queues/quiz.queue").then(m => m.getJobStatus(jobId));
+  
+  if (!job) {
+    throw new ApiError(404, "Job not found");
+  }
+
+  res.json(job);
+});

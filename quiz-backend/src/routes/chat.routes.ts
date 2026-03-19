@@ -17,7 +17,7 @@ const chatRouter = Router();
 chatRouter.get(
   "/chats",
   asyncHandler(async (req, res) => {
-    const userId = req.auth?.userId;
+    const userId = req.user?.id;
     console.log("UserId:", userId);
 
     if (!userId) return res.status(200).json({ chats: [] });
@@ -44,7 +44,7 @@ chatRouter.get(
   "/chat/:id",
   asyncHandler(async (req, res) => {
     const { id: quizId } = req.params;
-    const userId = req.auth?.userId;
+    const userId = req.user?.id;
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
     const sessionId = await ensureSession(quizId, userId);
@@ -63,7 +63,7 @@ chatRouter.post(
   asyncHandler(async (req, res) => {
     const { id: quizId } = req.params;
     const { role, content, sessionId } = req.body;
-    const userId = req.auth?.userId;
+    const userId = req.user?.id;
     if (!sessionId || !userId)
       return res.status(400).json({ error: "Missing sessionId or unauthorized" });
 
@@ -87,7 +87,7 @@ chatRouter.post(
   asyncHandler(async (req, res) => {
     const { id: quizId } = req.params;
     const { question, explanation, userQuery, type } = req.body;
-    const userId = req.auth?.userId;
+    const userId = req.user?.id;
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
     const result = await quizAI(type || "chat", {
@@ -106,7 +106,7 @@ chatRouter.get(
   "/chat/:id/questions",
   asyncHandler(async (req, res) => {
     const { id: quizId } = req.params;
-    const userId = req.auth?.userId;
+    const userId = req.user?.id;
     const qns = await db
       .select()
       .from(questions)

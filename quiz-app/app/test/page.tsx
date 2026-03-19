@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useSession } from "@/lib/auth/auth-client";
 
 export default function TestPage() {
-  const { getToken } = useAuth();
+  const { data: session } = useSession();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -12,11 +12,11 @@ export default function TestPage() {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const token = await getToken();
-        console.log("Frontend Clerk token:", token);
+        const token = session?.session?.token;
+        console.log("Session token:", token);
 
         if (!token) {
-          setError("No Clerk token found. Are you signed in?");
+          setError("No session token found. Are you signed in?");
           setLoading(false);
           return;
         }

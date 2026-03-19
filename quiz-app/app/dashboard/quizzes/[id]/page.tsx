@@ -11,7 +11,7 @@ import api from "@/lib/api";
 import type { QuizResponse, Result } from "@/lib/types";
 import Link from "next/link";
 import { MarkdownRenderer } from "@/components/quiz-render/MarkdownRender";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "@/lib/auth/auth-client";
 
 interface QuestionCardProps {
   question: Question;
@@ -173,13 +173,14 @@ export default function TakeQuizPage({
   const [result, setResult] = useState<Result | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
-  const { user, isLoaded } = useUser();
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
 
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoaded) {
+    if (!isPending) {
       if (!user) {
         router.push("/post-login");
       }
@@ -187,7 +188,7 @@ export default function TakeQuizPage({
         fetchQuiz(id);
       }
     }
-  }, [user, router, id]);
+  }, [user, router, id, isPending]);
 
   const fetchQuiz = async (id: string) => {
     try {

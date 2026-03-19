@@ -7,6 +7,7 @@ import {
 import { genAI } from "../utils/ai";
 import { ApiError } from "../utils/apiError";
 import { GoogleGenAI } from "@google/genai";
+import { getOrGenerateEmbedding } from "../utils/embeddingCache";
 
 const pinecone = new Pinecone({
   apiKey: process.env.PINECONE_API_KEY!,
@@ -47,7 +48,8 @@ async function ensureIndex() {
 const genai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_GEMINI!,
 });
-export async function generateEmbedding(text: string) {
+
+async function generateEmbeddingRaw(text: string): Promise<number[]> {
   if (!text || text.trim().length === 0) {
     throw new ApiError(400, "Cannot generate embedding for empty text");
   }
@@ -73,6 +75,11 @@ export async function generateEmbedding(text: string) {
       `Embedding generation failed: ${(err as Error).message}`
     );
   }
+}
+
+export async function generateEmbedding(text: string): Promise<number[]> {
+  // Use cache to avoid regenerating embeddings for duplicate content
+  return getOrGenerateEmbedding(text, () => generateEmbeddingRaw(text));
 }
 
 type ChunkInput = {

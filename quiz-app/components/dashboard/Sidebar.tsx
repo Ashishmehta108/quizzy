@@ -30,7 +30,7 @@ import {
   Note,
   Notepad2,
 } from "iconsax-reactjs";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useSession, signOut } from "@/lib/auth/auth-client";
 import {
   Collapsible,
   CollapsibleContent,
@@ -40,6 +40,7 @@ import { toast } from "sonner";
 import { Skeleton } from "../ui/skeleton";
 import { BACKEND_URL } from "@/lib/constants";
 import { useSocket } from "@/app/context/socket.context";
+import { getAuthFetchOptions } from "@/lib/auth/authService";
 
 export default function AppSidebar() {
   const { socket } = useSocket();
@@ -56,8 +57,8 @@ export default function AppSidebar() {
     };
   }, []);
   const [chats, setChats] = React.useState([]);
-  const { user } = useUser();
-  const { signOut, getToken } = useAuth();
+  const { data: session } = useSession();
+  const user = session?.user;
   const [chatsLoading, setChatsLoading] = React.useState(true);
   const handleLogout = async () => {
     await signOut();
@@ -68,16 +69,11 @@ export default function AppSidebar() {
   }, []);
   const getQuizChats = async () => {
     try {
-      const token = await getToken();
+      const token = session?.session?.token;
 
-      const data = await fetch(`${BACKEND_URL}/chats`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-      });
+      const data = await fetch(`${BACKEND_URL}/chats`,
+        getAuthFetchOptions(token || "")
+      );
       const res = await data.json();
 
       setChats(res.chats);

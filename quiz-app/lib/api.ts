@@ -1,10 +1,11 @@
 "use client";
-import { useAuth } from "@clerk/nextjs";
+import { authClient } from "@/lib/auth/auth-client";
 import axios from "axios";
-import { getAuth } from "@clerk/nextjs/server";
-async function fetchMe() {
-  const res = await fetch("/api/getToken");
-  return res.json();
+import { getAuthHeaders } from "@/lib/auth/authService";
+
+async function getSessionToken() {
+  const { data: session } = await authClient.getSession();
+  return session?.session?.token || null;
 }
 
 export const api = axios.create({
@@ -26,10 +27,11 @@ export const setToken = async (token: string) => {
 };
 
 api.interceptors.request.use(async (config) => {
-  const token = await fetchMe();
-  
+  const token = await getSessionToken();
+
   if (token) {
-    config.headers.Authorization = `Bearer ${token.token}`;
+    const headers = getAuthHeaders(token);
+    config.headers.Authorization = headers.Authorization;
   }
   return config;
 });

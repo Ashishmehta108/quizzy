@@ -6,7 +6,7 @@ import { and, eq } from "drizzle-orm";
 
 export const quizChecks = asyncHandler(async (req, res, next) => {
   const { title, query } = req.body;
-  const userId = req.auth?.userId;
+  const userId = req.user?.id;
 
   if (!userId) throw new ApiError(401, "Unauthorized: User ID missing");
   if (!title) throw new ApiError(400, "Quiz title is required");

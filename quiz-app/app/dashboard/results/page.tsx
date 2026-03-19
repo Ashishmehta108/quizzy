@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useSession } from "@/lib/auth/auth-client";
 import ResultTable from "@/components/ui/result-card";
 import api from "@/lib/api";
 import type { Result } from "@/lib/types";
@@ -18,14 +18,14 @@ export default function ResultsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { isLoaded } = useAuth();
-  const { user } = useUser();
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
 
   useEffect(() => {
-    if (isLoaded && user) {
+    if (!isPending && user) {
       fetchResults();
     }
-  }, [isLoaded, user]);
+  }, [isPending, user]);
 
   const fetchResults = async () => {
     setLoading(true);

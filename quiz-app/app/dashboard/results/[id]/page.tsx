@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { useUser, useAuth } from "@clerk/nextjs";
+import { useSession } from "@/lib/auth/auth-client";
 import { ArchiveBook } from "iconsax-reactjs";
 
 import { MarkdownRenderer } from "@/components/quiz-render/MarkdownRender";
@@ -65,18 +65,19 @@ export default function ResultViewPage(): React.JSX.Element | null {
   const [result, setResult] = useState<QuizResult | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
-  const { user, isLoaded } = useUser();
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
   const router = useRouter();
   const { id } = useParams();
 
   useEffect(() => {
     const initializePage = async () => {
-      if (isLoaded) {
+      if (!isPending) {
         await fetchResult();
       }
     };
     initializePage();
-  }, [user, isLoaded, id]);
+  }, [user, isPending, id]);
 
   const fetchResult = async () => {
     try {

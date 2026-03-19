@@ -13,10 +13,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { syncUser } from "@/lib/auth";
 
 export default function VerifyEmailPage() {
-  const { isLoaded, signUp, setActive } = useSignUp();
-  //   const { setActive } = usesetac();
+  const { isLoaded, signUp, setActive, getToken } = useSignUp();
   const router = useRouter();
 
   const [code, setCode] = useState("");
@@ -29,25 +29,6 @@ export default function VerifyEmailPage() {
 
     setError("");
     setIsLoading(true);
-    const { getToken } = useAuth();
-    const syncUser = async () => {
-      try {
-        const backendUrl = process.env.NEXT_PUBLIC_BACK_URL;
-        if (!backendUrl) throw new Error("Missing BACKEND URL env");
-
-        const jwt = await getToken();
-        if (!jwt) throw new Error("Missing Clerk session token");
-
-        const res = await fetch(`${backendUrl}/api/auth/sync`, {
-          method: "GET",
-          headers: { Authorization: `Bearer ${jwt}` },
-        });
-
-        if (!res.ok) throw new Error("Sync failed");
-      } catch (err) {
-        console.error("Sync error:", err);
-      }
-    };
 
     try {
       const result = await signUp.attemptEmailAddressVerification({ code });
@@ -55,7 +36,7 @@ export default function VerifyEmailPage() {
       if (result.status === "complete") {
         if (result.createdSessionId) {
           await setActive({ session: result.createdSessionId });
-          await syncUser();
+          await syncUser({ getToken });
           router.push("/dashboard");
         } else {
           router.push("/login");

@@ -14,10 +14,11 @@ import {
 import { useState } from "react";
 import { ModeToggle } from "../Modetoggle";
 import Link from "next/link";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "@/lib/auth/auth-client";
 
 export function NavbarDemo() {
-  const { user } = useUser();
+  const { data: session } = useSession();
+  const user = session?.user;
   const navItems = [
     {
       name: "Features",

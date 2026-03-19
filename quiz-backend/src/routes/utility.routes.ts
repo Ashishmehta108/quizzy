@@ -12,18 +12,19 @@ utilityRouter.route("/activityData").post(
   asyncHandler(async (req, res) => {
     try {
       console.log("[ActivityData] Request received");
-      const userId = req.auth?.userId;
+      const userId = req.user?.id;
       const { resultId } = req.body;
 
       console.log("[ActivityData] userId:", userId, "resultId:");
       if (!userId) throw new ApiError(400, "Missing userId in request body");
 
-      const [user] = await db
+      const user = await db
         .select({ id: users.id })
         .from(users)
-        .where(eq(users.clerkId, userId));
+        .where(eq(users.id, userId))
+        .limit(1);
       console.log("[ActivityData] User fetched:", user);
-      if (!user) throw new ApiError(404, "User not found");
+      if (!user || user.length === 0) throw new ApiError(404, "User not found");
 
       const date30DaysAgo = new Date();
       date30DaysAgo.setDate(date30DaysAgo.getDate() - 30);
@@ -98,17 +99,18 @@ utilityRouter.route("/usage").post(
   asyncHandler(async (req, res) => {
     try {
       console.log("[Usage] Request received");
-      const userId = req.auth?.userId;
+      const userId = req.user?.id;
       console.log("[Usage] userId:", userId);
 
       if (!userId) throw new ApiError(400, "Missing userId in request body");
 
-      const [user] = await db
+      const user = await db
         .select({ id: users.id })
         .from(users)
-        .where(eq(users.clerkId, userId));
+        .where(eq(users.id, userId))
+        .limit(1);
       console.log("[Usage] User fetched:", user);
-      if (!user) throw new ApiError(404, "User not found");
+      if (!user || user.length === 0) throw new ApiError(404, "User not found");
 
       const [billing] = await db
         .select({

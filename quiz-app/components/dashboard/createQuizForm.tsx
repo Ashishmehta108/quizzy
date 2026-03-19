@@ -49,10 +49,35 @@ export default function CreateQuizForm({
       setIsThinking(false);
     };
     socket.on("status", handler);
+    
+    // Listen for quiz completion
+    const completionHandler = (data: { jobId: string; quizId: string; questionCount: number }) => {
+      console.log("Quiz completed:", data);
+      setIsLoading(false);
+      setIsThinking(false);
+      setStatus("Quiz created successfully! ✅");
+      setTimeout(() => {
+        onSuccess?.();
+        setStatus(null);
+      }, 1000);
+    };
+    socket.on("quiz_completed", completionHandler);
+    
+    // Listen for quiz failure
+    const failureHandler = (data: { jobId: string; error: string }) => {
+      console.error("Quiz failed:", data);
+      setError(data.error || "Failed to create quiz");
+      setIsLoading(false);
+      setIsThinking(false);
+    };
+    socket.on("quiz_failed", failureHandler);
+    
     return () => {
       socket.off("status", handler);
+      socket.off("quiz_completed", completionHandler);
+      socket.off("quiz_failed", failureHandler);
     };
-  }, [socket]);
+  }, [socket, onSuccess]);
 
   const onSubmit = async (data: CreateQuizForm) => {
     try {
@@ -74,7 +99,12 @@ export default function CreateQuizForm({
         );
       }
 
-      await api.post<{ quiz: Quiz; questions: Question[] }>(
+      // Now returns job ID immediately instead of waiting for completion
+      const response = await api.post<{ 
+        jobId: string; 
+        status: string; 
+        message: string;
+      }>(
         "/quizzes",
         formData,
         {
@@ -83,12 +113,16 @@ export default function CreateQuizForm({
         }
       );
 
-      onSuccess?.();
+      console.log("Quiz generation started:", response.data);
+      // WebSocket will handle progress updates
+      // Don't call onSuccess here - it will be called when job completes
+      
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to create quiz");
+      setError(err.response?.data?.error || "Failed to create quiz");
     } finally {
       setIsLoading(false);
       setIsThinking(false);
+      // Note: Status updates will continue via WebSocket until job completes
     }
   };
 

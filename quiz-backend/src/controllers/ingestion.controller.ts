@@ -17,21 +17,21 @@ export class IngestionController {
       if (!file) return res.status(400).json({ success: false, error: "No file uploaded" });
 
       const docId = randomUUID();
-      const document = await libraryService.uploadDocument(req.workspace.id, req.auth.userId, {
+      const document = await libraryService.uploadDocument(req.workspace.id, req.user?.id, {
         id: docId,
         title: req.body.title || file.originalname,
         content: "",
-        uploadUrl: file.path, 
+        uploadUrl: file.path,
       });
 
       // Background process ingestion
-      ingestionService.processIngestion(docId, file.path, req.auth.userId, req.body.socketId)
+      ingestionService.processIngestion(docId, file.path, req.user?.id, req.body.socketId)
         .catch(err => console.error("Background ingestion failed", err));
 
-      res.status(202).json({ 
-        success: true, 
-        data: { documentId: docId }, 
-        message: "Ingestion started" 
+      res.status(202).json({
+        success: true,
+        data: { documentId: docId },
+        message: "Ingestion started"
       });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });

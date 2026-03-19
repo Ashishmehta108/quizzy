@@ -1,13 +1,2 @@
-"use client";
-import { useAuth } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-
-export function useLoginRedirect({}) {
-  const { userId } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (userId) router.replace("/dashboard");
-  }, [userId]);
-}
+// Re-export from auth hooks module for backward compatibility
+export { useAuthRedirect as useLoginRedirect } from "@/hooks/auth";

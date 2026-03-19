@@ -29,7 +29,7 @@ export class AssignmentController {
   async joinAssignment(req: any, res: Response) {
     try {
       const { shareToken } = req.body;
-      const member = await assignmentService.joinAssignment(shareToken, req.auth.userId);
+      const member = await assignmentService.joinAssignment(shareToken, req.user?.id);
       res.status(200).json({ success: true, data: member });
     } catch (error: any) {
       res.status(400).json({ success: false, error: error.message });
@@ -38,7 +38,7 @@ export class AssignmentController {
 
   async getAssignmentDetail(req: any, res: Response) {
     try {
-      const detail = await assignmentService.getAssignmentDetails(req.params.id, req.auth.userId);
+      const detail = await assignmentService.getAssignmentDetails(req.params.id, req.user?.id);
       res.status(200).json({ success: true, data: detail });
     } catch (error: any) {
       res.status(404).json({ success: false, error: error.message });

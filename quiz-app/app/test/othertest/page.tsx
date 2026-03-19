@@ -2,13 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { BACKEND_URL } from "@/lib/constants";
-import { useAuth } from "@clerk/nextjs";
+import { useSession } from "@/lib/auth/auth-client";
 
 export default function GetUserButton() {
-  const { getToken } = useAuth();
+  const { data: session } = useSession();
 
   const handleGetUser = async () => {
-    const token = await getToken();
+    const token = session?.session?.token;
     const res = await fetch(`${BACKEND_URL}/user`, {
       headers: { Authorization: `Bearer ${token}` },
       credentials: "include",

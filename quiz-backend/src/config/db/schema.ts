@@ -1,4 +1,4 @@
-import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
 import {
   pgTable,
   varchar,
@@ -178,6 +178,58 @@ export const studentGroups = pgTable("student_groups", {
   workspaceIdx: index("idx_sg_workspace").on(t.workspaceId),
 }));
 
+// Cohorts for grouping students
+export const cohorts = pgTable("cohorts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  courseId: uuid("course_id").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (t) => ({
+  courseIdx: index("idx_cohorts_course").on(t.courseId),
+}));
+
+export const cohortMembers = pgTable("cohort_members", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  cohortId: uuid("cohort_id").notNull(),
+  userId: varchar("user_id", { length: 36 }).notNull(),
+  role: varchar("role", { length: 50 }).default("learner").notNull(),
+  joinedAt: timestamp("joined_at").defaultNow().notNull(),
+}, (t) => ({
+  cohortIdx: index("idx_cohort_members_cohort").on(t.cohortId),
+  userIdx: index("idx_cohort_members_user").on(t.userId),
+  uniqueMember: index("idx_cohort_members_unique").on(t.cohortId, t.userId),
+}));
+
+export const indexingStatusEnum = pgEnum("indexing_status", [
+  "pending",
+  "processing",
+  "completed",
+  "failed",
+]);
+
+// Course Materials - links documents to courses (Library-first workflow)
+export const courseMaterials = pgTable("course_materials", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  courseId: uuid("course_id").notNull(),
+  documentId: varchar("document_id", { length: 36 }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  materialType: varchar("material_type", { length: 50 }).default("document").notNull(), // document, link, video, etc.
+  externalUrl: text("external_url"),
+  orderIndex: integer("order_index").default(0).notNull(),
+  indexingStatus: indexingStatusEnum("indexing_status").default("completed").notNull(),
+  version: integer("version").default(1).notNull(),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
+}, (t) => ({
+  courseIdx: index("idx_course_materials_course").on(t.courseId),
+  documentIdx: index("idx_course_materials_document").on(t.documentId),
+  courseDocIdx: index("idx_course_materials_unique").on(t.courseId, t.documentId),
+}));
+
 export const quizzes = pgTable("quizzes", {
   id: varchar("id", { length: 36 }).primaryKey(),
   workspaceId: uuid("workspace_id"),
@@ -210,14 +262,8 @@ export const questions = pgTable("questions", {
   submittedAt: timestamp("submitted_at").defaultNow().notNull(),
 }, (t) => ({
   quizIdx: index("idx_questions_quiz").on(t.quizId),
+  quizCreatedIdx: index("idx_questions_quiz_created").on(t.quizId, t.createdAt),
 }));
-
-export const indexingStatusEnum = pgEnum("indexing_status", [
-  "pending",
-  "processing",
-  "completed",
-  "failed",
-]);
 
 export const documents = pgTable("documents", {
   id: varchar("id", { length: 36 }).primaryKey(),
@@ -271,6 +317,7 @@ export const results = pgTable(
   (t) => ({
     userIdx: index("idx_results_user").on(t.userId),
     quizIdx: index("idx_results_quiz").on(t.quizId),
+    userQuizIdx: index("idx_results_user_quiz").on(t.userId, t.quizId),
     workspaceIdx: index("idx_results_workspace").on(t.workspaceId),
     assignmentIdx: index("idx_results_assignment").on(t.assignmentId),
     attemptIdx: index("idx_results_attempt").on(t.attemptId),
@@ -384,6 +431,7 @@ export const chatMessages = pgTable(
   },
   (t) => ({
     sessionIdx: index("idx_messages_session").on(t.sessionId),
+    sessionCreatedIdx: index("idx_messages_session_created").on(t.sessionId, t.createdAt),
     quizIdx: index("idx_messages_quiz").on(t.quizId),
     createdIdx: index("idx_messages_created").on(t.createdAt),
   })
@@ -464,4 +512,324 @@ export const assignmentMembers = pgTable("assignment_members", {
   assignmentIdx: index("idx_am_assignment").on(t.assignmentId),
   userIdx: index("idx_am_user").on(t.userId),
   uniqueMember: index("idx_am_unique").on(t.assignmentId, t.userId),
+}));
+
+// Student assignment submissions/attempts
+export const assignmentAttempts = pgTable("assignment_attempts", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  assignmentId: uuid("assignment_id").notNull(),
+  userId: varchar("user_id", { length: 36 }), // null for public submissions
+  studentEmail: varchar("student_email", { length: 255 }), // for public submissions
+  studentName: varchar("student_name", { length: 255 }), // for public submissions
+  quizId: varchar("quiz_id", { length: 36 }).notNull(),
+  answers: jsonb("answers").notNull(), // { questionId: selectedOptionIndex }
+  score: integer("score").default(0).notNull(),
+  totalQuestions: integer("total_questions").default(0).notNull(),
+  percentage: numeric("percentage", { precision: 5, scale: 2 }).default("0").notNull(),
+  timeTakenSeconds: integer("time_taken_seconds").default(0).notNull(),
+  startedAt: timestamp("started_at").defaultNow().notNull(),
+  submittedAt: timestamp("submitted_at"),
+  status: varchar("status", { length: 50 }).default("in_progress").notNull(), // in_progress, submitted, graded
+  attemptNumber: integer("attempt_number").default(1).notNull(),
+  gradedBy: varchar("graded_by", { length: 36 }),
+  gradedAt: timestamp("graded_at"),
+  feedback: text("feedback"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (t) => ({
+  assignmentIdx: index("idx_assignment_attempts_assignment").on(t.assignmentId),
+  userIdx: index("idx_assignment_attempts_user").on(t.userId),
+  quizIdx: index("idx_assignment_attempts_quiz").on(t.quizId),
+  statusIdx: index("idx_assignment_attempts_status").on(t.status),
+  submittedIdx: index("idx_assignment_attempts_submitted").on(t.submittedAt),
+  assignmentStatusIdx: index("idx_assign_attempts_assign_status").on(t.assignmentId, t.status),
+}));
+
+// ==================== RELATIONS ====================
+
+export const usersRelations = relations(users, ({ many }) => ({
+  workspaceMembers: many(workspaceMembers),
+  billings: many(billings),
+  quizzes: many(quizzes),
+  documents: many(documents),
+  results: many(results),
+  quizAttempts: many(quizAttempts),
+  notionIntegrations: many(NotionIntegration),
+  aiRequests: many(aiRequests),
+  events: many(events, { relationName: "actorUser" }),
+}));
+
+export const workspacesRelations = relations(workspaces, ({ many }) => ({
+  workspaceMembers: many(workspaceMembers),
+  billings: many(billings),
+  courses: many(courses),
+  studentGroups: many(studentGroups),
+  quizzes: many(quizzes),
+  documents: many(documents),
+  results: many(results),
+  quizAttempts: many(quizAttempts),
+  usageLedger: many(usageLedger),
+  events: many(events),
+  aiRequests: many(aiRequests),
+}));
+
+export const workspaceMembersRelations = relations(workspaceMembers, ({ one }) => ({
+  workspace: one(workspaces, {
+    fields: [workspaceMembers.workspaceId],
+    references: [workspaces.id],
+  }),
+  user: one(users, {
+    fields: [workspaceMembers.userId],
+    references: [users.id],
+  }),
+}));
+
+export const plansRelations = relations(plans, ({ many }) => ({
+  billings: many(billings),
+}));
+
+export const billingsRelations = relations(billings, ({ one, many }) => ({
+  user: one(users, {
+    fields: [billings.userId],
+    references: [users.id],
+  }),
+  workspace: one(workspaces, {
+    fields: [billings.workspaceId],
+    references: [workspaces.id],
+  }),
+  plan: one(plans, {
+    fields: [billings.planId],
+    references: [plans.id],
+  }),
+  usage: many(usage),
+}));
+
+export const usageLedgerRelations = relations(usageLedger, ({ one }) => ({
+  workspace: one(workspaces, {
+    fields: [usageLedger.workspaceId],
+    references: [workspaces.id],
+  }),
+}));
+
+export const usageRelations = relations(usage, ({ one }) => ({
+  billing: one(billings, {
+    fields: [usage.billingId],
+    references: [billings.id],
+  }),
+  workspace: one(workspaces, {
+    fields: [usage.workspaceId],
+    references: [workspaces.id],
+  }),
+}));
+
+export const coursesRelations = relations(courses, ({ one, many }) => ({
+  workspace: one(workspaces, {
+    fields: [courses.workspaceId],
+    references: [workspaces.id],
+  }),
+  quizzes: many(quizzes),
+  documents: many(documents),
+  cohorts: many(cohorts),
+  courseMaterials: many(courseMaterials),
+}));
+
+export const cohortsRelations = relations(cohorts, ({ one, many }) => ({
+  course: one(courses, {
+    fields: [cohorts.courseId],
+    references: [courses.id],
+  }),
+  members: many(cohortMembers),
+}));
+
+export const cohortMembersRelations = relations(cohortMembers, ({ one }) => ({
+  cohort: one(cohorts, {
+    fields: [cohortMembers.cohortId],
+    references: [cohorts.id],
+  }),
+  user: one(users, {
+    fields: [cohortMembers.userId],
+    references: [users.id],
+  }),
+}));
+
+export const courseMaterialsRelations = relations(courseMaterials, ({ one }) => ({
+  course: one(courses, {
+    fields: [courseMaterials.courseId],
+    references: [courses.id],
+  }),
+  document: one(documents, {
+    fields: [courseMaterials.documentId],
+    references: [documents.id],
+  }),
+}));
+
+export const studentGroupsRelations = relations(studentGroups, ({ one }) => ({
+  workspace: one(workspaces, {
+    fields: [studentGroups.workspaceId],
+    references: [workspaces.id],
+  }),
+}));
+
+export const quizzesRelations = relations(quizzes, ({ one, many }) => ({
+  workspace: one(workspaces, {
+    fields: [quizzes.workspaceId],
+    references: [workspaces.id],
+  }),
+  course: one(courses, {
+    fields: [quizzes.courseId],
+    references: [courses.id],
+  }),
+  user: one(users, {
+    fields: [quizzes.userId],
+    references: [users.id],
+  }),
+  questions: many(questions),
+  results: many(results),
+  quizAttempts: many(quizAttempts),
+  assignments: many(assignments),
+}));
+
+export const questionsRelations = relations(questions, ({ one }) => ({
+  quiz: one(quizzes, {
+    fields: [questions.quizId],
+    references: [quizzes.id],
+  }),
+  document: one(documents, {
+    fields: [questions.sourceDocumentId],
+    references: [documents.id],
+  }),
+}));
+
+export const documentsRelations = relations(documents, ({ one, many }) => ({
+  workspace: one(workspaces, {
+    fields: [documents.workspaceId],
+    references: [workspaces.id],
+  }),
+  course: one(courses, {
+    fields: [documents.courseId],
+    references: [courses.id],
+  }),
+  user: one(users, {
+    fields: [documents.userId],
+    references: [users.id],
+  }),
+  chunks: many(documentChunks),
+  questions: many(questions, { relationName: "sourceDocument" }),
+  courseMaterials: many(courseMaterials),
+}));
+
+export const documentChunksRelations = relations(documentChunks, ({ one }) => ({
+  document: one(documents, {
+    fields: [documentChunks.documentId],
+    references: [documents.id],
+  }),
+}));
+
+export const resultsRelations = relations(results, ({ one }) => ({
+  user: one(users, {
+    fields: [results.userId],
+    references: [users.id],
+  }),
+  quiz: one(quizzes, {
+    fields: [results.quizId],
+    references: [quizzes.id],
+  }),
+  workspace: one(workspaces, {
+    fields: [results.workspaceId],
+    references: [workspaces.id],
+  }),
+}));
+
+export const notionIntegrationRelations = relations(NotionIntegration, ({ one }) => ({
+  user: one(users, {
+    fields: [NotionIntegration.userId],
+    references: [users.id],
+  }),
+}));
+
+export const quizAttemptsRelations = relations(quizAttempts, ({ one }) => ({
+  user: one(users, {
+    fields: [quizAttempts.userId],
+    references: [users.id],
+  }),
+  quiz: one(quizzes, {
+    fields: [quizAttempts.quizId],
+    references: [quizzes.id],
+  }),
+  workspace: one(workspaces, {
+    fields: [quizAttempts.workspaceId],
+    references: [workspaces.id],
+  }),
+}));
+
+export const chatSessionsRelations = relations(chatSessions, ({ many }) => ({
+  messages: many(chatMessages),
+}));
+
+export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
+  session: one(chatSessions, {
+    fields: [chatMessages.sessionId],
+    references: [chatSessions.id],
+  }),
+}));
+
+export const eventsRelations = relations(events, ({ one }) => ({
+  workspace: one(workspaces, {
+    fields: [events.workspaceId],
+    references: [workspaces.id],
+  }),
+  actorUser: one(users, {
+    fields: [events.actorUserId],
+    references: [users.id],
+  }),
+}));
+
+export const aiRequestsRelations = relations(aiRequests, ({ one }) => ({
+  workspace: one(workspaces, {
+    fields: [aiRequests.workspaceId],
+    references: [workspaces.id],
+  }),
+  user: one(users, {
+    fields: [aiRequests.userId],
+    references: [users.id],
+  }),
+}));
+
+export const assignmentsRelations = relations(assignments, ({ one, many }) => ({
+  workspace: one(workspaces, {
+    fields: [assignments.workspaceId],
+    references: [workspaces.id],
+  }),
+  quiz: one(quizzes, {
+    fields: [assignments.quizId],
+    references: [quizzes.id],
+  }),
+  members: many(assignmentMembers),
+  attempts: many(assignmentAttempts),
+}));
+
+export const assignmentAttemptsRelations = relations(assignmentAttempts, ({ one }) => ({
+  assignment: one(assignments, {
+    fields: [assignmentAttempts.assignmentId],
+    references: [assignments.id],
+  }),
+  user: one(users, {
+    fields: [assignmentAttempts.userId],
+    references: [users.id],
+  }),
+  quiz: one(quizzes, {
+    fields: [assignmentAttempts.quizId],
+    references: [quizzes.id],
+  }),
+}));
+
+export const assignmentMembersRelations = relations(assignmentMembers, ({ one }) => ({
+  assignment: one(assignments, {
+    fields: [assignmentMembers.assignmentId],
+    references: [assignments.id],
+  }),
+  user: one(users, {
+    fields: [assignmentMembers.userId],
+    references: [users.id],
+  }),
 }));

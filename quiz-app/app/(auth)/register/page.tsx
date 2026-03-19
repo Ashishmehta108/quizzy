@@ -19,13 +19,15 @@ import Link from "next/link";
 import { Github, Loader } from "lucide-react";
 import Image from "next/image";
 import Logo from "@/public/quizzy_logo.png";
-import { useAuth, useSignUp } from "@clerk/nextjs";
+import { signUp } from "@/lib/auth/auth-client";
 import GoogleLogo from "@/public/google.svg";
+import { syncUser } from "@/lib/auth";
+import { AUTH_ROUTES, OAUTH_PROVIDERS, type OAuthProvider } from "@/lib/auth/authConstants";
+import { useAuthRedirect } from "@/hooks/auth";
 
 interface RegisterForm {
   name: string;
   lastName: string;
-  username: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -44,107 +46,40 @@ export default function RegisterPage() {
   } = useForm<RegisterForm>();
 
   const password = watch("password");
-  const { getToken } = useAuth();
-  const { signUp, setActive, isLoaded } = useSignUp();
 
-  const syncUser = async () => {
-    try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACK_URL;
-      if (!backendUrl) throw new Error("Missing BACKEND URL env");
-
-      const jwt = await getToken();
-      if (!jwt) throw new Error("Missing Clerk session token");
-
-      const res = await fetch(`${backendUrl}/api/auth/sync`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${jwt}` },
-      });
-
-      if (!res.ok) throw new Error("Sync failed");
-    } catch (err) {
-      console.error("Sync error:", err);
-    }
-  };
+  // Use the new auth redirect hook
+  useAuthRedirect();
 
   const onSubmit = async (data: RegisterForm) => {
     try {
-      if (!isLoaded) return;
-
       setError("");
       setIsLoading(true);
 
-      const result = await signUp.create({
-        emailAddress: data.email,
+      const result = await signUp.email({
+        email: data.email,
         password: data.password,
-        firstName: data.name,
-        lastName: data.lastName,
-        username: data.username,
+        name: `${data.name} ${data.lastName}`.trim(),
       });
-      console.log("Signup result:", result);
 
-      if (result.status === "complete") {
-        if (result.createdSessionId) {
-          await setActive({ session: result.createdSessionId });
-          await syncUser();
-          router.push("/dashboard");
-        } else {
-          router.push("/login");
-        }
-      } else if (result.status === "abandoned") {
-        setError("Sign-up process was abandoned. Please try again.");
-      } else if (result.status === "missing_requirements") {
-        try {
-          await signUp.prepareEmailAddressVerification({
-            strategy: "email_code",
-          });
-        } catch (verificationErr: any) {
-          console.error("Verification error:", verificationErr);
-        }
-        router.push("/verify-email");
-      } else {
-        setError("Unexpected signup status. Please try again.");
+      if (result.data?.session) {
+        await syncUser({ getToken: async () => result.data?.session?.token || null });
+        router.push("/dashboard");
+      } else if (result.error) {
+        setError(result.error.message || "Signup failed");
       }
     } catch (err: any) {
       console.error("Signup error:", err);
-
-      let message = "Signup failed";
-
-      if (err?.errors && Array.isArray(err.errors) && err.errors.length > 0) {
-        message =
-          err.errors[0]?.longMessage || err.errors[0]?.message || message;
-      } else if (err?._status === "missing_requirements") {
-        if (
-          Array.isArray(err.requiredFields) &&
-          err.requiredFields.length > 0
-        ) {
-          message = `Missing required fields: ${err.requiredFields
-            .map((f: any) => f?.fieldId || f)
-            .join(", ")}`;
-        } else {
-          message = "Please complete all required sign-up fields.";
-        }
-      } else if (typeof err?.message === "string") {
-        message = err.message;
-      }
-
-      setError(message);
+      setError(err?.message || "Signup failed");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const oauthLogin = async (provider: "oauth_google" | "oauth_github") => {
-    if (!isLoaded) return;
-    try {
-      await signUp.authenticateWithRedirect({
-        strategy: provider,
-        redirectUrl: "/sso-callback?redirect=/post-login",
-        redirectUrlComplete: "/post-login",
-      });
-    } catch (err) {
-      console.error(`${provider} login failed:`, err);
-      setError("OAuth login failed");
-    }
+  const oauthLogin = async (provider: "google" | "github") => {
+    await signUp.social({
+      providerId: provider,
+      callbackURL: AUTH_ROUTES.POST_LOGIN,
+    });
   };
 
   return (
@@ -171,18 +106,18 @@ export default function RegisterPage() {
         <CardContent>
           <div className="flex flex-col gap-2 mb-4">
             <Button
-              onClick={() => oauthLogin("oauth_google")}
+              onClick={() => oauthLogin("google")}
               variant="outline"
-              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100 
+              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100
                  dark:border-zinc-700 dark:hover:bg-zinc-800 dark:text-white"
             >
               <Image src={GoogleLogo} alt="Google" className="h-4 w-4" />
               Sign up with Google
             </Button>
             <Button
-              onClick={() => oauthLogin("oauth_github")}
+              onClick={() => oauthLogin("github")}
               variant="outline"
-              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100 
+              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100
                dark:border-zinc-700  hover:text-zinc-900 dark:hover:bg-zinc-800 dark:text-white"
             >
               <Github className="h-4 w-4" /> Sign up with GitHub
@@ -225,21 +160,6 @@ export default function RegisterPage() {
               {errors.lastName && (
                 <p className="text-sm text-destructive">
                   {errors.lastName.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="Choose a username"
-                {...register("username", { required: "Username is required" })}
-              />
-              {errors.username && (
-                <p className="text-sm text-destructive">
-                  {errors.username.message}
                 </p>
               )}
             </div>

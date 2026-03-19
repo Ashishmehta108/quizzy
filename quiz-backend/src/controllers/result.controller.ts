@@ -10,14 +10,15 @@ export const PostResult = async (req: Request, res: Response) => {
   try {
     const { totalScore, optionsFilled, quizId } = req.body;
 
-    const userId = req.auth?.userId;
+    const userId = req.user?.id;
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
-    const [user] = await db
+    const user = await db
       .select({ id: users.id })
       .from(users)
-      .where(eq(users.clerkId, userId as string));
-    if (!user) return res.status(404).json({ error: "User not found" });
+      .where(eq(users.id, userId))
+      .limit(1);
+    if (!user || user.length === 0) return res.status(404).json({ error: "User not found" });
 
     const [quiz] = await db
       .select()
@@ -51,15 +52,16 @@ export const PostResult = async (req: Request, res: Response) => {
 
 export const GetResults = async (req: Request, res: Response) => {
   try {
-    const userId = req.auth?.userId;
+    const userId = req.user?.id;
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
-    const [user] = await db
+    const user = await db
       .select({ id: users.id })
       .from(users)
-      .where(eq(users.clerkId, userId as string));
+      .where(eq(users.id, userId))
+      .limit(1);
     console.log(user);
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user || user.length === 0) return res.status(404).json({ error: "User not found" });
 
     const data = await db
       .select()
@@ -91,7 +93,7 @@ export const GetResultById = async (req: Request, res: Response) => {
     console.log("➡️ GetResultById called");
 
     // 1. Check authentication
-    const userId = req.auth?.userId;
+    const userId = req.user?.id;
     console.log("🔑 userId from auth:", userId);
 
     if (!userId) {
@@ -100,15 +102,16 @@ export const GetResultById = async (req: Request, res: Response) => {
     }
 
     // 2. Validate user existence
-    const [user] = await db
+    const user = await db
       .select({ id: users.id })
       .from(users)
-      .where(eq(users.clerkId, userId));
+      .where(eq(users.id, userId))
+      .limit(1);
 
     console.log("👤 DB user lookup result:", user);
 
-    if (!user) {
-      console.warn("⚠️ User not found for clerkId:");
+    if (!user || user.length === 0) {
+      console.warn("⚠️ User not found for userId:");
       return res.status(404).json({ error: "User not found" });
     }
 

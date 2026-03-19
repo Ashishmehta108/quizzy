@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useSession } from "@/lib/auth/auth-client";
 import { BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { QuizTable } from "@/components/ui/quiz-card";
@@ -21,15 +21,15 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [resultIds, setResultIds] = useState<string[]>([]);
-  const { isLoaded } = useAuth();
-  const { user } = useUser();
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoaded && user) {
+    if (!isPending && user) {
       fetchData();
     }
-  }, [isLoaded, user]);
+  }, [isPending, user]);
 
   const fetchData = async () => {
     setLoading(true);

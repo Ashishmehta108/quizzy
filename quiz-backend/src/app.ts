@@ -6,8 +6,8 @@ import helmet from "helmet";
 import express, { NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import { clerkMiddleware } from "@clerk/express";
-import { clerkClient } from "./config/clerk/clerk";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./auth";
 import notionRouter from "./routes/notion.route";
 import authRouter from "./routes/auth.routes";
 import quizRouter from "./routes/quiz.routes";
@@ -21,6 +21,7 @@ import workspaceRouter from "./routes/workspace.routes";
 import libraryRouter from "./routes/library.routes";
 import assignmentRouter from "./routes/assignment.routes";
 import courseRouter from "./routes/course.routes";
+import cohortRouter from "./routes/cohort.routes";
 import analyticsRoutes from "./routes/analytics.routes";
 import exportRoutes from "./routes/export.routes";
 import gradingRoutes from "./routes/grading.routes";
@@ -31,7 +32,10 @@ import {
 } from "./middlewares/ratelimit.middleware";
 
 const app = express();
-app.use(clerkMiddleware({ clerkClient }));
+
+// Mount Better Auth handler BEFORE body parsers
+app.all("/api/auth/*abc", toNodeHandler(auth));
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -56,6 +60,20 @@ app.use(compression());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("tiny"));
 
+// Add caching headers for GET requests
+app.use((req, res, next) => {
+  if (req.method === "GET" && req.path.startsWith("/api/")) {
+    // Cache for 1 minute for authenticated requests
+    if (req.headers.authorization) {
+      res.set("Cache-Control", "public, max-age=60");
+      res.set("ETag", `"${Date.now()}"`);
+    } else {
+      res.set("Cache-Control", "public, max-age=300"); // 5 minutes for public endpoints
+    }
+  }
+  next();
+});
+
 app.use(rateLimitByIP({ windowSec: 60, max: 300, burst: 150 }));
 
 app.post(
@@ -69,24 +87,21 @@ app.post(
 
 app.get("/api/user", async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith("Bearer ")) {
-      return res.status(401).json({ error: "No token provided" });
-    }
-    const token = authHeader.split(" ")[1];
+    const session = await auth.api.getSession({
+      //@ts-ignore
+      headers: req.headers,
+    });
 
-    const session = await clerkClient.sessions.getSession(token);
-
-    if (!session || !session.userId) {
-      return res.status(401).json({ error: "Invalid token" });
+    if (!session || !session.user) {
+      return res.status(401).json({ error: "Unauthorized" });
     }
 
     console.log("Verified session:", session);
 
     res.status(200).json({
       status: "OK",
-      userId: session.userId,
-      sessionId: session.id,
+      userId: session.user.id,
+      sessionId: session.session.id,
     });
   } catch (err) {
     console.error("Token verification failed:", err);
@@ -105,6 +120,7 @@ app.use("/api/workspaces", workspaceRouter);
 app.use("/api/library", libraryRouter);
 app.use("/api/assignments", assignmentRouter);
 app.use("/api/courses", courseRouter);
+app.use("/api/cohorts", cohortRouter);
 app.use("/api", chatRouter);
 app.use("/api", analyticsRoutes);
 app.use("/api", exportRoutes);

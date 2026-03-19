@@ -6,7 +6,7 @@ import { useSocket } from "@/app/context/socket.context";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { BACKEND_URL } from "@/lib/constants";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useSession } from "@/lib/auth/auth-client";
 import { motion } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
@@ -36,7 +36,8 @@ interface QuizQuestion {
 }
 
 function FollowUpMessage({ content, role, createdAt }: Message) {
-  const { user } = useUser();
+  const { data: session } = useSession();
+  const user = session?.user;
   const isUser = role === "user";
   const timestamp = createdAt
     ? new Date(createdAt).toLocaleTimeString([], {

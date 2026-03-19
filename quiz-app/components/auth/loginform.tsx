@@ -1,5 +1,5 @@
 "use client";
-import { useAuth, useSignIn } from "@clerk/nextjs";
+import { signIn } from "@/lib/auth/auth-client";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
@@ -18,10 +18,11 @@ import Image from "next/image";
 import Logo from "@/public/quizzy_logo.png";
 import { Loader, Github, Mail, EyeOffIcon, EyeClosed } from "lucide-react";
 import google from "@/public/google.svg";
-import { syncUser } from "@/lib/actions/syncUser";
+import { syncUser } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/schema/loginSchema";
-import { ROUTES } from "@/constants";
+import { AUTH_ROUTES, OAUTH_PROVIDERS } from "@/lib/auth/authConstants";
+import { useAuthRedirect } from "@/hooks/auth";
 import { Eye, EyeOff, Lock } from "lucide-react";
 
 export interface LoginForm {
@@ -32,10 +33,12 @@ export interface LoginForm {
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
-  const { isLoaded, signIn, setActive } = useSignIn();
-  const { getToken, userId } = useAuth();
+  const { isPending, data: session } = signIn.useSignIn();
   const router = useRouter();
   const [error, setError] = useState<string>("");
+
+  // Use the new auth redirect hook
+  useAuthRedirect();
 
   const {
     register,
@@ -46,41 +49,31 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginForm) => {
-    if (!isLoaded) return;
     try {
       setError("");
-      const result = await signIn.create({
-        identifier: data.email,
+      const result = await signIn.email({
+        email: data.email,
         password: data.password,
       });
 
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId });
-        await syncUser({ getToken });
+      if (result.data?.session) {
+        await syncUser({ getToken: async () => result.data?.session?.token || null });
         router.push("/dashboard");
-      } else {
-        console.log(result);
+      } else if (result.error) {
+        setError(result.error.message || "Login failed");
       }
     } catch (err: unknown) {
-      const clerkError = err as { errors?: any[] };
-      setError(clerkError.errors?.[0]?.longMessage ?? "Login failed");
+      const typedErr = err as { message?: string };
+      setError(typedErr.message ?? "Login failed");
     }
   };
 
-  const oauthLogin = async (provider: "oauth_google" | "oauth_github") => {
-    if (!isLoaded) return;
-
-    await signIn.authenticateWithRedirect({
-      strategy: provider,
-      redirectUrl: ROUTES.SSO_CALLBACK,
-      redirectUrlComplete: ROUTES.POST_LOGIN,
+  const oauthLogin = async (provider: "google" | "github") => {
+    await signIn.social({
+      providerId: provider,
+      callbackURL: AUTH_ROUTES.POST_LOGIN,
     });
   };
-  useEffect(() => {
-    if (userId) {
-      router.replace("/dashboard");
-    }
-  }, [userId, router]);
 
   return (
     <div className="flex pt-20 justify-center bg-white dark:bg-zinc-900 px-4">
@@ -111,20 +104,20 @@ export default function LoginPage() {
           <div className="flex  gap-2 mb-4">
             <Button
               aria-label="Sign in with Google"
-              onClick={() => oauthLogin("oauth_google")}
+              onClick={() => oauthLogin("google")}
               variant="outline"
-              disabled={isSubmitting || !isLoaded}
-              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100 
+              disabled={isSubmitting || isPending}
+              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100
                dark:border-zinc-700 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:text-white"
             >
               <Image src={google} alt="Google" className="h-4 w-4" />
               Google
             </Button>
             <Button
-              onClick={() => oauthLogin("oauth_github")}
+              onClick={() => oauthLogin("github")}
               variant="outline"
-              disabled={isSubmitting || !isLoaded}
-              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100 
+              disabled={isSubmitting || isPending}
+              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100
                dark:border-zinc-700  hover:text-zinc-900 dark:hover:bg-zinc-800 dark:text-white"
             >
               <Github className="h-4 w-4" /> GitHub

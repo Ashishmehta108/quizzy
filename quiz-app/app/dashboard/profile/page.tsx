@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useUser, useClerk } from "@clerk/nextjs";
+import { useSession, signOut } from "@/lib/auth/auth-client";
 import {
   Card,
   CardContent,
@@ -15,14 +15,14 @@ import { Button } from "@/components/ui/button";
 
 const Profile = () => {
   const [isMounted, setIsMounted] = useState(false);
-  const { user, isLoaded } = useUser();
-  const { signOut, openUserProfile } = useClerk();
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  if (!isMounted || !isLoaded) {
+  if (!isMounted || isPending) {
     return (
       <Card className="max-w-md mx-auto mt-10 bg-zinc-100/40 dark:bg-zinc-900/40 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-lg p-6 space-y-4">
         <div className="flex items-center gap-4">

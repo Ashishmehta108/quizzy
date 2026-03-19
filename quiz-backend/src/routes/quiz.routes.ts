@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createQuiz, getQuizzes } from "../controllers/quiz.controller";
+import { createQuiz, getQuizzes, getJobStatus } from "../controllers/quiz.controller";
 import { checkAuth } from "../utils/checkAuth";
 import { upload } from "../middlewares/upload.middleware";
 import { db } from "../config/db/index";
@@ -17,12 +17,15 @@ quizRouter.post("/", upload.array("files", 5), createQuiz);
 
 quizRouter.get("/", checkAuth, getQuizzes);
 
+// Job status endpoint for async quiz generation
+quizRouter.get("/job/:jobId", checkAuth, getJobStatus);
+
 quizRouter.get(
   "/:id",
   checkAuth,
   async (req: QuizRequest, res: QuizResponse) => {
     const { id } = req.params;
-    const userId = req.auth?.userId;
+    const userId = req.user?.id;
 
     if (!id) {
       return res.status(400).json({ error: "Quiz ID is required" });

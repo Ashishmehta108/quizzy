@@ -4,7 +4,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import logo from "../public/quizzy_logo.png";
 import TanstackQuery from "../components/Tanstackquery";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Arimo } from "next/font/google";
 import { SocketProvider } from "./context/socket.context";
 import { NavigationProvider } from "@/components/navigator/navigationProvider";
@@ -29,20 +28,18 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={arimo.className}>
-        <ClerkProvider key={process.env.CLERK_SECRET_KEY}>
-          <SocketProvider>
-            <NavigationProvider>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                disableTransitionOnChange
-              >
-                <TanstackQuery>{children}</TanstackQuery>
-              </ThemeProvider>
-            </NavigationProvider>
-          </SocketProvider>
-        </ClerkProvider>
+        <SocketProvider>
+          <NavigationProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <TanstackQuery>{children}</TanstackQuery>
+            </ThemeProvider>
+          </NavigationProvider>
+        </SocketProvider>
       </body>
     </html>
   );

@@ -3,7 +3,7 @@ import { results, users } from "../config/db/schema";
 import { and, eq, gte, sql } from "drizzle-orm";
 import { Request, Response } from "express";
 export const quizzesThisMonth = async (req: Request, res: Response) => {
-  const userId = req.auth?.userId;
+  const userId = req.user?.id;
 
   if (!userId) {
     throw new Error("Unauthorized");
@@ -16,7 +16,7 @@ export const quizzesThisMonth = async (req: Request, res: Response) => {
       quizzesCompletedThisMonth: sql<number>`COUNT(${results.id})`,
     })
     .from(users)
-    .where(eq(users.clerkId, userId))
+    .where(eq(users.id, userId))
     .leftJoin(
       results,
       and(

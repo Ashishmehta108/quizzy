@@ -5,20 +5,37 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { quizAI, ensureSession } from "./services/aiservice";
 import "./loadPath";
+import { quizWorker } from "./workers/quiz.worker";
+import { redis } from "./config/redis";
+import { createAdapter } from "@socket.io/redis-adapter";
+
 const PORT = process.env.PORT || 5000;
 const server = createServer(app);
 
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: process.env.FRONTEND_URL || "*",
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
+
+// Set up Redis adapter for Socket.IO (enables horizontal scaling)
+const pubClient = redis.duplicate();
+const subClient = redis.duplicate();
+
+Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+  console.log("✅ Redis Socket.IO adapter connected");
+  io.adapter(createAdapter(pubClient, subClient));
+}).catch(err => {
+  console.error("❌ Failed to connect Redis Socket.IO adapter:", err);
+  // Fallback to in-memory adapter if Redis fails
+});
+
 app.get("/", (req, res) => {
-  console.log(req.auth?.userId);
   res.send("Quizzy Backend is running");
 });
+
 const userSocketMap = new Map<string, string>();
 
 io.on("connection", (socket) => {
@@ -77,8 +94,29 @@ io.on("connection", (socket) => {
   });
 });
 
+// Graceful shutdown
+process.on("SIGTERM", async () => {
+  console.log("🛑 SIGTERM received, shutting down gracefully...");
+  await quizWorker.close();
+  await redis.quit();
+  server.close(() => {
+    console.log("✅ Server closed");
+    process.exit(0);
+  });
+});
+
+process.on("SIGINT", async () => {
+  console.log("🛑 SIGINT received, shutting down gracefully...");
+  await quizWorker.close();
+  await redis.quit();
+  server.close(() => {
+    console.log("✅ Server closed");
+    process.exit(0);
+  });
+});
+
 server.listen(PORT, () => {
   console.log(`✅ Server started on http://localhost:${PORT}`);
 });
 
-export { io, userSocketMap };
+export { userSocketMap };
