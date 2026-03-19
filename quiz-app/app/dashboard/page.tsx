@@ -195,7 +195,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
-      <main className="max-w-7xl container mx-auto px-4 sm:px-6 lg:px-8 pb-12 pt-8">
+      <main className="max-w-7xl container mx-auto px-4 sm:px-6 lg:px-8 pb-12 pt-4 sm:pt-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>

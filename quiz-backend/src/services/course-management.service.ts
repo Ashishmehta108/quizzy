@@ -14,6 +14,10 @@ export class CourseManagementService {
     return await courseRepo.listCoursesByWorkspace(workspaceId);
   }
 
+  async createCourse(workspaceId: string, title: string, description?: string) {
+    return await courseRepo.createCourse({ workspaceId, title, description });
+  }
+
   async getCourse(id: string) {
     return await courseRepo.getCourseById(id);
   }

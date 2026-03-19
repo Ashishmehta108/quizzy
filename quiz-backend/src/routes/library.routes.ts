@@ -9,11 +9,14 @@ import { resolveWorkspace } from "../middlewares/workspace.middleware";
 import { requireRole } from "../middlewares/role.middleware";
 import multer from "multer";
 
+import { resolveUser } from "../middlewares/auth.middleware";
+
 const router = Router();
 const libraryController = new LibraryController();
 const ingestionController = new IngestionController();
 const upload = multer({ dest: "uploads/" });
 
+router.use(resolveUser);
 router.use(resolveWorkspace);
 
 router.get("/", libraryController.listDocuments);

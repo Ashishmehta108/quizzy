@@ -17,6 +17,16 @@ export class CourseController {
     }
   }
 
+  async createCourse(req: any, res: Response) {
+    try {
+      const { title, description } = req.body;
+      const course = await courseService.createCourse(req.workspace.id, title, description);
+      res.status(201).json({ success: true, data: course });
+    } catch (error: any) {
+      res.status(400).json({ success: false, error: error.message });
+    }
+  }
+
   async getCourse(req: any, res: Response) {
     try {
       const course = await courseService.getCourse(req.params.id);

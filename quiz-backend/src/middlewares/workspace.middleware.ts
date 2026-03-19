@@ -8,11 +8,11 @@ import { WorkspaceService } from "../services/workspace.service";
 const workspaceService = new WorkspaceService();
 
 export async function resolveWorkspace(req: any, res: Response, next: NextFunction) {
-  const workspaceId = req.headers["x-workspace-id"] || req.query.workspaceId;
-  const userId = req.auth?.userId; // Assuming Clerk middleware attaches auth
+  const workspaceId = req.headers["x-workspace-id"] || req.query.workspaceId || req.params.workspaceId;
+  const dbUserId = req.user?.id;
 
-  if (!userId) {
-    return res.status(401).json({ success: false, error: "Unauthorized" });
+  if (!dbUserId) {
+    return res.status(401).json({ success: false, error: "Unauthorized: DB User not resolved" });
   }
 
   if (!workspaceId) {
@@ -20,7 +20,7 @@ export async function resolveWorkspace(req: any, res: Response, next: NextFuncti
   }
 
   try {
-    const membership = await workspaceService.checkMembership(workspaceId as string, userId);
+    const membership = await workspaceService.checkMembership(workspaceId as string, dbUserId);
     
     if (!membership) {
       return res.status(403).json({ success: false, error: "Not a member of this workspace" });

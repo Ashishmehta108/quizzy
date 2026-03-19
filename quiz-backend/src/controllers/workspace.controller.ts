@@ -14,11 +14,11 @@ export class WorkspaceController {
   async createWorkspace(req: any, res: Response) {
     try {
       const { name } = req.body;
-      const userId = req.auth.userId;
+      const dbUserId = req.user.id;
 
-      const workspace = await workspaceService.createWorkspace(userId, name);
+      const workspace = await workspaceService.createWorkspace(dbUserId, name);
       // Create initial billing
-      await billingService.createInitialBilling(workspace.id, userId);
+      await billingService.createInitialBilling(workspace.id, dbUserId);
 
       res.status(200).json({ success: true, data: workspace });
     } catch (error: any) {
@@ -28,8 +28,8 @@ export class WorkspaceController {
 
   async listUserWorkspaces(req: any, res: Response) {
     try {
-      const userId = req.auth.userId;
-      const workspaces = await workspaceService.getUserWorkspaces(userId);
+      const dbUserId = req.user.id;
+      const workspaces = await workspaceService.getUserWorkspaces(dbUserId);
       res.status(200).json({ success: true, data: workspaces });
     } catch (error: any) {
       res.status(500).json({ success: false, error: error.message });

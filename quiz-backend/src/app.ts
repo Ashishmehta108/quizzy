@@ -37,7 +37,14 @@ app.use(
     origin: process.env.FRONTEND_URL,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-User-Id"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-User-Id",
+      "X-Workspace-Id",
+      "x-workspace-id",
+      "X-Requested-With",
+    ],
   })
 );
 app.use(helmet());

@@ -22,16 +22,17 @@
     --muted: 240 4.8% 95.9%; /* zinc-100 */
     --muted-foreground: 240 3.8% 46.1%; /* zinc-500 */
 
-    --accent: 240 5% 26.1%; /* zinc-600 */
+    /* Used mostly for hover/focus surfaces */
+    --accent: 240 5% 96%; /* zinc-100 */
     --sidebar: #fafafa;
-    --accent-foreground: 210 40% 98%;
+    --accent-foreground: 240 5% 10%; /* zinc-900 */
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 240 5% 90%; /* zinc-200 */
     --input: 240 5% 90%; /* zinc-200 */
-    --ring: 217.2 91.2% 59.8%; /* blue-600 */
+    --ring: 220 47% 40%;
 
     --radius: 0.75rem;
 
@@ -52,7 +53,7 @@
 
     --popover: 240 5% 10%;
     --popover-foreground: 240 5% 96%;
-    --primary: 240 5% 26.1%; /* zinc-600 */
+    --primary: 220 55% 72%;
 
     --primary-foreground: 240 5% 96%; /* zinc-100 */
 
@@ -70,7 +71,7 @@
 
     --border: 240 3.7% 15.9%; /* zinc-800 */
     --input: 240 3.7% 15.9%;
-    --ring: 217.2 91.2% 59.8%;
+    --ring: 220 55% 60%;
 
     --color-1: oklch(66.2% 0.225 25.9);
     --color-2: oklch(60.4% 0.26 302);

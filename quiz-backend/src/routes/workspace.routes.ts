@@ -7,8 +7,13 @@ import { WorkspaceController } from "../controllers/workspace.controller";
 import { resolveWorkspace } from "../middlewares/workspace.middleware";
 import { requireRole } from "../middlewares/role.middleware";
 
+import { resolveUser } from "../middlewares/auth.middleware";
+
 const router = Router();
 const controller = new WorkspaceController();
+
+// All workspace routes require a resolved user
+router.use(resolveUser);
 
 router.post("/", controller.createWorkspace);
 router.get("/", controller.listUserWorkspaces);
