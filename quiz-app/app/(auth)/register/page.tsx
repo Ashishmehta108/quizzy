@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 import Link from "next/link";
-import { Github, Loader } from "lucide-react";
+import { Loader } from "lucide-react";
 import Image from "next/image";
 import Logo from "@/public/quizzy_logo.png";
 import { useAuth, useSignUp } from "@clerk/nextjs";
@@ -173,7 +173,7 @@ export default function RegisterPage() {
             <Button
               onClick={() => oauthLogin("oauth_google")}
               variant="outline"
-              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100 
+              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100
                  dark:border-zinc-700 dark:hover:bg-zinc-800 dark:text-white"
             >
               <Image src={GoogleLogo} alt="Google" className="h-4 w-4" />
@@ -182,10 +182,11 @@ export default function RegisterPage() {
             <Button
               onClick={() => oauthLogin("oauth_github")}
               variant="outline"
-              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100 
+              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100
                dark:border-zinc-700  hover:text-zinc-900 dark:hover:bg-zinc-800 dark:text-white"
             >
-              <Github className="h-4 w-4" /> Sign up with GitHub
+              {/*<Github className="h-4 w-4" />*/}
+              Sign up with GitHub
             </Button>
           </div>
 

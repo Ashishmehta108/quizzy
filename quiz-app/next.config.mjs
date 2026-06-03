@@ -6,7 +6,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  allowedDevOrigins: ["sherril-exoskeletal-heinously.ngrok-free.dev"],
+};
 
-}
-
-export default nextConfig
+export default nextConfig;

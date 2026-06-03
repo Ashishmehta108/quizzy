@@ -14,7 +14,7 @@ import {
   BookOpen,
   Target,
 } from "lucide-react";
- 
+
 import { QuizTable } from "@/components/ui/quiz-card";
 import ResultTable from "@/components/ui/result-card";
 import {
@@ -53,49 +53,43 @@ const StatCard = ({
   progress,
 }: StatCardProps) => {
   return (
-    <Card className="bg-white dark:bg-zinc-900 shadow-sm ring-1 ring-zinc-200/60 dark:ring-zinc-800/60 rounded-2xl shadow-inner">
-      <CardContent className="p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex-1 space-y-1 sm:space-y-3">
-            <p className="text-xs sm:text-sm font-medium text-zinc-600 dark:text-zinc-400">
-              {title}
-            </p>
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <p className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-zinc-100">
-                {value}
-              </p>
-              {trend && (
-                <Badge
-                  variant="secondary"
-                  className="text-[10px] sm:text-xs sm:px-2 px-2 py-1"
-                >
-                  {trend}
-                </Badge>
-              )}
-            </div>
-            {subtitle && (
-              <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
-                {subtitle}
-              </p>
-            )}
-            {progress !== undefined && (
-              <div className="space-y-1 sm:space-y-2 pt-1">
-                <Progress value={progress} className="h-2" />
-                <p className="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400">
-                  {progress}% completion rate
-                </p>
-              </div>
-            )}
-          </div>
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-zinc-50 dark:bg-zinc-800 shadow-inner ring-1 ring-zinc-200/40 dark:ring-zinc-700/40 flex items-center justify-center">
-            <Icon
-              size="16"
-              className="sm:text-zinc-600 text-zinc-500 dark:text-zinc-400"
+    <div className="bg-[#111113] border border-[#23252a] rounded-xl p-5 flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-4">
+        <p className="text-xs font-medium text-[#8a8f98] tracking-wide uppercase">
+          {title}
+        </p>
+        <div className="w-8 h-8 rounded-md bg-[#1a1a1f] border border-[#23252a] flex items-center justify-center shrink-0">
+          <Icon size={14} className="text-[#8a8f98]" />
+        </div>
+      </div>
+
+      <div className="flex items-baseline gap-2 flex-wrap">
+        <p className="text-2xl font-semibold text-[#f7f8f8] tracking-tight">
+          {value}
+        </p>
+        {trend && (
+          <span className="text-[10px] bg-[#1a1a1f] text-[#8a8f98] border border-[#23252a] rounded-full px-2 py-0.5">
+            {trend}
+          </span>
+        )}
+      </div>
+
+      {subtitle && <p className="text-xs text-[#62666d] -mt-2">{subtitle}</p>}
+
+      {progress !== undefined && (
+        <div className="space-y-1.5">
+          <div className="h-[3px] w-full bg-[#1a1a1f] rounded-full overflow-hidden">
+            <div
+              className="h-full bg-[#5e6ad2] rounded-full transition-all duration-500"
+              style={{ width: `${progress}%` }}
             />
           </div>
+          <p className="text-[10px] text-[#62666d]">
+            {progress}% completion rate
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 };
 

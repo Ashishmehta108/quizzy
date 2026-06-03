@@ -1,9 +1,9 @@
 import {
   Brain,
   Mail,
-  Github,
-  Twitter,
-  Linkedin,
+  // Github,
+  // Twitter,
+  // Linkedin,
   ArrowRight,
 } from "lucide-react";
 import { AnimatedElement } from "@/app/page";
@@ -40,7 +40,7 @@ export default function Footer() {
               </p>
 
               {/* Social Links */}
-              <div className="flex items-center space-x-3">
+              {/*<div className="flex items-center space-x-3">
                 {[
                   { icon: Twitter, href: "#", label: "Twitter" },
                   { icon: Github, href: "#", label: "GitHub" },
@@ -58,7 +58,7 @@ export default function Footer() {
                     </a>
                   </Button>
                 ))}
-              </div>
+              </div>*/}
             </div>
 
             {/* Product Links */}
@@ -155,7 +155,7 @@ export default function Footer() {
                       />
                     )}
                   </div>
-                )
+                ),
               )}
             </div>
           </div>

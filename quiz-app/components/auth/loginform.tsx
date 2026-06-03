@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Image from "next/image";
 import Logo from "@/public/quizzy_logo.png";
-import { Loader, Github, Mail, EyeOffIcon, EyeClosed } from "lucide-react";
+import { Loader, Mail, EyeOffIcon, EyeClosed } from "lucide-react";
 import google from "@/public/google.svg";
 import { syncUser } from "@/lib/actions/syncUser";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -114,7 +114,7 @@ export default function LoginPage() {
               onClick={() => oauthLogin("oauth_google")}
               variant="outline"
               disabled={isSubmitting || !isLoaded}
-              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100 
+              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100
                dark:border-zinc-700 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:text-white"
             >
               <Image src={google} alt="Google" className="h-4 w-4" />
@@ -124,10 +124,11 @@ export default function LoginPage() {
               onClick={() => oauthLogin("oauth_github")}
               variant="outline"
               disabled={isSubmitting || !isLoaded}
-              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100 
+              className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100
                dark:border-zinc-700  hover:text-zinc-900 dark:hover:bg-zinc-800 dark:text-white"
             >
-              <Github className="h-4 w-4" /> GitHub
+              {/*<Github className="h-4 w-4" />*/}
+              GitHub
             </Button>
           </div>
 
@@ -142,11 +143,13 @@ export default function LoginPage() {
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative group">
-                <Mail className="      absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4
+                <Mail
+                  className="      absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4
       text-zinc-400 dark:text-zinc-500
       transition-colors duration-200
       group-focus-within:text-zinc-700
-      dark:group-focus-within:text-zinc-300" />
+      dark:group-focus-within:text-zinc-300"
+                />
 
                 <Input
                   id="email"
@@ -168,22 +171,22 @@ export default function LoginPage() {
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative group">
-  <Lock
-    aria-hidden
-    className="
+                <Lock
+                  aria-hidden
+                  className="
       absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4
       text-zinc-400 dark:text-zinc-500
       transition-colors duration-200
       group-focus-within:text-zinc-700
       dark:group-focus-within:text-zinc-300
     "
-  />
+                />
 
-  <Input
-    id="password"
-    type={showPassword ? "text" : "password"}
-    placeholder="Enter your password"
-    className="
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  className="
       pl-10 pr-10
       bg-white dark:bg-zinc-900
       border-zinc-200 dark:border-zinc-700
@@ -194,16 +197,16 @@ export default function LoginPage() {
       focus-visible:border-zinc-400
       dark:focus-visible:border-zinc-500
     "
-    {...register("password")}
-  />
+                  {...register("password")}
+                />
 
-    {/* Eye toggle */}
-<Button
-  type="button"
-  aria-label={showPassword ? "Hide password" : "Show password"}
-  onClick={() => setShowPassword((v) => !v)}
-  variant={"ghost"}
-  className="
+                {/* Eye toggle */}
+                <Button
+                  type="button"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  onClick={() => setShowPassword((v) => !v)}
+                  variant={"ghost"}
+                  className="
     absolute right-3 top-1/2 -translate-y-1/2
     flex items-center justify-center
     rounded-md
@@ -215,15 +218,14 @@ export default function LoginPage() {
     focus-visible:ring-2
     focus-visible:ring-zinc-300 dark:focus-visible:ring-zinc-600
   "
->
-  {showPassword ? (
-    <EyeClosed className="h-4 w-4" />
-  ) : (
-    <Eye className="h-4 w-4" />
-  )}
-</Button>
-
-</div>
+                >
+                  {showPassword ? (
+                    <EyeClosed className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
 
               {errors.password && (
                 <p className="text-sm text-destructive">
