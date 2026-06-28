@@ -26,8 +26,8 @@ import api from "@/lib/api";
 import type { Question, Quiz } from "@/lib/types";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createQuizSchema } from "@/utils/schema";
-import type { CreateQuizForm } from "@/utils/schema";
+import { createQuizSchema } from "@/utils/quiz-schemas";
+import type { CreateQuizForm } from "@/utils/quiz-schemas";
 import { useSocket } from "@/app/context/socket.context";
 import StatusUpdates from "@/components/agent/animateUpdate";
 

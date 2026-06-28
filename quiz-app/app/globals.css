@@ -129,6 +129,11 @@ html {
   scrollbar-gutter: stable;
 }
 
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
 @theme inline {
   @keyframes rainbow {
     0% {

@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Upload, Loader2, Globe } from "lucide-react";
 import api from "@/lib/api";
 import type { Question, Quiz } from "@/lib/types";
-import { createQuizSchema, type CreateQuizForm } from "@/utils/schema";
+import { createQuizSchema, type CreateQuizForm } from "@/utils/quiz-schemas";
 import { useSocket } from "@/app/context/socket.context";
 import StatusUpdates from "@/components/agent/animateUpdate";
 import {

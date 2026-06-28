@@ -43,7 +43,7 @@ export default function UsageWidget() {
         </div>
 
         <p className="text-xs text-muted-foreground">
-          Plan: {plan.name} ({billing.status}) | Period:{" "}
+          Plan: {plan.name}{billing?.status ? ` (${billing.status})` : ""} | Period:{" "}
           {usage.periodStart
             ? new Date(usage.periodStart).toLocaleDateString()
             : "N/A"}{" "}

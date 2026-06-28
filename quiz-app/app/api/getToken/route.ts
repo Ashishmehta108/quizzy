@@ -1,19 +1,34 @@
-// app/api/me/route.ts (Next.js App Router style)
-import { getAuth, clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 export async function GET(req: NextRequest) {
   try {
-    const { userId, sessionId, getToken } = getAuth(req);
+    const cookieStore = await cookies();
+    const token =
+      cookieStore.get("better-auth.session_token")?.value ||
+      cookieStore.get("__Secure-better-auth.session_token")?.value;
 
-    const sessionToken = await getToken();
-    if (!userId) {
+    if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await (await clerkClient()).users.getUser(userId);
+    const backendUrl = process.env.NEXT_PUBLIC_BACK_URL || "http://localhost:5000";
+    const res = await fetch(`${backendUrl}/api/me`, {
+      headers: {
+        Cookie: `better-auth.session_token=${token}`,
+      },
+    });
 
-    return NextResponse.json({ user, token: sessionToken }, { status: 200 });
+    if (!res.ok) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const sessionData = await res.json();
+    if (!sessionData || !sessionData.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    return NextResponse.json({ user: sessionData.user, token }, { status: 200 });
   } catch (err) {
     console.error(err);
     return NextResponse.json(
@@ -22,3 +37,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
