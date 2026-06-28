@@ -4,11 +4,26 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/ui/sidebar";
-import { LogOut, User, Sparkles, ChevronDown } from "lucide-react";
+import { LogOut, ChevronDown } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Logo from "../../public/quizzy_logo.png";
 import Image from "next/image";
-import { FavoriteChart, Home, Note, Notepad2 } from "iconsax-reactjs";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  DashboardSquareAddIcon,
+  LibraryIcon,
+  AssignmentsIcon,
+  CourseIcon,
+  ChartAnalysisIcon,
+  NotebookIcon,
+  NoteEditIcon,
+  BrainIcon,
+  ChatBotIcon,
+  UserCircleIcon,
+  CheckListIcon,
+  FileCheckIcon,
+  CrownIcon,
+} from "@hugeicons/core-free-icons";
 import { authClient } from "@/auth-client";
 import { useRouter } from "next/navigation";
 import {
@@ -133,6 +148,8 @@ export default function AppSidebar() {
     });
   };
 
+  const iconProps = { size: 17, strokeWidth: 1.5, type: "stroke" as const };
+
   return (
     <Sidebar className="bg-zinc-100 dark:bg-[#0d0d0f] border-none">
       <div className="flex flex-col h-full">
@@ -140,14 +157,8 @@ export default function AppSidebar() {
         <div className="px-4 pt-5 pb-3 flex-shrink-0">
           <Link href="/dashboard" className="flex items-center gap-1.5">
             <div className="relative flex items-center">
-              <div className="absolute top-[14px] left-[15px] h-4 w-4 bg-zinc-50 dark:bg-zinc-950 z-0" />
-              <Image
-                src={Logo}
-                height={46}
-                width={46}
-                alt="logo"
-                className="relative z-10"
-              />
+              <div className="absolute top-[14px] left-[15px] h-4 w-4 bg-zinc-100 dark:bg-[#0d0d0f] z-0" />
+              <Image src={Logo} height={46} width={46} alt="logo" className="relative z-10" />
             </div>
             <span className="text-[15px] font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">
               Quizzy
@@ -161,51 +172,72 @@ export default function AppSidebar() {
           <NavItem
             href="/dashboard"
             exact
-            icon={<Home size={16} variant="Linear" />}
-            label="Home"
+            label="Dashboard"
+            icon={<HugeiconsIcon icon={DashboardSquareAddIcon} {...iconProps} />}
+          />
+
+          <SectionLabel>Quizzes</SectionLabel>
+          <NavItem
+            href="/dashboard/quizzes"
+            exact
+            label="All Quizzes"
+            icon={<HugeiconsIcon icon={CheckListIcon} {...iconProps} />}
+          />
+          <NavItem
+            href="/dashboard/quizzes/create"
+            label="Create Quiz"
+            icon={<HugeiconsIcon icon={NoteEditIcon} {...iconProps} />}
+          />
+          <NavItem
+            href="/dashboard/results"
+            label="Results"
+            icon={<HugeiconsIcon icon={FileCheckIcon} {...iconProps} />}
           />
 
           <SectionLabel>Library</SectionLabel>
           <NavItem
             href="/dashboard/library"
-            icon={<Note size={16} variant="Linear" />}
             label="My Content"
+            icon={<HugeiconsIcon icon={LibraryIcon} {...iconProps} />}
           />
 
           <SectionLabel>Classroom</SectionLabel>
           <NavItem
             href="/dashboard/courses"
-            icon={<User size={15} strokeWidth={1.4} />}
             label="Courses & Cohorts"
+            icon={<HugeiconsIcon icon={CourseIcon} {...iconProps} />}
           />
           <NavItem
             href="/dashboard/assignments"
-            icon={<Notepad2 size={16} variant="Linear" />}
             label="Assignments"
+            icon={<HugeiconsIcon icon={AssignmentsIcon} {...iconProps} />}
           />
 
           <SectionLabel>Workspace</SectionLabel>
           <NavItem
             href="/dashboard/analytics"
-            icon={<FavoriteChart size={16} variant="Linear" />}
             label="Analytics"
+            icon={<HugeiconsIcon icon={ChartAnalysisIcon} {...iconProps} />}
           />
           <NavItem
             href="/dashboard/pricing"
-            icon={<Sparkles size={15} strokeWidth={1.4} />}
             label="Billing & Plans"
+            icon={<HugeiconsIcon icon={CrownIcon} {...iconProps} />}
           />
 
           <SectionLabel>AI Assistant</SectionLabel>
           <NavItem
             href="/dashboard/chat/ai"
-            icon={<Sparkles size={15} strokeWidth={1.4} />}
             label="Chat with AI"
+            icon={<HugeiconsIcon icon={ChatBotIcon} {...iconProps} />}
           />
 
           <Collapsible className="mt-0.5">
-            <CollapsibleTrigger className="group w-full flex items-center justify-between px-2.5 py-[6px] rounded-lg text-[13px] font-normal text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40 transition-colors duration-150">
-              <span>Chats</span>
+            <CollapsibleTrigger className="group w-full flex items-center justify-between px-2.5 py-[6px] rounded-lg text-[13px] font-normal text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40 transition-colors duration-150">
+              <span className="flex items-center gap-2.5">
+                <HugeiconsIcon icon={NotebookIcon} {...iconProps} className="text-zinc-600 dark:text-zinc-500" />
+                Chats
+              </span>
               <ChevronDown
                 size={13}
                 strokeWidth={1.6}
@@ -248,12 +280,9 @@ export default function AppSidebar() {
             className="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40 transition-colors duration-150"
           >
             <Avatar className="w-7 h-7">
-              <AvatarImage
-                src={user?.image || "https://github.com/shadcn.png"}
-                alt="@user"
-              />
-              <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800">
-                <User size={13} strokeWidth={1.4} className="text-zinc-500" />
+              <AvatarImage src={user?.image || "https://github.com/shadcn.png"} alt="@user" />
+              <AvatarFallback className="bg-zinc-200 dark:bg-zinc-800">
+                <HugeiconsIcon icon={UserCircleIcon} size={14} strokeWidth={1.4} type="stroke" className="text-zinc-500" />
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col min-w-0">
