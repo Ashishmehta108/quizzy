@@ -144,11 +144,11 @@ export default function LoginPage() {
               <Label htmlFor="email">Email</Label>
               <div className="relative group">
                 <Mail
-                  className="      absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4
+                  className="   absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4
       text-zinc-400 dark:text-zinc-500
       transition-colors duration-200
-      group-focus-within:text-zinc-700
-      dark:group-focus-within:text-zinc-300"
+      group-focus-within:text-zinc-600
+      dark:group-focus-within:text-zinc-400"
                 />
 
                 <Input
@@ -177,8 +177,8 @@ export default function LoginPage() {
       absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4
       text-zinc-400 dark:text-zinc-500
       transition-colors duration-200
-      group-focus-within:text-zinc-700
-      dark:group-focus-within:text-zinc-300
+      group-focus-within:text-zinc-600
+      dark:group-focus-within:text-zinc-400
     "
                 />
 
@@ -207,12 +207,13 @@ export default function LoginPage() {
                   onClick={() => setShowPassword((v) => !v)}
                   variant={"ghost"}
                   className="
+                  bg-transparent
     absolute right-3 top-1/2 -translate-y-1/2
     flex items-center justify-center
     rounded-md
     text-zinc-400 dark:text-zinc-500
     hover:text-zinc-700 dark:hover:text-zinc-300
-    hover:bg-transparent dark:hover:bg-zinc-800
+    hover:bg-transparent 
     transition-colors duration-200
     focus-visible:outline-none
     focus-visible:ring-2

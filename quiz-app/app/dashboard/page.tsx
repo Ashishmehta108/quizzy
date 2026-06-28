@@ -32,6 +32,7 @@ import { useActivityData } from "@/hooks/useUtility";
 import ActivityChart from "@/components/dashboard/activityWidget";
 import CreateQuizModal from "@/components/dashboard/createQuizModal";
 import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
+import { useUser } from "@clerk/nextjs";
 
 interface StatCardProps {
   title: string;
@@ -113,6 +114,7 @@ const fetchQuizzesAndResults = async () => {
 export default function DashboardPage() {
   const router = useRouter();
   const { data: activityData } = useActivityData();
+  const { user } = useUser();
 
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => setIsMounted(true), []);
@@ -194,11 +196,11 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
-              Dashboard
+            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-2">
+              Welcome back, {user?.firstName} 👋
             </h1>
             <p className="text-zinc-600 dark:text-zinc-400">
-              Track your learning progress and quiz performance
+              Continue your learning journey today.
             </p>
           </div>
         </div>

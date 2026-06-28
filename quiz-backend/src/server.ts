@@ -4,7 +4,7 @@ import app from "./app";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { quizAI, ensureSession } from "./services/aiservice";
-import "./loadPath";
+
 const PORT = process.env.PORT || 5000;
 const server = createServer(app);
 
@@ -22,18 +22,18 @@ app.get("/", (req, res) => {
 const userSocketMap = new Map<string, string>();
 
 io.on("connection", (socket) => {
-  console.log("✅ socket connected:", socket.id);
+  console.log(" socket connected:", socket.id);
 
   socket.on("register", (userId: string) => {
     userSocketMap.set(userId, socket.id);
-    console.log(`👤 User ${userId} registered with socket ${socket.id}`);
+    console.log(`User ${userId} registered with socket ${socket.id}`);
   });
 
   socket.on("join_session", async ({ quizId, userId }) => {
     const sessionId = await ensureSession(quizId, userId);
     const room = `quiz_${quizId}_${sessionId}`;
     socket.join(room);
-    console.log(`📚 Socket ${socket.id} joined room ${room}`);
+    console.log(` Socket ${socket.id} joined room ${room}`);
     socket.emit("session_ready", { sessionId });
   });
 
@@ -66,7 +66,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("❌ socket disconnected:", socket.id);
+    console.log("socket disconnected:", socket.id);
     for (const [userId, id] of userSocketMap.entries()) {
       if (id === socket.id) {
         userSocketMap.delete(userId);
@@ -78,7 +78,7 @@ io.on("connection", (socket) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`✅ Server started on http://localhost:${PORT}`);
+  console.log(`Server started on http://localhost:${PORT}`);
 });
 
 export { io, userSocketMap };

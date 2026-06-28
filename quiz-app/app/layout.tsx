@@ -8,6 +8,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Arimo } from "next/font/google";
 import { SocketProvider } from "./context/socket.context";
 import { NavigationProvider } from "@/components/navigator/navigationProvider";
+import { CookieConsentBanner } from "@/components/cookie-consent/cookieBanner";
 
 const arimo = Arimo({
   subsets: ["greek"],
@@ -15,7 +16,7 @@ const arimo = Arimo({
 export const metadata: Metadata = {
   title: "Quiz App - Create and Take Quizzes",
   description: "A modern quiz application built with Next.js",
-  generator: "v0.dev",
+  
   icons: {
     icon: logo.src,
   },
@@ -43,6 +44,7 @@ export default async function RootLayout({
             </NavigationProvider>
           </SocketProvider>
         </ClerkProvider>
+        <CookieConsentBanner />
       </body>
     </html>
   );
