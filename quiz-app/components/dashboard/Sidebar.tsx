@@ -61,7 +61,7 @@ function NavGroup({
   return (
     <Collapsible defaultOpen={defaultOpen} className="mt-4 first:mt-1">
       <CollapsibleTrigger className="group w-full flex items-center justify-between px-2 mb-0.5">
-        <span className="text-[10.5px] font-medium text-zinc-500 dark:text-zinc-500 select-none">
+        <span className="text-[9px] font-medium text-zinc-500 dark:text-zinc-500 select-none">
           {label}
         </span>
         <ChevronDown
