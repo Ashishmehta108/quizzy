@@ -26,4 +26,4 @@ router.patch("/:workspaceId", requireRole("owner", "admin"), controller.updateWo
 router.get("/:workspaceId/members", controller.listMembers);
 router.get("/:workspaceId/entitlements", controller.getEntitlements);
 
-export default router;
+export const workspaceRouter = router;

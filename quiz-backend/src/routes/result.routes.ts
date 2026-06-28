@@ -5,10 +5,10 @@ import {
   GetResults,
 } from "../controllers/result.controller";
 import { checkAuth } from "../utils/checkAuth";
-const resultRouter = Router();
+export const resultRouter = Router();
 
 resultRouter.post("/", checkAuth, PostResult);
 resultRouter.get("/", checkAuth, GetResults);
 resultRouter.get("/:id", checkAuth, GetResultById);
 
-export default resultRouter;
+

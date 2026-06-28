@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 import { QuizRequest, QuizResponse } from "../types/routes/quiz";
 import { quizChecks } from "../checks/quiz.checks";
 
-const quizRouter = Router();
+export const quizRouter = Router();
 
 quizRouter.post("/check", checkAuth, quizChecks, (req, res) => {
   res.json({ ok: true });
@@ -50,4 +50,4 @@ quizRouter.get(
   }
 );
 
-export default quizRouter;
+

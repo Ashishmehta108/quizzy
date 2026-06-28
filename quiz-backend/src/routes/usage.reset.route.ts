@@ -4,7 +4,7 @@ import { usage } from "../config/db/schema";
 import { isNull } from "drizzle-orm";
 import { asyncHandler } from "../utils/asyncHandler";
 
-const updateUsageRouter = Router();
+export const updateUsageRouter = Router();
 export const resetUsage = async () => {
   await db
     .update(usage)
@@ -27,4 +27,4 @@ updateUsageRouter.post(
   })
 );
 
-export default updateUsageRouter;
+

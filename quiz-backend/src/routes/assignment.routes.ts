@@ -22,4 +22,4 @@ router.post("/", requireRole("owner", "admin", "instructor"), controller.createA
 router.get("/", controller.listAssignments);
 router.get("/:id", controller.getAssignmentDetail);
 
-export default router;
+export const assignmentRouter = router;

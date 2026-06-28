@@ -11,4 +11,4 @@ router.get("/assignments/:id/results", (req, res) => {
   res.json({ success: true, data: [] }); // dummy for now
 });
 
-export default router;
+export const analyticsRoutes = router;

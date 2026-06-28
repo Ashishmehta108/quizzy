@@ -14,4 +14,4 @@ router.get("/pricing/current", getCurrentPlan);
 router.get("/pricing/trigger", checkUpgrade);
 router.post("/pricing/checkout", createCheckoutSession);
 
-export default router;
+export const pricingRoutes = router;

@@ -22,4 +22,4 @@ router.get("/cohorts", controller.listCohorts);
 router.post("/cohorts", requireRole("owner", "admin"), controller.createCohort);
 router.get("/:id", controller.getCourse);
 
-export default router;
+export const courseRouter = router;

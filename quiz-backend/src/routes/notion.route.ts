@@ -13,4 +13,4 @@ router.get("/callback", notionCallback);
 router.get("/databases", getDatabases);
 router.get("/integration", getIntegrationInfo);
 
-export default router;
+export const notionRouter = router;

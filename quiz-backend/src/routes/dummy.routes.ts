@@ -2,7 +2,7 @@ import { io } from "../server";
 import { asyncHandler } from "../utils/asyncHandler";
 import { Router } from "express";
 
-const dummyRouter = Router();
+export const dummyRouter = Router();
 
 dummyRouter.route("/dummy").post(
   asyncHandler(async (req, res) => {
@@ -26,4 +26,4 @@ dummyRouter.route("/dummy").post(
 
 
 
-export default dummyRouter;
+

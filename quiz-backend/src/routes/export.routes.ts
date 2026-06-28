@@ -6,4 +6,4 @@ const router = Router();
 router.get("/assignments/:id/export", exportAssignmentResults);
 router.get("/assignments/:id/export/questions", exportAssignmentResults); // Could map to specific questions CSV
 
-export default router;
+export const exportRoutes = router;

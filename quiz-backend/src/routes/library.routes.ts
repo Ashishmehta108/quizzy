@@ -25,4 +25,4 @@ router.post("/upload", upload.single("file"), ingestionController.uploadAndProce
 router.get("/:id", libraryController.getDocument);
 router.delete("/:id", requireRole("owner", "admin"), libraryController.deleteDocument);
 
-export default router;
+export const libraryRouter = router;

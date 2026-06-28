@@ -6,4 +6,4 @@ const router = Router();
 router.get("/attempts/:id/review", getAttemptReview);
 router.patch("/attempts/:id/grade", updateGrade);
 
-export default router;
+export const gradingRoutes = router;

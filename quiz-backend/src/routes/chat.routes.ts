@@ -12,7 +12,7 @@ import { eq, desc, asc, and } from "drizzle-orm";
 import { asyncHandler } from "../utils/asyncHandler";
 import { ApiError } from "../utils/apiError";
 
-const chatRouter = Router();
+export const chatRouter = Router();
 
 chatRouter.get(
   "/chats",
@@ -118,4 +118,4 @@ chatRouter.get(
   })
 );
 
-export default chatRouter;
+
