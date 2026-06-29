@@ -150,13 +150,13 @@ export default function AppSidebar() {
   const iconProps = { size: 17, strokeWidth: 1.5, type: "stroke" as const };
 
   return (
-    <Sidebar className="bg-zinc-100 dark:bg-[#0d0d0f] border-none">
+    <Sidebar className="bg-zinc-50 dark:bg-[#111113] border-none [&>[data-sidebar=sidebar]]:shadow-[inset_0_8px_12px_-6px_rgba(0,0,0,0.06)] dark:[&>[data-sidebar=sidebar]]:shadow-[inset_0_8px_14px_-6px_rgba(0,0,0,0.45)]">
       <div className="flex flex-col h-full">
         {/* Logo */}
         <div className="px-4 pt-5 pb-3 flex-shrink-0">
           <Link href="/dashboard" className="flex items-center gap-1.5">
             <div className="relative flex items-center">
-              <div className="absolute top-[14px] left-[15px] h-4 w-4 bg-zinc-100 dark:bg-[#0d0d0f] z-0" />
+              <div className="absolute top-[14px] left-[15px] h-4 w-4 bg-zinc-50 dark:bg-[#111113] z-0" />
               <Image src={Logo} height={46} width={46} alt="logo" className="relative z-10" />
             </div>
             <span className="text-[15px] font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">Quizzy</span>

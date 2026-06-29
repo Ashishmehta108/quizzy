@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { authClient } from "@/auth-client";
 import ResultTable from "@/components/ui/result-card";
 import api from "@/lib/api";
 import type { Result } from "@/lib/types";
@@ -11,15 +11,18 @@ import {
   renderSkeletons,
 } from "@/components/loader/Skeleton";
 import EmptyState from "@/components/Empty";
-import { Notepad2 } from "iconsax-reactjs";
+import { NoteEditIcon } from "@hugeicons/core-free-icons";
+import { makeIcon } from "@/components/ui/hugeicon";
 
 export default function ResultsPage() {
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { isLoaded } = useAuth();
-  const { user } = useUser();
+  const { data: session, isPending: isSessionLoading } = authClient.useSession();
+  const user = session?.user;
+  const isLoaded = !isSessionLoading;
+
 
   useEffect(() => {
     if (isLoaded && user) {
@@ -46,7 +49,7 @@ export default function ResultsPage() {
   if (!user) return null;
 
   return (
-    <div className="bg-white dark:bg-zinc-900 max-w-5xl mx-auto container px-4 sm:px-6 lg:px-8 py-8">
+    <div className="bg-zinc-50 dark:bg-[#111113] max-w-5xl mx-auto container px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6 text-center">
         <h2 className="text-xl font-semibold dark:text-white">Your Results</h2>
         <p className="text-gray-600 dark:text-zinc-400">
@@ -60,7 +63,7 @@ export default function ResultsPage() {
 
       {!loading && !error && results.length === 0 && (
         <EmptyState
-          icon={Notepad2}
+          icon={makeIcon(NoteEditIcon)}
           title="No results yet"
           description="Take some quizzes to see your results here."
           action={null}

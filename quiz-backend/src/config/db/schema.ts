@@ -1,4 +1,4 @@
-import { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { relations, InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
   pgTable,
   varchar,
@@ -13,20 +13,84 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 
-export const users = pgTable("users", {
+export const user = pgTable("user", {
   id: varchar("id", { length: 36 }).primaryKey(),
-  clerkId: varchar("clerk_id", { length: 255 }).notNull().unique(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
   name: varchar("name", { length: 100 }),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  image: text("image"),
   role: varchar("role", { length: 50 }).default("user").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
   isActive: boolean("is_active").default(true).notNull(),
   isBanned: boolean("is_banned").default(false).notNull(),
   bannedReason: text("banned_reason"),
   apiKey: varchar("api_key", { length: 64 }).unique(),
   apiKeyLastRotatedAt: timestamp("api_key_last_rotated_at").defaultNow(),
+  username: text("username"),
 });
+
+export const session = pgTable(
+  "session",
+  {
+    id: text("id").primaryKey(),
+    expiresAt: timestamp("expires_at").notNull(),
+    token: text("token").notNull().unique(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .$onUpdate(() => new Date())
+      .notNull(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+  },
+  (table) => [index("session_userId_idx").on(table.userId)],
+);
+
+export const account = pgTable(
+  "account",
+  {
+    id: text("id").primaryKey(),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    idToken: text("id_token"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at"),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+    scope: text("scope"),
+    password: text("password"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [index("account_userId_idx").on(table.userId)],
+);
+
+export const verification = pgTable(
+  "verification",
+  {
+    id: text("id").primaryKey(),
+    identifier: text("identifier").notNull(),
+    value: text("value").notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [index("verification_identifier_idx").on(table.identifier)],
+);
 
 export const workspaceRoleEnum = pgEnum("workspace_role", [
   "owner",
@@ -49,7 +113,7 @@ export const workspaceMembers = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
-    userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
     role: workspaceRoleEnum("role").notNull().default("learner"),
     joinedAt: timestamp("joined_at").defaultNow().notNull(),
   },
@@ -66,8 +130,7 @@ export const plans = pgTable("plans", {
   description: text("description"),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
   currency: varchar("currency", { length: 10 }).default("INR").notNull(),
-  interval: varchar("interval", { length: 20 }).default("monthly").notNull(), // monthly | yearly
-  // Structured entitlements
+  interval: varchar("interval", { length: 20 }).default("monthly").notNull(),
   maxCourses: integer("max_courses").default(1).notNull(),
   maxCohorts: integer("max_cohorts").default(1).notNull(),
   maxMaterialPages: integer("max_material_pages").default(50).notNull(),
@@ -77,8 +140,8 @@ export const plans = pgTable("plans", {
   maxStudentSeats: integer("max_student_seats").default(25).notNull(),
   maxAiGenerations: integer("max_ai_generations").default(5).notNull(),
   maxWebsearches: integer("max_websearches").default(10).notNull(),
-  exportTypes: jsonb("export_types").default(["none"]).notNull(), // ["none"] | ["csv"] | ["csv","pdf"]
-  analyticsLevel: varchar("analytics_level", { length: 20 }).default("basic").notNull(), // basic | full | api
+  exportTypes: jsonb("export_types").default(["none"]).notNull(),
+  analyticsLevel: varchar("analytics_level", { length: 20 }).default("basic").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -86,12 +149,12 @@ export const billings = pgTable(
   "billings",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    userId: varchar("user_id", { length: 36 }).notNull().references(() => users.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
     workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
     planId: uuid("plan_id").notNull().references(() => plans.id, { onDelete: "cascade" }),
     stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
     stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }),
-    status: varchar("status", { length: 50 }).notNull(), // active, cancelled, expired, trialing
+    status: varchar("status", { length: 50 }).notNull(),
     startDate: timestamp("start_date").defaultNow().notNull(),
     endDate: timestamp("end_date"),
     currentPeriodStart: timestamp("current_period_start"),
@@ -138,7 +201,7 @@ export const usageLedger = pgTable(
 
 export const usage = pgTable("usage", {
   id: uuid("id").defaultRandom().primaryKey(),
-  workspaceId: uuid("workspace_id"), // nullable for migration
+  workspaceId: uuid("workspace_id"),
   billingId: uuid("billing_id")
     .notNull()
     .references(() => billings.id, { onDelete: "cascade" }),
@@ -153,8 +216,8 @@ export const usage = pgTable("usage", {
     .$onUpdate(() => new Date()),
 });
 
-export type GetUser = InferSelectModel<typeof users>;
-export type NewUser = InferInsertModel<typeof users>;
+export type GetUser = InferSelectModel<typeof user>;
+export type NewUser = InferInsertModel<typeof user>;
 
 export const courses = pgTable("courses", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -184,7 +247,7 @@ export const quizzes = pgTable("quizzes", {
   courseId: uuid("course_id"),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
-  userId: varchar("user_id", { length: 36 }),
+  userId: text("user_id"),
   sourceType: varchar("source_type", { length: 50 }).default("ai").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   submitted: boolean("submitted").default(false).notNull(),
@@ -223,7 +286,7 @@ export const documents = pgTable("documents", {
   id: varchar("id", { length: 36 }).primaryKey(),
   workspaceId: uuid("workspace_id"),
   courseId: uuid("course_id"),
-  userId: varchar("user_id", { length: 36 }),
+  userId: text("user_id"),
   title: varchar("title", { length: 255 }).notNull(),
   content: text("content").notNull(),
   uploadUrl: text("upload_url").notNull(),
@@ -255,8 +318,8 @@ export const results = pgTable(
   "results",
   {
     id: varchar("id", { length: 36 }).primaryKey(),
-    userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }),
-    quizId: varchar("quiz_id", { length: 36 }), 
+    userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
+    quizId: varchar("quiz_id", { length: 36 }),
     score: integer("score").notNull(),
     optionsReview: text("quiz_review").notNull(),
     submittedAt: timestamp("submitted_at").notNull().defaultNow(),
@@ -265,7 +328,7 @@ export const results = pgTable(
     attemptId: varchar("attempt_id", { length: 36 }),
     overrideScore: integer("override_score"),
     instructorComments: text("instructor_comments"),
-    gradedBy: varchar("graded_by", { length: 36 }),
+    gradedBy: text("graded_by"),
     gradedAt: timestamp("graded_at"),
   },
   (t) => ({
@@ -282,7 +345,7 @@ export type NewResult = InferInsertModel<typeof results>;
 
 export const NotionIntegration = pgTable("NotionIntegration", {
   id: varchar("id", { length: 36 }).primaryKey(),
-  userId: varchar("user_id", { length: 36 }).references(() => users.id, {
+  userId: text("user_id").references(() => user.id, {
     onDelete: "cascade",
   }),
   notionAccessTokenHash: varchar("notion_access_token_hash", { length: 255 }),
@@ -309,8 +372,8 @@ export const quizAttempts = pgTable(
   "quiz_attempts",
   {
     id: varchar("id", { length: 36 }).primaryKey(),
-    userId: varchar("user_id", { length: 36 })
-      .references(() => users.id, { onDelete: "cascade" })
+    userId: text("user_id")
+      .references(() => user.id, { onDelete: "cascade" })
       .notNull(),
     quizId: varchar("quiz_id", { length: 36 })
       .references(() => quizzes.id, { onDelete: "cascade" })
@@ -351,7 +414,7 @@ export const chatSessions = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     quizId: text("quiz_id").notNull(),
-    userId: text("user_id").notNull(), // adapt to your auth (Clerk)
+    userId: text("user_id").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -395,7 +458,7 @@ export const events = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     workspaceId: uuid("workspace_id").notNull(),
     eventType: varchar("event_type", { length: 50 }).notNull(),
-    actorUserId: varchar("actor_user_id", { length: 36 }),
+    actorUserId: text("actor_user_id"),
     entityType: varchar("entity_type", { length: 50 }),
     entityId: varchar("entity_id", { length: 36 }),
     metadata: jsonb("metadata"),
@@ -416,7 +479,7 @@ export const aiRequests = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     workspaceId: uuid("workspace_id").notNull(),
-    userId: varchar("user_id", { length: 36 }).notNull(),
+    userId: text("user_id").notNull(),
     requestType: varchar("request_type", { length: 50 }).notNull(),
     model: varchar("model", { length: 100 }),
     tokensIn: integer("tokens_in").default(0).notNull(),
@@ -455,7 +518,7 @@ export const assignments = pgTable("assignments", {
 export const assignmentMembers = pgTable("assignment_members", {
   id: uuid("id").defaultRandom().primaryKey(),
   assignmentId: uuid("assignment_id").notNull(),
-  userId: varchar("user_id", { length: 36 }).notNull(),
+  userId: text("user_id").notNull(),
   status: varchar("status", { length: 50 }).default("assigned").notNull(),
   attemptsUsed: integer("attempts_used").default(0).notNull(),
   lastAttemptAt: timestamp("last_attempt_at"),
@@ -464,4 +527,23 @@ export const assignmentMembers = pgTable("assignment_members", {
   assignmentIdx: index("idx_am_assignment").on(t.assignmentId),
   userIdx: index("idx_am_user").on(t.userId),
   uniqueMember: index("idx_am_unique").on(t.assignmentId, t.userId),
+}));
+
+export const userRelations = relations(user, ({ many }) => ({
+  sessions: many(session),
+  accounts: many(account),
+}));
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, {
+    fields: [session.userId],
+    references: [user.id],
+  }),
+}));
+
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(user, {
+    fields: [account.userId],
+    references: [user.id],
+  }),
 }));

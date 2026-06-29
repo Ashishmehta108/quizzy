@@ -1,14 +1,21 @@
 import { NextFunction, Request, Response } from "express";
+import { fromNodeHeaders } from "better-auth/node";
+import { auth } from "../auth";
 
-export const checkAuth = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.auth) {
-    return next(new Error("Unauthenticated"));
+export const checkAuth = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(req.headers),
+    });
+
+    if (!session || !session.user) {
+      return res.status(401).json({ error: "Unauthenticated" });
+    }
+
+    // Attach session user to request for downstream use
+    (req as any).betterAuthUser = session.user;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Unauthenticated" });
   }
-  console.log(req.auth);
-  console.log("checking if session exists");
-  console.log(req.auth.userId);
-  if (!req?.auth?.userId) {
-    return next(new Error("Unauthenticated"));
-  }
-  next();
 };

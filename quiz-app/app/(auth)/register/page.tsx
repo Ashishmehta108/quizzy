@@ -19,7 +19,7 @@ import Link from "next/link";
 import { Loader } from "lucide-react";
 import Image from "next/image";
 import Logo from "@/public/quizzy_logo.png";
-import { useAuth, useSignUp } from "@clerk/nextjs";
+import { authClient } from "@/auth-client";
 import GoogleLogo from "@/public/google.svg";
 
 interface RegisterForm {
@@ -44,102 +44,38 @@ export default function RegisterPage() {
   } = useForm<RegisterForm>();
 
   const password = watch("password");
-  const { getToken } = useAuth();
-  const { signUp, setActive, isLoaded } = useSignUp();
-
-  const syncUser = async () => {
-    try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACK_URL;
-      if (!backendUrl) throw new Error("Missing BACKEND URL env");
-
-      const jwt = await getToken();
-      if (!jwt) throw new Error("Missing Clerk session token");
-
-      const res = await fetch(`${backendUrl}/api/auth/sync`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${jwt}` },
-      });
-
-      if (!res.ok) throw new Error("Sync failed");
-    } catch (err) {
-      console.error("Sync error:", err);
-    }
-  };
 
   const onSubmit = async (data: RegisterForm) => {
     try {
-      if (!isLoaded) return;
-
       setError("");
       setIsLoading(true);
 
-      const result = await signUp.create({
-        emailAddress: data.email,
+      await authClient.signUp.email({
+        email: data.email,
         password: data.password,
-        firstName: data.name,
-        lastName: data.lastName,
+        name: `${data.name} ${data.lastName}`,
         username: data.username,
-      });
-      console.log("Signup result:", result);
-
-      if (result.status === "complete") {
-        if (result.createdSessionId) {
-          await setActive({ session: result.createdSessionId });
-          await syncUser();
+      }, {
+        onSuccess: () => {
           router.push("/dashboard");
-        } else {
-          router.push("/login");
+        },
+        onError: (ctx) => {
+          setError(ctx.error.message || "Signup failed");
         }
-      } else if (result.status === "abandoned") {
-        setError("Sign-up process was abandoned. Please try again.");
-      } else if (result.status === "missing_requirements") {
-        try {
-          await signUp.prepareEmailAddressVerification({
-            strategy: "email_code",
-          });
-        } catch (verificationErr: any) {
-          console.error("Verification error:", verificationErr);
-        }
-        router.push("/verify-email");
-      } else {
-        setError("Unexpected signup status. Please try again.");
-      }
+      });
     } catch (err: any) {
       console.error("Signup error:", err);
-
-      let message = "Signup failed";
-
-      if (err?.errors && Array.isArray(err.errors) && err.errors.length > 0) {
-        message =
-          err.errors[0]?.longMessage || err.errors[0]?.message || message;
-      } else if (err?._status === "missing_requirements") {
-        if (
-          Array.isArray(err.requiredFields) &&
-          err.requiredFields.length > 0
-        ) {
-          message = `Missing required fields: ${err.requiredFields
-            .map((f: any) => f?.fieldId || f)
-            .join(", ")}`;
-        } else {
-          message = "Please complete all required sign-up fields.";
-        }
-      } else if (typeof err?.message === "string") {
-        message = err.message;
-      }
-
-      setError(message);
+      setError(err?.message || "Signup failed");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const oauthLogin = async (provider: "oauth_google" | "oauth_github") => {
-    if (!isLoaded) return;
+  const oauthLogin = async (provider: "google" | "github") => {
     try {
-      await signUp.authenticateWithRedirect({
-        strategy: provider,
-        redirectUrl: "/sso-callback?redirect=/post-login",
-        redirectUrlComplete: "/post-login",
+      await authClient.signIn.social({
+        provider,
+        callbackURL: "/dashboard",
       });
     } catch (err) {
       console.error(`${provider} login failed:`, err);
@@ -147,8 +83,9 @@ export default function RegisterPage() {
     }
   };
 
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-900 py-12 px-4 sm:px-6 lg:px-8 clerk-captcha">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-900 py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="md:text-2xl text-xl flex justify-center items-center font-bold text-center">
@@ -171,7 +108,7 @@ export default function RegisterPage() {
         <CardContent>
           <div className="flex flex-col gap-2 mb-4">
             <Button
-              onClick={() => oauthLogin("oauth_google")}
+              onClick={() => oauthLogin("google")}
               variant="outline"
               className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100
                  dark:border-zinc-700 dark:hover:bg-zinc-800 dark:text-white"
@@ -180,7 +117,7 @@ export default function RegisterPage() {
               Sign up with Google
             </Button>
             <Button
-              onClick={() => oauthLogin("oauth_github")}
+              onClick={() => oauthLogin("github")}
               variant="outline"
               className="w-full flex items-center gap-2 border-zinc-300 hover:bg-zinc-100
                dark:border-zinc-700  hover:text-zinc-900 dark:hover:bg-zinc-800 dark:text-white"

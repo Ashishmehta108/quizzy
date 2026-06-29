@@ -14,10 +14,11 @@ import {
 import { useState } from "react";
 import { ModeToggle } from "../Modetoggle";
 import Link from "next/link";
-import { useUser } from "@clerk/nextjs";
+import { authClient } from "@/auth-client";
 
 export function NavbarDemo() {
-  const { user } = useUser();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
   const navItems = [
     {
       name: "Features",
@@ -49,7 +50,7 @@ export function NavbarDemo() {
               {" "}
               <ModeToggle />
             </NavbarButton>
-            {!user?.emailAddresses[0].emailAddress && (
+            {!user?.email && (
               <Link href={"/login"}>
                 <NavbarButton variant="primary"> Login</NavbarButton>
               </Link>
@@ -82,7 +83,7 @@ export function NavbarDemo() {
             ))}
             <div className="flex w-full   flex-col gap-4">
               <ModeToggle />
-              {!user?.emailAddresses[0].emailAddress && (
+              {!user?.email && (
                 <Link href={"/login"}>
                   <NavbarButton
                     onClick={() => setIsMobileMenuOpen(false)}

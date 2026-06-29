@@ -19,6 +19,7 @@ export const getPricingPlans = async (req: Request, res: Response) => {
 export const getCurrentPlan = async (req: Request, res: Response) => {
   try {
     // Mock for now, would join with billings
+    // const 
     return res.status(200).json({
       success: true,
       data: {

@@ -1,5 +1,5 @@
 import { db } from "../config/db/index";
-import { quizzes, results, users } from "../config/db/schema";
+import { quizzes, results } from "../config/db/schema";
 import { and, eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { calculateResult } from "../utils/calculateresult";
@@ -10,14 +10,8 @@ export const PostResult = async (req: Request, res: Response) => {
   try {
     const { totalScore, optionsFilled, quizId } = req.body;
 
-    const userId = req.auth?.userId;
-    if (!userId) return res.status(401).json({ error: "Unauthorized" });
-
-    const [user] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.clerkId, userId as string));
-    if (!user) return res.status(404).json({ error: "User not found" });
+    const authUser = (req as any).betterAuthUser;
+    if (!authUser?.id) return res.status(401).json({ error: "Unauthorized" });
 
     const [quiz] = await db
       .select()
@@ -33,7 +27,7 @@ export const PostResult = async (req: Request, res: Response) => {
         optionsReview: optionsFilled,
         score: totalScore,
         quizId,
-        userId: user.id,
+        userId: authUser.id,
         submittedAt: new Date(),
       })
       .returning();
@@ -51,20 +45,13 @@ export const PostResult = async (req: Request, res: Response) => {
 
 export const GetResults = async (req: Request, res: Response) => {
   try {
-    const userId = req.auth?.userId;
-    if (!userId) return res.status(401).json({ error: "Unauthorized" });
-
-    const [user] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.clerkId, userId as string));
-    console.log(user);
-    if (!user) return res.status(404).json({ error: "User not found" });
+    const authUser = (req as any).betterAuthUser;
+    if (!authUser?.id) return res.status(401).json({ error: "Unauthorized" });
 
     const data = await db
       .select()
       .from(results)
-      .where(eq(results.userId, user.id));
+      .where(eq(results.userId, authUser.id));
 
     if (!data.length) return res.json({ data: [] });
 
@@ -90,74 +77,43 @@ export const GetResultById = async (req: Request, res: Response) => {
   try {
     console.log("➡️ GetResultById called");
 
-    // 1. Check authentication
-    const userId = req.auth?.userId;
-    console.log("🔑 userId from auth:", userId);
-
-    if (!userId) {
-      console.warn("⚠️ Unauthorized request - no userId found");
+    const authUser = (req as any).betterAuthUser;
+    if (!authUser?.id) {
+      console.warn("⚠️ Unauthorized request - no session user");
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    // 2. Validate user existence
-    const [user] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.clerkId, userId));
-
-    console.log("👤 DB user lookup result:", user);
-
-    if (!user) {
-      console.warn("⚠️ User not found for clerkId:");
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    // 3. Validate request param
     const { id } = req.params;
-    console.log("📦 Request param id:");
+    console.log("📦 Request param id:", id);
 
     if (!id) {
-      console.warn("⚠️ Invalid result ID:");
+      console.warn("⚠️ Invalid result ID");
       return res.status(400).json({ error: "Invalid result ID" });
     }
 
-    // 4. Fetch result entry
     const resultRows = await db
       .select()
       .from(results)
-      .where(and(eq(results.userId, user.id), eq(results.id, id)));
+      .where(and(eq(results.userId, authUser.id), eq(results.id, id)));
 
-    console.log("📊 Result rows fetched:");
+    console.log("📊 Result rows fetched:", resultRows.length);
 
     if (!resultRows || resultRows.length === 0) {
-      console.warn(
-        "⚠️ Result not found for userId:",
-        user.id,
-        " resultId:",
-        id
-      );
+      console.warn("⚠️ Result not found for userId:", authUser.id, "resultId:", id);
       return res.status(404).json({ error: "Result not found" });
     }
 
     const resultData = resultRows[0];
     console.log("✅ Found resultData:", resultData);
 
-    // 5. Ensure quizId exists
     if (!resultData.quizId) {
-      console.error("❌ Result has no quizId:");
+      console.error("❌ Result has no quizId");
       return res.status(400).json({ error: "Result has no associated quizId" });
     }
 
-    // 6. Calculate result
-    console.log("🧮 Calculating result for:", {
-      resultId: resultData.id,
-
-      quizId: resultData.quizId,
-    });
-
     const result = await calculateResult(
       resultData.id,
-      user.id,
+      authUser.id,
       resultData.quizId
     );
 
@@ -166,7 +122,6 @@ export const GetResultById = async (req: Request, res: Response) => {
       return res.status(500).json({ error: "Result calculation failed" });
     }
 
-    // 7. Success
     console.log("🎉 Successfully calculated result:", result);
     return res.json({ result });
   } catch (error: any) {

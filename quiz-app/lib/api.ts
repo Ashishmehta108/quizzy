@@ -1,8 +1,7 @@
 "use client";
-import { useAuth } from "@clerk/nextjs";
 import axios from "axios";
-import { getAuth } from "@clerk/nextjs/server";
 async function fetchMe() {
+
   const res = await fetch("/api/getToken");
   return res.json();
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useUser, useClerk } from "@clerk/nextjs";
+import { authClient } from "@/auth-client";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -14,15 +15,28 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
 const Profile = () => {
+  const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
-  const { user, isLoaded } = useUser();
-  const { signOut, openUserProfile } = useClerk();
+  const { data: session, isPending: isSessionLoading } = authClient.useSession();
+  const user = session?.user;
+  const isLoaded = !isSessionLoading;
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
+  const handleSignOut = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/login");
+        }
+      }
+    });
+  };
+
   if (!isMounted || !isLoaded) {
+
     return (
       <Card className="max-w-md mx-auto mt-10 bg-zinc-100/40 dark:bg-zinc-900/40 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-lg p-6 space-y-4">
         <div className="flex items-center gap-4">
@@ -45,21 +59,21 @@ const Profile = () => {
           <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-zinc-300 via-zinc-200 to-zinc-400 dark:from-zinc-700 dark:via-zinc-600 dark:to-zinc-400 blur-md opacity-40" />
           <Avatar className="h-20 w-20 ring-2 ring-zinc-300 dark:ring-zinc-700 relative z-10">
             <AvatarImage
-              src={user?.imageUrl || "https://github.com/shadcn.png"}
-              alt={user?.fullName || "User"}
+              src={user?.image || "https://github.com/shadcn.png"}
+              alt={user?.name || "User"}
             />
             <AvatarFallback className="bg-zinc-200 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-200">
-              {user?.fullName?.charAt(0)?.toUpperCase() ?? "U"}
+              {user?.name?.charAt(0)?.toUpperCase() ?? "U"}
             </AvatarFallback>
           </Avatar>
         </div>
         <CardTitle className="mt-4 text-2xl font-semibold text-zinc-800 dark:text-zinc-100">
-          {user?.fullName ?? "Unnamed User"}
+          {user?.name ?? "Unnamed User"}
         </CardTitle>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
           {user?.username
             ? `@${user.username}`
-            : user?.primaryEmailAddress?.emailAddress}
+            : user?.email}
         </p>
       </CardHeader>
 
@@ -68,9 +82,7 @@ const Profile = () => {
         <div className="flex justify-between">
           <span className="text-zinc-500 dark:text-zinc-400 mr-3">Email</span>
           <span className="font-medium text-zinc-800 dark:text-zinc-200">
-            {user?.primaryEmailAddress?.emailAddress ??
-              user?.emailAddresses?.[0]?.emailAddress ??
-              "No email"}
+            {user?.email ?? "No email"}
           </span>
         </div>
         <div className="flex justify-between">
@@ -87,13 +99,13 @@ const Profile = () => {
       <CardFooter className="flex gap-3 px-6 pb-6">
         <Button
           variant="outline"
-          onClick={() => openUserProfile()}
+          onClick={() => alert("Profile editing is managed in settings.")}
           className="flex-1 border-zinc-300 text-zinc-700 hover:bg-zinc-200 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800 hover:text-zinc-800"
         >
           Edit Profile
         </Button>
         <Button
-          onClick={() => signOut()}
+          onClick={handleSignOut}
           className="flex-1 bg-zinc-800 text-zinc-100 hover:bg-zinc-700 dark:bg-zinc-700 dark:hover:bg-zinc-600"
         >
           Sign Out

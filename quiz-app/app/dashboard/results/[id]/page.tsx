@@ -27,8 +27,10 @@ import {
 } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { useUser, useAuth } from "@clerk/nextjs";
-import { ArchiveBook } from "iconsax-reactjs";
+import { authClient } from "@/auth-client";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { LibraryIcon } from "@hugeicons/core-free-icons";
+
 
 import { MarkdownRenderer } from "@/components/quiz-render/MarkdownRender";
 
@@ -65,7 +67,10 @@ export default function ResultViewPage(): React.JSX.Element | null {
   const [result, setResult] = useState<QuizResult | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
-  const { user, isLoaded } = useUser();
+  const { data: session, isPending: isSessionLoading } = authClient.useSession();
+  const user = session?.user;
+  const isLoaded = !isSessionLoading;
+
   const router = useRouter();
   const { id } = useParams();
 
@@ -308,7 +313,7 @@ export default function ResultViewPage(): React.JSX.Element | null {
         <section className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <ArchiveBook className="h-5 w-5 text-zinc-600 dark:text-zinc-300" />
+              <HugeiconsIcon icon={LibraryIcon} size={20} className="text-zinc-600 dark:text-zinc-300" />
               <div>
                 <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
                   Question Review

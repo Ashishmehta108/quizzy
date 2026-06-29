@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import {
-  users,
+  user as userTable,
   quizzes,
   questions,
   results,
@@ -25,14 +25,15 @@ async function seed() {
   const billingId = randomUUID();
   const workspaceId = randomUUID();
 
-  await db.delete(users).where(eq(users.email, "john@example.com"));
+  await db.delete(userTable).where(eq(userTable.email, "john@example.com"));
 
-  await db.insert(users).values({
+  await db.insert(userTable).values({
     id: userId,
-    clerkId: "user_" + randomUUID(),
     name: "John Doe",
     email: "john@example.com",
-    role: "user",
+    emailVerified: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   });
 
   await db.insert(workspaces).values({

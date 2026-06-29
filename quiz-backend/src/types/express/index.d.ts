@@ -1,10 +1,11 @@
 import "express";
-import { User } from "@clerk/express";
+import { GetUser } from "../config/db/schema";
 
 declare global {
   namespace Express {
     interface Request {
-      auth?: { userId: string };
+      betterAuthUser?: { id: string; email: string; name: string; emailVerified: boolean; image?: string | null; createdAt: Date; updatedAt: Date };
+      user?: GetUser;
       file?: Express.Multer.File;
     }
   }

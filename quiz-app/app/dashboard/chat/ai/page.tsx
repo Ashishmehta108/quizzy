@@ -26,7 +26,7 @@ export default function ChatAIPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-900 py-8 px-4">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#111113] py-8 px-4">
       <div className="max-w-3xl mx-auto">
         <Card>
           <CardHeader>

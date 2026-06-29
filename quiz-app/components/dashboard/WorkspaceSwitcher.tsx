@@ -158,17 +158,18 @@ export default function WorkspaceSwitcher() {
               "flex items-center justify-between cursor-pointer",
               "rounded-md px-2 py-1.5 text-xs",
               "text-neutral-500 dark:text-neutral-400",
-              "aria-selected:bg-neutral-50 dark:aria-selected:bg-neutral-800/60",
-              "aria-selected:text-neutral-700 dark:aria-selected:text-neutral-300",
-              "hover:bg-neutral-50 dark:hover:bg-neutral-800/60",
-              "hover:text-neutral-700 dark:hover:text-neutral-300",
+              "aria-selected:bg-neutral-100 dark:aria-selected:bg-neutral-800/60",
+              "aria-selected:text-neutral-800 dark:aria-selected:text-neutral-300",
+              "hover:bg-neutral-100 dark:hover:bg-neutral-800/60",
+              "hover:text-neutral-800 dark:hover:text-neutral-300",
               "transition-colors duration-100",
-              isActive && "text-neutral-800 dark:text-neutral-200 font-medium"
+              isActive &&
+                "bg-[#1B2B4B]/10 dark:bg-[#1B2B4B] aria-selected:bg-[#1B2B4B]/10 dark:aria-selected:bg-[#1B2B4B] text-[#1B2B4B] dark:text-white font-medium"
             )}
           >
             <span className="truncate">{workspace.name}</span>
             {isActive && (
-              <Check className="h-3 w-3 shrink-0 text-[#1B2B4B] dark:text-neutral-400 ml-2" />
+              <Check className="h-3 w-3 shrink-0 text-[#1B2B4B] dark:text-white ml-2" />
             )}
           </CommandItem>
         );
@@ -188,8 +189,8 @@ export default function WorkspaceSwitcher() {
         "cursor-pointer rounded-md px-2 py-1.5 text-xs",
         "text-neutral-400 dark:text-neutral-500",
         "hover:text-neutral-700 dark:hover:text-neutral-300",
-        "hover:bg-neutral-50 dark:hover:bg-neutral-800/60",
-        "aria-selected:bg-neutral-50 dark:aria-selected:bg-neutral-800/60",
+        "hover:bg-neutral-100 dark:hover:bg-neutral-800/60",
+        "aria-selected:bg-neutral-100 dark:aria-selected:bg-neutral-800/60",
         "transition-colors duration-100"
       )}
     >

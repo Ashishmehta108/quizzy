@@ -1,31 +1,32 @@
 import { db } from "../config/db/index";
-import { results, users } from "../config/db/schema";
+import { results, user as userTable } from "../config/db/schema";
 import { and, eq, gte, sql } from "drizzle-orm";
 import { Request, Response } from "express";
-export const quizzesThisMonth = async (req: Request, res: Response) => {
-  const userId = req.auth?.userId;
 
-  if (!userId) {
+export const quizzesThisMonth = async (req: Request, res: Response) => {
+  const authUser = (req as any).betterAuthUser;
+
+  if (!authUser?.id) {
     throw new Error("Unauthorized");
   }
 
   const [data] = await db
     .select({
-      userId: users.id,
-      name: users.name,
+      userId: userTable.id,
+      name: userTable.name,
       quizzesCompletedThisMonth: sql<number>`COUNT(${results.id})`,
     })
-    .from(users)
-    .where(eq(users.clerkId, userId))
+    .from(userTable)
+    .where(eq(userTable.id, authUser.id))
     .leftJoin(
       results,
       and(
-        eq(users.id, results.userId),
+        eq(userTable.id, results.userId),
         gte(results.submittedAt, sql`date_trunc('month', now())`)
       )
     );
 
   return (
-    data.quizzesCompletedThisMonth ?? { userId, quizzesCompletedThisMonth: 0 }
-  );
+    data.quizzesCompletedThisMonth ?? { userId: authUser.id, quizzesCompletedThisMonth: 0 }
+);
 };

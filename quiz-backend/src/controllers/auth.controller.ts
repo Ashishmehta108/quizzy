@@ -1,38 +1,36 @@
 import { db } from "../config/db";
-import { users, plans, billings, usage, workspaces, workspaceMembers } from "../config/db/schema";
+import { user, plans, billings, usage, workspaces, workspaceMembers } from "../config/db/schema";
 import { eq } from "drizzle-orm";
 import { Request, Response, NextFunction } from "express";
 import { randomUUID } from "node:crypto";
-import { clerkClient } from "../config/clerk/clerk";
 import { ApiError } from "../utils/apiError";
+import { auth } from "../auth";
+import { fromNodeHeaders } from "better-auth/node";
 
 const syncUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log(req.auth?.userId);
-    const userId = req.auth?.userId || req.body.auth?.userId;
-    if (!userId) throw new ApiError(401, "Unauthorized: User ID not provided");
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(req.headers),
+    });
 
-    let [user] = await db.select().from(users).where(eq(users.clerkId, userId));
+    if (!session || !session.user) {
+      throw new ApiError(401, "Unauthorized: No active session found");
+    }
 
-    if (!user) {
-      let clerkUser;
+    const userId = session.user.id;
+
+    let [dbUser] = await db.select().from(user).where(eq(user.id, userId));
+
+    if (!dbUser) {
       try {
-        clerkUser = await clerkClient.users.getUser(userId);
-      } catch {
-        clerkUser = null;
-      }
-
-      const email = clerkUser?.emailAddresses?.[0]?.emailAddress;
-      const name = clerkUser?.firstName || email?.split("@")[0] || "Anonymous";
-
-      try {
-        [user] = await db
-          .insert(users)
+        [dbUser] = await db
+          .insert(user)
           .values({
-            id: randomUUID(),
-            clerkId: userId,
-            email: email || "",
-            name,
+            id: userId,
+            email: session.user.email,
+            name: session.user.name || "Anonymous",
+            emailVerified: session.user.emailVerified || false,
+            image: session.user.image,
             createdAt: new Date(),
             updatedAt: new Date(),
             apiKey: randomUUID().replace(/-/g, ""),
@@ -45,6 +43,22 @@ const syncUser = async (req: Request, res: Response, next: NextFunction) => {
           `Failed to create user record: ${error.message}`
         );
       }
+    } else if (!dbUser.apiKey) {
+      try {
+        [dbUser] = await db
+          .update(user)
+          .set({
+            apiKey: randomUUID().replace(/-/g, ""),
+            apiKeyLastRotatedAt: new Date(),
+          })
+          .where(eq(user.id, userId))
+          .returning();
+      } catch (error: any) {
+        throw new ApiError(
+          500,
+          `Failed to initialize API key: ${error.message}`
+        );
+      }
     }
 
     let billingCreated = false;
@@ -53,12 +67,12 @@ const syncUser = async (req: Request, res: Response, next: NextFunction) => {
     let userWorkspaces = await db
       .select()
       .from(workspaceMembers)
-      .where(eq(workspaceMembers.userId, user.id));
+      .where(eq(workspaceMembers.userId, dbUser.id));
 
     if (userWorkspaces.length === 0) {
       // Create a default Personal Workspace
       const workspaceId = randomUUID();
-      const workspaceName = `${user.name}'s Workspace`;
+      const workspaceName = `${dbUser.name}'s Workspace`;
       const slug = workspaceName.toLowerCase().replace(/[^a-z0-9]/g, "-") + "-" + randomUUID().substring(0, 5);
 
       await db.insert(workspaces).values({
@@ -72,7 +86,7 @@ const syncUser = async (req: Request, res: Response, next: NextFunction) => {
       await db.insert(workspaceMembers).values({
         id: randomUUID(),
         workspaceId,
-        userId: user.id,
+        userId: dbUser.id,
         role: "owner",
         joinedAt: new Date(),
       });
@@ -88,7 +102,7 @@ const syncUser = async (req: Request, res: Response, next: NextFunction) => {
         const billingId = randomUUID();
         await db.insert(billings).values({
           id: billingId,
-          userId: user.id,
+          userId: dbUser.id,
           workspaceId,
           planId: freePlan.id,
           startDate: new Date(),
@@ -115,11 +129,11 @@ const syncUser = async (req: Request, res: Response, next: NextFunction) => {
 
     res.json({
       user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        createdAt: user.createdAt,
-        apiKey: user.apiKey,
+        id: dbUser.id,
+        name: dbUser.name,
+        email: dbUser.email,
+        createdAt: dbUser.createdAt,
+        apiKey: dbUser.apiKey,
       },
       billingCreated,
     });
@@ -129,7 +143,6 @@ const syncUser = async (req: Request, res: Response, next: NextFunction) => {
     const message =
       error instanceof ApiError ? error.message : "Internal server error";
 
-    // Respond safely without console logging the error
     res.status(status).json({ message });
   }
 };
