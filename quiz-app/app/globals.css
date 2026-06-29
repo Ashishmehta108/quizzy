@@ -47,7 +47,7 @@
   .dark {
     --background: 240 5% 10%; /* zinc-900 */
     --foreground: 240 5% 96%; /* zinc-100 */
-    --sidebar: #18181b;
+    --sidebar: #111113;
     --card: 240 5% 10%;
     --card-foreground: 240 5% 96%;
 

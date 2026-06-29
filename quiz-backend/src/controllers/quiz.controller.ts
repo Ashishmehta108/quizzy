@@ -2,7 +2,7 @@ import { db } from "../config/db";
 import {
   quizzes,
   questions,
-  users,
+  user as userTable,
   usage,
   billings,
   documents,
@@ -15,7 +15,6 @@ import { upsertChunks } from "../ai/pinecone";
 import { chunkText } from "../utils/chunk";
 import fs from "fs/promises";
 import { Response, Request } from "express";
-import type { InferSelectModel } from "drizzle-orm";
 import { Readable } from "stream";
 import { QuizRequest, QuizResponse } from "../types/routes/quiz";
 import extractTextFromImage from "../utils/ocr";
@@ -49,8 +48,6 @@ export interface FileRequest extends Request {
   };
 }
 
-type User = InferSelectModel<typeof users>;
-
 interface QuizQuestion {
   question: string;
   options: string[];
@@ -78,8 +75,9 @@ export const createQuiz = asyncHandler(
       const websearch = req.body.webSearch === "true";
       const socketId = req.body.socketId;
       const description = req.body.description || "No description provided";
-      const userId = req.auth?.userId;
-      if (!userId) throw new ApiError(401, "Unauthorized: userId missing");
+
+      const authUser = (req as any).betterAuthUser;
+      if (!authUser?.id) throw new ApiError(401, "Unauthorized: userId missing");
 
       const workspaceId = req.headers["x-workspace-id"] as string;
       if (!workspaceId) throw new ApiError(400, "Workspace ID is required");
@@ -91,20 +89,13 @@ export const createQuiz = asyncHandler(
 
       emitUpdate(socketId, "status", "Creating quiz request recieved ");
 
-      const [getUser] = await db
-        .select()
-        .from(users)
-        .where(eq(users.clerkId, userId));
-
-      if (!getUser?.id) throw new ApiError(401, "User not found");
-
       const { title, query } = req.body;
       if (!title) throw new ApiError(400, "Title is required");
 
       const existingQuiz = await db
         .select()
         .from(quizzes)
-        .where(and(eq(quizzes.title, title), eq(quizzes.userId, getUser.id)));
+        .where(and(eq(quizzes.title, title), eq(quizzes.userId, authUser.id)));
 
       if (existingQuiz.length > 0) {
         emitUpdate(socketId, "status", "Quiz with this title already exists");
@@ -128,15 +119,15 @@ export const createQuiz = asyncHandler(
           docIds.push(documentId);
 
           if (fileType === "application/pdf") {
-            fullDoc += await processPdf(filePath, getUser.id, documentId, file);
+            fullDoc += await processPdf(filePath, authUser.id, documentId, file);
           } else if (fileType === "text/plain") {
             const buffer = await fs.readFile(filePath);
             const chunks = chunkText(buffer.toString(), 1000, 100);
-            await upsertChunks(getUser.id, documentId, chunks);
+            await upsertChunks(authUser.id, documentId, chunks);
             await db.insert(documents).values({
               id: documentId,
               title,
-              userId: getUser.id,
+              userId: authUser.id,
               content: chunks.map((c) => c.text).join(" "),
               uploadUrl: "",
               createdAt: new Date(),
@@ -147,11 +138,11 @@ export const createQuiz = asyncHandler(
           ) {
             const data = await extractTextFromImage(filePath);
             const chunks = chunkText(data, 1000, 100);
-            await upsertChunks(getUser.id, documentId, chunks);
+            await upsertChunks(authUser.id, documentId, chunks);
             await db.insert(documents).values({
               id: documentId,
               title,
-              userId: getUser.id,
+              userId: authUser.id,
               content: chunks.map((c) => c.text).join(" "),
               uploadUrl: "",
               createdAt: new Date(),
@@ -171,7 +162,7 @@ export const createQuiz = asyncHandler(
         { input: { title, query }, usage: { webSearchesDone: 0 } },
         {
           configurable: {
-            userId: getUser.id,
+            userId: authUser.id,
             docIds,
             websearchOn: websearch,
           },
@@ -187,7 +178,7 @@ export const createQuiz = asyncHandler(
       const [billing] = await db
         .select()
         .from(billings)
-        .where(eq(billings.userId, getUser.id))
+        .where(eq(billings.userId, authUser.id))
         .limit(1);
 
       const [currentUsage] = await db
@@ -210,7 +201,7 @@ export const createQuiz = asyncHandler(
       await db.insert(quizzes).values({
         id: quizId,
         title,
-        userId: getUser.id,
+        userId: authUser.id,
         createdAt: new Date(),
         submitted: false,
         description,
@@ -260,33 +251,33 @@ export const createQuiz = asyncHandler(
 
 export const getQuizzes = async (req: QuizRequest, res: QuizResponse) => {
   try {
-    const userId = req.auth?.userId!;
-    console.log("userid is here",userId)
-    let rslts = [];
-    const [user]: User[] = await db
-      .select()
-      .from(users)
-      .where(eq(users.clerkId, userId));
-console.log(user)
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+    const authUser = (req as any).betterAuthUser;
+    if (!authUser?.id) {
+      return res.status(401).json({ error: "Unauthorized" });
     }
+
+    console.log("userid is here", authUser.id);
+    let rslts = [];
 
     const userQuizzes = await db
       .select()
       .from(quizzes)
-      .where(eq(quizzes.userId, user.id))
+      .where(eq(quizzes.userId, authUser.id))
       .execute();
+
     if (userQuizzes.length === 0) {
       return res.json([]);
     }
+
     const r = await db
       .select()
       .from(results)
-      .where(eq(results.userId, user.id));
+      .where(eq(results.userId, authUser.id));
+
     if (!r.length) {
       rslts = [];
     }
+
     const quizzesWithQuestions = await Promise.all(
       userQuizzes.map(async (quiz) => {
         const questionsList = await db
@@ -296,23 +287,7 @@ console.log(user)
 
         return {
           ...quiz,
-          /*parameter) quiz: {
-    id: string;
-    title: string;
-    userId: string | null;
-    createdAt: Date;
-    submitted: boolean;
-}*/
-          questions: questionsList /*const questionsList: {
-    id: string;
-    quizId: string | null;
-    question: string;
-    options: string;
-    answer: number;
-    createdAt: Date;
-    submittedAt: Date;
-    explanation: string;
-}[] */,
+          questions: questionsList,
           resultId: r.find((result) => result.quizId === quiz.id)?.id || "",
         };
       })

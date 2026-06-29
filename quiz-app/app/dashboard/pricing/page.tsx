@@ -14,7 +14,8 @@ import {
   CardDescription,
   CardFooter,
 } from "@/components/ui/card";
-import { Check, Zap, Mail } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Tick02Icon, FlashIcon, Mail01Icon } from "@hugeicons/core-free-icons";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -54,7 +55,7 @@ function PricingSkeleton() {
 function FeatureItem({ label }: { label: string }) {
   return (
     <li className="flex items-center gap-2.5 text-sm text-neutral-600 dark:text-zinc-400">
-      <Check className="h-3.5 w-3.5 text-neutral-400 dark:text-zinc-500 flex-shrink-0" />
+      <HugeiconsIcon icon={Tick02Icon} size={14} className="text-[#1B2B4B] dark:text-indigo-400 flex-shrink-0" />
       {label}
     </li>
   );
@@ -93,7 +94,7 @@ function PlanCard({
       {isPro && (
         <div className="absolute -top-2.5 left-5">
           <Badge className="bg-[#1B2B4B] dark:bg-[#1B2B4B] text-white hover:bg-[#1B2B4B] px-2 py-0 text-[10px] font-medium tracking-wide gap-1 rounded-sm h-5">
-            <Zap className="h-2.5 w-2.5" />
+            <HugeiconsIcon icon={FlashIcon} size={10} />
             Popular
           </Badge>
         </div>
@@ -170,7 +171,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-zinc-950">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#111113]">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14 sm:py-20 space-y-10">
 
         {/* Header */}
@@ -211,7 +212,7 @@ export default function PricingPage() {
             variant="ghost"
             className="flex-shrink-0 h-8 text-xs border border-neutral-200 dark:border-zinc-700/80 text-neutral-600 dark:text-zinc-400 hover:bg-neutral-100/60 dark:hover:bg-zinc-800/60 hover:text-neutral-900 dark:hover:text-zinc-200 gap-1.5 rounded-md px-3"
           >
-            <Mail className="h-3.5 w-3.5" />
+            <HugeiconsIcon icon={Mail01Icon} size={14} />
             Contact Sales
           </Button>
         </div>

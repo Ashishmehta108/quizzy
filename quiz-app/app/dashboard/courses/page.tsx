@@ -17,15 +17,16 @@ import { toast } from "sonner";
 import api from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  Plus,
-  Users,
-  MoreHorizontal,
-  ChevronRight,
-  Search,
-  BookMarked,
-  Layers,
-} from "lucide-react";
+  PlusSignIcon,
+  UserMultipleIcon,
+  MoreHorizontalIcon,
+  ArrowRight01Icon,
+  Search01Icon,
+  Book02Icon,
+  Layers01Icon,
+} from "@hugeicons/core-free-icons";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -74,14 +75,14 @@ function CourseCard({
           <div className="flex items-start justify-between gap-2 mb-3">
             {/* Icon tile */}
             <div className="w-8 h-8 rounded-md border border-neutral-200 dark:border-zinc-800 bg-neutral-50 dark:bg-zinc-800/60 flex items-center justify-center flex-shrink-0">
-              <BookMarked className="h-3.5 w-3.5 text-neutral-400 dark:text-zinc-500" />
+              <HugeiconsIcon icon={Book02Icon} size={14} className="text-neutral-400 dark:text-zinc-500" />
             </div>
             <Button
               variant="ghost"
               size="icon"
               className="h-7 w-7 rounded-md opacity-0 group-hover:opacity-100 transition-opacity text-neutral-400 hover:text-neutral-700 dark:hover:text-zinc-200"
             >
-              <MoreHorizontal className="h-3.5 w-3.5" />
+              <HugeiconsIcon icon={MoreHorizontalIcon} size={14} />
             </Button>
           </div>
 
@@ -101,7 +102,7 @@ function CourseCard({
             onClick={() => onView(course.id)}
           >
             View course
-            <ChevronRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-0.5" />
+            <HugeiconsIcon icon={ArrowRight01Icon} size={12} className="transition-transform group-hover/btn:translate-x-0.5" />
           </Button>
         </CardContent>
       </Card>
@@ -128,7 +129,7 @@ function EmptyState({
     >
       <div className="flex flex-col items-center justify-center py-20 px-8 rounded-lg border border-dashed border-neutral-200 dark:border-zinc-800 bg-neutral-50/40 dark:bg-zinc-900/30 text-center">
         <div className="mb-4 w-9 h-9 rounded-lg bg-white dark:bg-zinc-900 border border-neutral-200 dark:border-zinc-800 flex items-center justify-center shadow-sm">
-          <BookMarked className="h-4 w-4 text-neutral-400 dark:text-zinc-500" />
+          <HugeiconsIcon icon={Book02Icon} size={16} className="text-neutral-400 dark:text-zinc-500" />
         </div>
         <p className="text-sm font-medium text-neutral-900 dark:text-zinc-100 mb-1">
           {searchQuery ? "No courses match your search" : "No courses yet"}
@@ -154,7 +155,7 @@ function EmptyState({
             className="mt-4 h-8 px-3 text-xs rounded-md border-neutral-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-neutral-600 dark:text-zinc-400 hover:bg-neutral-50 dark:hover:bg-zinc-800 hover:text-neutral-900 dark:hover:text-zinc-200 gap-1.5 font-medium"
             onClick={onCreate}
           >
-            <Plus className="h-3.5 w-3.5" />
+            <HugeiconsIcon icon={PlusSignIcon} size={14} />
             New Course
           </Button>
         )}
@@ -207,7 +208,8 @@ function CreateCourseDialog({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Intro to Machine Learning"
-              className="h-9 rounded-md text-sm border-neutral-200 dark:border-zinc-700 bg-white dark:bg-zinc-900   dark:focus-visible:ring-zinc-600"
+              className="h-9 rounded-md text-sm border-neutral-200 dark:border-zinc-700 bg-neutral-50 dark:bg-zinc-800/50 text-neutral-900 dark:text-zinc-100 placeholder:text-neutral-300 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#1B2B4B]/30 focus-visible:border-[#1B2B4B]/40 dark:focus-visible:ring-zinc-500 dark:focus-visible:border-zinc-600 transition-colors"
+              autoFocus
             />
           </div>
           <div className="space-y-1.5">
@@ -221,7 +223,7 @@ function CreateCourseDialog({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What will students learn in this course?"
-              className="min-h-[100px] rounded-md text-sm border-neutral-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 dark:focus-visible:ring-zinc-600 resize-none"
+              className="min-h-[100px] rounded-md text-sm border-neutral-200 dark:border-zinc-700 bg-neutral-50 dark:bg-zinc-800/50 text-neutral-900 dark:text-zinc-100 placeholder:text-neutral-300 dark:placeholder:text-zinc-600 focus-visible:ring-1 focus-visible:ring-[#1B2B4B]/30 focus-visible:border-[#1B2B4B]/40 dark:focus-visible:ring-zinc-500 dark:focus-visible:border-zinc-600 transition-colors resize-none"
             />
           </div>
         </div>
@@ -238,7 +240,7 @@ function CreateCourseDialog({
           </Button>
           <Button
             size="sm"
-            className="h-8 px-4 text-xs rounded-md bg-blue-500 hover:bg-blue-600 text-white border-0 disabled:opacity-50"
+            className="h-8 px-4 text-xs rounded-md bg-[#1B2B4B] hover:bg-[#162240] text-white border-0 disabled:opacity-50"
             disabled={isPending || !name.trim()}
             onClick={onSubmit}
           >
@@ -314,14 +316,14 @@ export default function CoursesPage() {
   );
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#111113]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-neutral-200/60 dark:border-zinc-800/60">
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 mb-2">
-              <Layers className="h-3.5 w-3.5 text-neutral-400 dark:text-zinc-500" />
+              <HugeiconsIcon icon={Layers01Icon} size={14} className="text-neutral-400 dark:text-zinc-500" />
               <span className="text-[11px] uppercase tracking-widest font-medium text-neutral-400 dark:text-zinc-500">
                 Learning Center
               </span>
@@ -341,7 +343,7 @@ export default function CoursesPage() {
               className="h-8 px-3 text-xs rounded-md border-neutral-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-neutral-600 dark:text-zinc-400 hover:bg-neutral-50 dark:hover:bg-zinc-800 gap-1.5 font-medium"
               onClick={() => setShowCohortDialog(true)}
             >
-              <Users className="h-3.5 w-3.5" />
+              <HugeiconsIcon icon={UserMultipleIcon} size={14} />
               New Cohort
             </Button>
             <Button
@@ -349,7 +351,7 @@ export default function CoursesPage() {
               className="h-8 px-3 text-xs rounded-md bg-[#1B2B4B] hover:bg-[#162240] text-white border-0 gap-1.5 font-medium"
               onClick={() => setShowCourseDialog(true)}
             >
-              <Plus className="h-3.5 w-3.5" />
+              <HugeiconsIcon icon={PlusSignIcon} size={14} />
               New Course
             </Button>
           </div>
@@ -358,7 +360,7 @@ export default function CoursesPage() {
         {/* Toolbar */}
         <div className="flex items-center justify-between gap-3">
           <div className="relative max-w-xs w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-neutral-400" />
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"><HugeiconsIcon icon={Search01Icon} size={14} /></span>
             <Input
               placeholder="Search courses..."
               className="pl-9 h-8 text-xs rounded-md border-neutral-200 dark:border-zinc-700/80 bg-white dark:bg-zinc-900 focus-visible:ring-1 focus-visible:ring-neutral-300 dark:focus-visible:ring-zinc-600 placeholder:text-neutral-400"

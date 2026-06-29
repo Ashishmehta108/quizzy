@@ -6,8 +6,9 @@ import { useSocket } from "@/app/context/socket.context";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { BACKEND_URL } from "@/lib/constants";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { authClient } from "@/auth-client";
 import { motion } from "framer-motion";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -15,7 +16,9 @@ import { MarkdownRenderer } from "@/components/quiz-render/MarkdownRender";
 import EmptyState from "@/components/Empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import aira from "@/public/aira.jpg";
-import { MessageSquare, Send2 } from "iconsax-reactjs";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ChatBotIcon, Sent02Icon } from "@hugeicons/core-free-icons";
+import { makeIcon } from "@/components/ui/hugeicon";
 import { AutoResizeTextarea } from "@/components/followups/AutoResize";
 import { v4 as uuidv4 } from "uuid";
 
@@ -36,7 +39,8 @@ interface QuizQuestion {
 }
 
 function FollowUpMessage({ content, role, createdAt }: Message) {
-  const { user } = useUser();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
   const isUser = role === "user";
   const timestamp = createdAt
     ? new Date(createdAt).toLocaleTimeString([], {
@@ -91,12 +95,13 @@ function FollowUpMessage({ content, role, createdAt }: Message) {
           <AvatarFallback className="bg-zinc-700 text-zinc-100 text-xs">
             U
           </AvatarFallback>
-          <AvatarImage src={user?.imageUrl} />
+          <AvatarImage src={user?.image} />
         </Avatar>
       )}
     </motion.div>
   );
 }
+
 
 export default function QuizChatPage() {
   const { id: quizId } = useParams();
@@ -114,7 +119,11 @@ export default function QuizChatPage() {
   const [showQuestions, setShowQuestions] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const { userId, isLoaded } = useAuth();
+  const { data: session, isPending: isSessionLoading } = authClient.useSession();
+  const userId = session?.user?.id;
+  const isLoaded = !isSessionLoading;
+
+
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -291,7 +300,7 @@ export default function QuizChatPage() {
           </div>
         ) : messages.length === 0 && !isTyping ? (
           <EmptyState
-            icon={MessageSquare}
+            icon={makeIcon(ChatBotIcon)}
             title="No messages yet"
             description="Start the conversation by asking a question about this quiz."
             action={
@@ -438,7 +447,7 @@ export default function QuizChatPage() {
             {loading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Send2 className="h-4 w-4" />
+              <HugeiconsIcon icon={Sent02Icon} size={16} />
             )}
           </Button>
         </div>

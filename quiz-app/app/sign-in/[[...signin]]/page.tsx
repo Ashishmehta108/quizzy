@@ -1,12 +1,16 @@
 import LoginPage from "@/app/(auth)/login/page";
-import { SignIn } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
-  const { userId } = await auth()
-  if (userId) {
+  const cookieStore = await cookies();
+  const token =
+    cookieStore.get("better-auth.session_token")?.value ||
+    cookieStore.get("__Secure-better-auth.session_token")?.value;
+
+  if (token) {
     return redirect("/dashboard");
   }
   return <LoginPage />;
 }
+

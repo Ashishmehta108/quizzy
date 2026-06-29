@@ -20,12 +20,48 @@ export default function ScoreDistributionChart() {
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <AreaChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-        <XAxis dataKey="range" fontSize={12} />
-        <YAxis fontSize={12} />
-        <ReTooltip />
-        <Area type="monotone" dataKey="count" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.1} />
+      <AreaChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+        <defs>
+          <linearGradient id="distFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#6366f1" stopOpacity={0.25} />
+            <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid
+          strokeDasharray="3 3"
+          vertical={false}
+          stroke="currentColor"
+          className="opacity-[0.12] text-zinc-400 dark:text-zinc-600"
+        />
+        <XAxis
+          dataKey="range"
+          fontSize={11}
+          axisLine={false}
+          tickLine={false}
+          className="text-zinc-400 dark:text-zinc-500"
+        />
+        <YAxis
+          fontSize={11}
+          axisLine={false}
+          tickLine={false}
+          width={36}
+          className="text-zinc-400 dark:text-zinc-500"
+        />
+        <ReTooltip
+          contentStyle={{
+            borderRadius: 12,
+            border: "1px solid rgba(161,161,170,0.25)",
+            fontSize: 12,
+          }}
+        />
+        <Area
+          type="monotone"
+          dataKey="count"
+          stroke="#6366f1"
+          strokeWidth={2}
+          fill="url(#distFill)"
+          dot={false}
+        />
       </AreaChart>
     </ResponsiveContainer>
   );

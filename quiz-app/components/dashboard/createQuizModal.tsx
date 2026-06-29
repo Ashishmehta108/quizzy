@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Add } from "iconsax-reactjs";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { PlusSignIcon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,7 +22,7 @@ export default function CreateQuizModal() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 shadow-sm ring-1 ring-zinc-900/10 dark:ring-zinc-100/10 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible  :ring-zinc-100">
-          <Add size="18" className="mr-2" />
+          <HugeiconsIcon icon={PlusSignIcon} size={18} className="mr-2" />
           Create Quiz
         </Button>
       </DialogTrigger>

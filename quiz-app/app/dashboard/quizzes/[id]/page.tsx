@@ -11,7 +11,8 @@ import api from "@/lib/api";
 import type { QuizResponse, Result } from "@/lib/types";
 import Link from "next/link";
 import { MarkdownRenderer } from "@/components/quiz-render/MarkdownRender";
-import { useUser } from "@clerk/nextjs";
+import { authClient } from "@/auth-client";
+
 
 interface QuestionCardProps {
   question: Question;
@@ -173,8 +174,11 @@ export default function TakeQuizPage({
   const [result, setResult] = useState<Result | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
-  const { user, isLoaded } = useUser();
+  const { data: session, isPending: isSessionLoading } = authClient.useSession();
+  const user = session?.user;
+  const isLoaded = !isSessionLoading;
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+
 
   const router = useRouter();
 

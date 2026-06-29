@@ -7,7 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ArchiveBook, TableDocument, Add, Notepad2 } from "iconsax-reactjs";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  LibraryIcon,
+  CheckListIcon,
+  PlusSignIcon,
+  NoteEditIcon,
+} from "@hugeicons/core-free-icons";
+import { makeIcon } from "@/components/ui/hugeicon";
 import {
   Trophy,
   CheckCircle2 as CheckCircle,
@@ -30,9 +37,11 @@ import EmptyState from "@/components/Empty";
 import UsageWidget from "@/components/dashboard/UsageWidget";
 import { useActivityData } from "@/hooks/useUtility";
 import ActivityChart from "@/components/dashboard/activityWidget";
+import ActivityStreak from "@/components/dashboard/ActivityStreak";
 import CreateQuizModal from "@/components/dashboard/createQuizModal";
 import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
-import { useUser } from "@clerk/nextjs";
+import { authClient } from "@/auth-client";
+
 
 interface StatCardProps {
   title: string;
@@ -54,38 +63,38 @@ const StatCard = ({
   progress,
 }: StatCardProps) => {
   return (
-    <div className="bg-[#111113] border border-[#23252a] rounded-xl p-5 flex flex-col gap-4">
+    <div className="bg-white border border-zinc-200 dark:bg-[#111113] dark:border-[#23252a] rounded-xl p-5 flex flex-col gap-4">
       <div className="flex items-start justify-between gap-4">
-        <p className="text-xs font-medium text-[#8a8f98] tracking-wide uppercase">
+        <p className="text-xs font-medium text-zinc-500 dark:text-[#8a8f98] tracking-wide uppercase">
           {title}
         </p>
-        <div className="w-8 h-8 rounded-md bg-[#1a1a1f] border border-[#23252a] flex items-center justify-center shrink-0">
-          <Icon size={14} className="text-[#8a8f98]" />
+        <div className="w-8 h-8 rounded-md bg-zinc-100 border border-zinc-200 dark:bg-[#1a1a1f] dark:border-[#23252a] flex items-center justify-center shrink-0">
+          <Icon size={14} className="text-zinc-500 dark:text-[#8a8f98]" />
         </div>
       </div>
 
       <div className="flex items-baseline gap-2 flex-wrap">
-        <p className="text-2xl font-semibold text-[#f7f8f8] tracking-tight">
+        <p className="text-2xl font-semibold text-zinc-900 dark:text-[#f7f8f8] tracking-tight">
           {value}
         </p>
         {trend && (
-          <span className="text-[10px] bg-[#1a1a1f] text-[#8a8f98] border border-[#23252a] rounded-full px-2 py-0.5">
+          <span className="text-[10px] bg-zinc-100 text-zinc-500 border border-zinc-200 dark:bg-[#1a1a1f] dark:text-[#8a8f98] dark:border-[#23252a] rounded-full px-2 py-0.5">
             {trend}
           </span>
         )}
       </div>
 
-      {subtitle && <p className="text-xs text-[#62666d] -mt-2">{subtitle}</p>}
+      {subtitle && <p className="text-xs text-zinc-400 dark:text-[#62666d] -mt-2">{subtitle}</p>}
 
       {progress !== undefined && (
         <div className="space-y-1.5">
-          <div className="h-[3px] w-full bg-[#1a1a1f] rounded-full overflow-hidden">
+          <div className="h-[3px] w-full bg-zinc-100 dark:bg-[#1a1a1f] rounded-full overflow-hidden">
             <div
               className="h-full bg-[#5e6ad2] rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-[10px] text-[#62666d]">
+          <p className="text-[10px] text-zinc-400 dark:text-[#62666d]">
             {progress}% completion rate
           </p>
         </div>
@@ -114,7 +123,9 @@ const fetchQuizzesAndResults = async () => {
 export default function DashboardPage() {
   const router = useRouter();
   const { data: activityData } = useActivityData();
-  const { user } = useUser();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+
 
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => setIsMounted(true), []);
@@ -191,13 +202,13 @@ export default function DashboardPage() {
     );
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
+    <div className="flex-1 bg-zinc-50 dark:bg-[#111113]">
       <main className="max-w-7xl container mx-auto px-4 sm:px-6 lg:px-8 pb-12 pt-4 sm:pt-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-2">
-              Welcome back, {user?.firstName} 👋
+              Welcome back, {user?.name?.split(" ")[0]} 👋
             </h1>
             <p className="text-zinc-600 dark:text-zinc-400">
               Continue your learning journey today.
@@ -263,7 +274,16 @@ export default function DashboardPage() {
           />
         </div>
 
-        {activityData && <ActivityChart data={activityData} />}
+        <div className="flex flex-col lg:flex-row gap-4 mb-2">
+          <div className="flex-1 min-w-0">
+            <ActivityStreak data={activityData || []} />
+          </div>
+          {activityData && (
+            <div className="flex-1 min-w-0">
+              <ActivityChart data={activityData} />
+            </div>
+          )}
+        </div>
 
         {/* Usage Widget */}
         <div className="grid gap-6 mt-2 grid-cols-1 lg:grid-cols-2">
@@ -277,7 +297,7 @@ export default function DashboardPage() {
               value="quizzes"
               className="flex items-center gap-2 data-[state=active]:bg-zinc-100 data-[state=active]:text-zinc-900 dark:data-[state=active]:bg-zinc-800 dark:data-[state=active]:text-zinc-300 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-zinc-900/10 dark:data-[state=active]:ring-zinc-100/10 rounded-xl focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100"
             >
-              <ArchiveBook size="18" /> My Quizzes
+              <HugeiconsIcon icon={LibraryIcon} size={18} /> My Quizzes
               {stats.totalQuizzes > 0 && (
                 <Badge variant="secondary" className="ml-1 text-xs">
                   {stats.totalQuizzes}
@@ -288,7 +308,7 @@ export default function DashboardPage() {
               value="results"
               className="flex items-center gap-2 data-[state=active]:bg-zinc-900 data-[state=active]:text-white dark:data-[state=active]:bg-zinc-800 dark:data-[state=active]:text-zinc-300 data-[state=active]:shadow-sm data-[state=active]:ring-1 data-[state=active]:ring-zinc-900/10 dark:data-[state=active]:ring-zinc-100/10 rounded-xl focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100"
             >
-              <TableDocument size="18" /> Results
+              <HugeiconsIcon icon={CheckListIcon} size={18} /> Results
               {stats.totalResults > 0 && (
                 <Badge variant="secondary" className="ml-1 text-xs">
                   {stats.totalResults}
@@ -301,7 +321,7 @@ export default function DashboardPage() {
           <TabsContent value="quizzes" className="space-y-6">
             {stats.totalQuizzes === 0 ? (
               <EmptyState
-                icon={ArchiveBook}
+                icon={makeIcon(LibraryIcon)}
                 title="No quizzes yet"
                 description="Start creating engaging quizzes to test knowledge and track learning progress."
                 action={
@@ -310,7 +330,7 @@ export default function DashboardPage() {
                       size="lg"
                       className="bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 shadow-sm ring-1 ring-zinc-900/10 dark:ring-zinc-100/10 focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-zinc-100"
                     >
-                      <Add size="18" className="mr-2" /> Create Your First Quiz
+                      <HugeiconsIcon icon={PlusSignIcon} size={18} className="mr-2" /> Create Your First Quiz
                     </Button>
                   </Link>
                 }
@@ -326,7 +346,7 @@ export default function DashboardPage() {
           <TabsContent value="results" className="space-y-6">
             {stats.totalResults === 0 ? (
               <EmptyState
-                icon={Notepad2}
+                icon={makeIcon(NoteEditIcon)}
                 title="No results yet"
                 description="Take some quizzes to see your performance analytics and track your learning progress."
                 action={

@@ -6,7 +6,7 @@ import helmet from "helmet";
 import express, { NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import { clerkClient } from "./config/clerk/clerk";
+
 import { errorHandler } from "./middlewares/errorHanlder";
 import * as routes from "./routes";
 import {
@@ -18,7 +18,6 @@ import { auth } from "./auth";
 
 const app = express();
 
-// app.use(clerkMiddleware({ clerkClient }));
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -65,27 +64,21 @@ app.get("/api/me", async (req, res) => {
 
 app.get("/api/user", async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith("Bearer ")) {
-      return res.status(401).json({ error: "No token provided" });
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(req.headers),
+    });
+
+    if (!session || !session.user) {
+      return res.status(401).json({ error: "Unauthorized" });
     }
-    const token = authHeader.split(" ")[1];
-
-    const session = await clerkClient.sessions.getSession(token);
-
-    if (!session || !session.userId) {
-      return res.status(401).json({ error: "Invalid token" });
-    }
-
-    console.log("Verified session:", session);
 
     res.status(200).json({
       status: "OK",
-      userId: session.userId,
-      sessionId: session.id,
+      userId: session.user.id,
+      sessionId: session.session.id,
     });
   } catch (err) {
-    console.error("Token verification failed:", err);
+    console.error("Session verification failed:", err);
     res.status(401).json({ error: "Unauthorized" });
   }
 });

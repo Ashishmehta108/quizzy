@@ -22,12 +22,12 @@ quizRouter.get(
   checkAuth,
   async (req: QuizRequest, res: QuizResponse) => {
     const { id } = req.params;
-    const userId = req.auth?.userId;
+    const authUser = (req as any).betterAuthUser;
 
     if (!id) {
       return res.status(400).json({ error: "Quiz ID is required" });
     }
-    if (!userId) {
+    if (!authUser?.id) {
       return res.status(401).json({ error: "Unauthorized" });
     }
     const [quizRecord] = await db

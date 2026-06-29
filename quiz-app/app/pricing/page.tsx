@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@clerk/nextjs";
+import { authClient } from "@/auth-client";
 
 export default function PricingPage() {
   const router = useRouter();
   const [isAnnual, setIsAnnual] = useState(false);
-  const { userId } = useAuth();
+  const { data: session } = authClient.useSession();
+  const userId = session?.user?.id;
+
   
   const currentPlan = userId ? "Free" : null;
   

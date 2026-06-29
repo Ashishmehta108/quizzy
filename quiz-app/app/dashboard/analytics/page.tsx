@@ -6,35 +6,64 @@
 
 import React from "react";
 import { useWorkspaceContext } from "@/app/context/WorkspaceContext";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { TrendingUp, Users, ClipboardList, Target } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Analytics01Icon,
+  Target02Icon,
+  TradeUpIcon,
+  UserMultipleIcon,
+  ClipboardListIcon,
+} from "@hugeicons/core-free-icons";
 import dynamic from "next/dynamic";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
+import { BACKEND_URL } from "@/lib/constants";
 
-const PerformanceChart = dynamic(() => import("@/components/dashboard/analytics/PerformanceChart"), { 
-  ssr: false,
-  loading: () => <div className="h-full w-full bg-zinc-100 animate-pulse rounded-lg" />
-});
+const PerformanceChart = dynamic(
+  () => import("@/components/dashboard/analytics/PerformanceChart"),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-full w-full rounded-lg" />,
+  }
+);
 
-const ScoreDistributionChart = dynamic(() => import("@/components/dashboard/analytics/ScoreDistributionChart"), { 
-  ssr: false,
-  loading: () => <div className="h-full w-full bg-zinc-100 animate-pulse rounded-lg" />
-});
+const ScoreDistributionChart = dynamic(
+  () => import("@/components/dashboard/analytics/ScoreDistributionChart"),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-full w-full rounded-lg" />,
+  }
+);
+
+const STATS = [
+  { label: "Total Attempts", value: "124", icon: Target02Icon },
+  { label: "Avg. Score", value: "72%", icon: TradeUpIcon },
+  { label: "Active Students", value: "48", icon: UserMultipleIcon },
+  { label: "Assignments", value: "12", icon: ClipboardListIcon },
+];
 
 export default function AnalyticsPage() {
   const { activeWorkspace } = useWorkspaceContext();
 
-  const { data: analytics, isLoading } = useQuery({
+  const { isLoading } = useQuery({
     queryKey: ["analytics", activeWorkspace?.id],
     queryFn: async () => {
-      const { data } = await axios.get(`http://localhost:5000/api/analytics/overview`, {
+      const { data } = await axios.get(`${BACKEND_URL}/analytics/overview`, {
         headers: { "x-workspace-id": activeWorkspace?.id },
         withCredentials: true,
       });
       return data.data;
     },
     enabled: !!activeWorkspace?.id,
+    retry: false,
   });
 
   const mockData = [
@@ -45,56 +74,89 @@ export default function AnalyticsPage() {
     { name: "Quiz 5", avg: 70 },
   ];
 
-  if (isLoading) return <div className="p-8">Analyzing patterns...</div>;
-
   return (
-    <div className="p-4 sm:p-8 space-y-6 sm:space-y-8">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold">Analytics & Insights</h1>
-        <p className="text-sm sm:text-base text-zinc-500">Monitor student performance and engagement across the workspace.</p>
-      </div>
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#111113]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        {/* Header */}
+        <div className="space-y-1 pb-6 border-b border-neutral-200/60 dark:border-zinc-800/60">
+          <div className="flex items-center gap-1.5 mb-2">
+            <HugeiconsIcon
+              icon={Analytics01Icon}
+              size={14}
+              className="text-neutral-400 dark:text-zinc-500"
+            />
+            <span className="text-[11px] uppercase tracking-widest font-medium text-neutral-400 dark:text-zinc-500">
+              Insights
+            </span>
+          </div>
+          <h1 className="text-xl font-semibold tracking-tight text-neutral-900 dark:text-zinc-100">
+            Analytics
+          </h1>
+          <p className="text-sm text-neutral-500 dark:text-zinc-400">
+            Monitor student performance and engagement across the workspace.
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: "Total Attempts", value: "124", icon: Target, color: "text-blue-600", bg: "bg-blue-50" },
-          { label: "Avg. Score", value: "72%", icon: TrendingUp, color: "text-green-600", bg: "bg-green-50" },
-          { label: "Active Students", value: "48", icon: Users, color: "text-purple-600", bg: "bg-purple-50" },
-          { label: "Assignments", value: "12", icon: ClipboardList, color: "text-orange-600", bg: "bg-orange-50" },
-        ].map((stat, i) => (
-          <Card key={i}>
-            <CardContent className="p-6 flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-zinc-500">{stat.label}</p>
-                <h3 className="text-2xl font-bold mt-1">{stat.value}</h3>
-              </div>
-              <div className={`p-3 rounded-xl ${stat.bg}`}>
-                <stat.icon className={`h-6 w-6 ${stat.color}`} />
-              </div>
+        {/* Stat cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {isLoading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-[92px] rounded-xl" />
+              ))
+            : STATS.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="rounded-xl border border-neutral-200/70 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 p-5 flex items-start justify-between gap-3"
+                >
+                  <div>
+                    <p className="text-xs font-medium text-neutral-400 dark:text-zinc-500 tracking-wide uppercase">
+                      {stat.label}
+                    </p>
+                    <p className="text-2xl font-semibold text-neutral-900 dark:text-zinc-100 mt-2 tracking-tight">
+                      {stat.value}
+                    </p>
+                  </div>
+                  <span className="w-8 h-8 rounded-md bg-indigo-50 dark:bg-indigo-500/15 flex items-center justify-center flex-shrink-0">
+                    <HugeiconsIcon
+                      icon={stat.icon}
+                      size={15}
+                      className="text-indigo-500 dark:text-indigo-400"
+                    />
+                  </span>
+                </div>
+              ))}
+        </div>
+
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Card className="rounded-2xl border border-neutral-200/70 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 shadow-none">
+            <CardHeader className="p-5 pb-2">
+              <CardTitle className="text-sm font-semibold text-neutral-900 dark:text-zinc-100">
+                Performance Trends
+              </CardTitle>
+              <CardDescription className="text-xs text-neutral-400 dark:text-zinc-500">
+                Average scores across recent assessments
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="h-[280px] p-5 pt-2">
+              <PerformanceChart data={mockData} />
             </CardContent>
           </Card>
-        ))}
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Performance Trends</CardTitle>
-            <CardDescription>Average scores across recent assessments</CardDescription>
-          </CardHeader>
-          <CardContent className="h-[300px]">
-            <PerformanceChart data={mockData} />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Score Distribution</CardTitle>
-            <CardDescription>Frequency of scores in 20% intervals</CardDescription>
-          </CardHeader>
-          <CardContent className="h-[300px]">
-            <ScoreDistributionChart />
-          </CardContent>
-        </Card>
+          <Card className="rounded-2xl border border-neutral-200/70 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 shadow-none">
+            <CardHeader className="p-5 pb-2">
+              <CardTitle className="text-sm font-semibold text-neutral-900 dark:text-zinc-100">
+                Score Distribution
+              </CardTitle>
+              <CardDescription className="text-xs text-neutral-400 dark:text-zinc-500">
+                Frequency of scores in 20% intervals
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="h-[280px] p-5 pt-2">
+              <ScoreDistributionChart />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
